@@ -1,8 +1,8 @@
-package com.dokev.gold_dduck.event;
+package com.dokev.gold_dduck.event.domain;
 
 import com.dokev.gold_dduck.common.BaseEntity;
-import com.dokev.gold_dduck.gift.Gift;
-import com.dokev.gold_dduck.member.Member;
+import com.dokev.gold_dduck.gift.domain.Gift;
+import com.dokev.gold_dduck.member.domain.Member;
 import lombok.Getter;
 
 import javax.persistence.*;
@@ -10,6 +10,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.UUID;
 
 @Getter
 @Entity
@@ -29,6 +30,9 @@ public class Event extends BaseEntity {
 
     @Column(name = "end_at", columnDefinition = "TIMESTAMP")
     private LocalDateTime endAt;
+
+    @Column(name = "code", nullable = false)
+    private UUID code;
 
     @Enumerated(value = EnumType.STRING)
     @Column(name = "progress_status", nullable = false, length = 30)

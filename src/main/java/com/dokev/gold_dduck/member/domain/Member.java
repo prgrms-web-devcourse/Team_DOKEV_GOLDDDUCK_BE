@@ -1,7 +1,7 @@
-package com.dokev.gold_dduck.member;
+package com.dokev.gold_dduck.member.domain;
 
 import com.dokev.gold_dduck.common.BaseEntity;
-import com.dokev.gold_dduck.event.Event;
+import com.dokev.gold_dduck.event.domain.Event;
 import lombok.Getter;
 
 import javax.persistence.*;
@@ -34,7 +34,6 @@ public class Member extends BaseEntity {
     private String profileImage;
 
     @OneToMany(mappedBy = "member")
-    @JoinColumn(name = "event_id")
     private List<Event> events = new ArrayList<>();
 
     public Optional<String> getProfileImage() {

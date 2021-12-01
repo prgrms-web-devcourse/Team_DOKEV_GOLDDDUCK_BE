@@ -1,9 +1,9 @@
-package com.dokev.gold_dduck.event;
+package com.dokev.gold_dduck.event.domain;
 
 import com.dokev.gold_dduck.common.BaseEntity;
-import com.dokev.gold_dduck.gift.Gift;
-import com.dokev.gold_dduck.gift.GiftItem;
-import com.dokev.gold_dduck.member.Member;
+import com.dokev.gold_dduck.gift.domain.Gift;
+import com.dokev.gold_dduck.gift.domain.GiftItem;
+import com.dokev.gold_dduck.member.domain.Member;
 import lombok.Getter;
 
 import javax.persistence.*;
@@ -19,11 +19,11 @@ public class EventLog extends BaseEntity {
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "event_id")
+    @JoinColumn(name = "event_id", nullable = false)
     private Event event;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "member_id")
+    @JoinColumn(name = "member_id", nullable = false)
     private Member member;
 
     @ManyToOne(fetch = FetchType.LAZY)
