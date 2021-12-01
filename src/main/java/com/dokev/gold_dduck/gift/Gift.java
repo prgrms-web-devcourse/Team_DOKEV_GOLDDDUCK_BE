@@ -5,10 +5,7 @@ import com.dokev.gold_dduck.event.Event;
 import lombok.Getter;
 
 import javax.persistence.*;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
 
 @Getter
 @Entity
@@ -19,6 +16,9 @@ public class Gift extends BaseEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "gift_id")
     private Long id;
+
+    @Column(name = "code", nullable = false)
+    private UUID code;
 
     @Column(name = "category", nullable = false, length = 50)
     private String category;

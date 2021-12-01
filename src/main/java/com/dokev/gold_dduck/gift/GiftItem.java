@@ -22,6 +22,9 @@ public class GiftItem extends BaseEntity {
     @Column(name = "content", columnDefinition = "TEXT", nullable = false)
     private String content;
 
+    @Column(name = "used", nullable = false)
+    private boolean used;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "gift_id")
     private Gift gift;
