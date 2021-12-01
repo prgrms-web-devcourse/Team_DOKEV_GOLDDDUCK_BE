@@ -1,7 +1,7 @@
-package com.dokev.gold_dduck.gift;
+package com.dokev.gold_dduck.gift.domain;
 
 import com.dokev.gold_dduck.common.BaseEntity;
-import com.dokev.gold_dduck.event.Event;
+import com.dokev.gold_dduck.event.domain.Event;
 import lombok.Getter;
 
 import javax.persistence.*;
@@ -16,9 +16,6 @@ public class Gift extends BaseEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "gift_id")
     private Long id;
-
-    @Column(name = "code", nullable = false)
-    private UUID code;
 
     @Column(name = "category", nullable = false, length = 50)
     private String category;
@@ -38,7 +35,7 @@ public class Gift extends BaseEntity {
     }
 
     public void changeEvent(Event event) {
-        if (Objects.nonNull(this.event)){
+        if (Objects.nonNull(this.event)) {
             this.event.getGifts().remove(this);
         }
         this.event = event;
