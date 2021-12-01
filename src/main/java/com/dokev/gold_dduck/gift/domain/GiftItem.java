@@ -1,4 +1,4 @@
-package com.dokev.gold_dduck.gift;
+package com.dokev.gold_dduck.gift.domain;
 
 import com.dokev.gold_dduck.common.BaseEntity;
 import lombok.Getter;
@@ -15,7 +15,7 @@ public class GiftItem extends BaseEntity {
     @Column(name = "gift_item_id")
     private Long id;
 
-    @Column(name = "gift_type", length = 20)
+    @Column(name = "gift_type", length = 20, nullable = false)
     @Enumerated(EnumType.STRING)
     private GiftType giftType;
 
