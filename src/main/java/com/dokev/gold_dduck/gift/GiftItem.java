@@ -23,7 +23,7 @@ public class GiftItem extends BaseEntity {
     private String content;
 
     @Column(name = "used", nullable = false)
-    private Boolean used;
+    private boolean used;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "gift_id")
