@@ -2,12 +2,26 @@ package com.dokev.gold_dduck.gift.domain;
 
 import com.dokev.gold_dduck.common.BaseEntity;
 import com.dokev.gold_dduck.event.domain.Event;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
+import javax.persistence.Table;
+import lombok.AccessLevel;
 import lombok.Getter;
-
-import javax.persistence.*;
-import java.util.*;
+import lombok.NoArgsConstructor;
 
 @Getter
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Entity
 @Table(name = "gift")
 public class Gift extends BaseEntity {
@@ -29,6 +43,13 @@ public class Gift extends BaseEntity {
 
     @OneToMany(mappedBy = "gift")
     private List<GiftItem> giftItems = new ArrayList<>();
+
+    public Gift(String category, Integer itemCount) {
+        Objects.requireNonNull(category, "선물 카테고리는 notnull이어야 합니다.");
+        Objects.requireNonNull(itemCount, "선물 갯수는 notnull이어야 합니다.");
+        this.category = category;
+        this.itemCount = itemCount;
+    }
 
     public Optional<Integer> getItemCount() {
         return Optional.ofNullable(itemCount);
