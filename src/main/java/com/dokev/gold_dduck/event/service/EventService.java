@@ -1,5 +1,7 @@
 package com.dokev.gold_dduck.event.service;
 
+import com.dokev.gold_dduck.common.error.ErrorCode;
+import com.dokev.gold_dduck.common.exception.BusinessException;
 import com.dokev.gold_dduck.event.domain.Event;
 import com.dokev.gold_dduck.event.dto.EventConverter;
 import com.dokev.gold_dduck.event.dto.EventResponseDto;
@@ -13,6 +15,7 @@ import com.dokev.gold_dduck.member.domain.Member;
 import com.dokev.gold_dduck.member.dto.MemberResponseDto;
 import com.dokev.gold_dduck.member.repository.MemberRepository;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
 import org.springframework.stereotype.Service;
@@ -37,9 +40,12 @@ public class EventService {
     }
 
     public EventResponseDto findDetailEvent(UUID code) {
-        Event event = eventRepository.findEventByCode(code);
-        Member member = memberRepository.findMemberByEventId(event.getId());
-        List<Gift> gifts = eventRepository.findGiftsByEventId(event.getId());
+        Optional<Event> event = eventRepository.findEventByCode(code);
+        if (event.isEmpty()) {
+            throw new BusinessException(ErrorCode.INVALID_INPUT_VALUE);
+        }
+        Member member = memberRepository.findMemberByEventId(event.get().getId());
+        List<Gift> gifts = eventRepository.findGiftsByEventId(event.get().getId());
 
         List<GiftResponseDto> giftResponseDtos = gifts.stream()
                 .map(giftConverter::convertToGiftResponseDto)
@@ -47,7 +53,7 @@ public class EventService {
 
         MemberResponseDto memberResponseDto = memberConverter.convertToMemberResponseDto(member);
 
-        return eventConverter.convertToEventResponseDto(event, giftResponseDtos, memberResponseDto);
+        return eventConverter.convertToEventResponseDto(event.get(), giftResponseDtos, memberResponseDto);
     }
 
 }
