@@ -45,6 +45,8 @@ public class Gift extends BaseEntity {
     private List<GiftItem> giftItems = new ArrayList<>();
 
     public Gift(String category, Integer itemCount) {
+        Objects.requireNonNull(category, "선물 카테고리는 notnull이어야 합니다.");
+        Objects.requireNonNull(itemCount, "선물 갯수는 notnull이어야 합니다.");
         this.category = category;
         this.itemCount = itemCount;
     }

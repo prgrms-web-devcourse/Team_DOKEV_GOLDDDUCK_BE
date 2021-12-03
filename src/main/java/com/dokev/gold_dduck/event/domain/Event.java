@@ -24,6 +24,7 @@ import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.springframework.util.Assert;
 
 @Getter
 @Entity
@@ -40,10 +41,10 @@ public class Event extends BaseEntity {
     @Column(name = "gift_choice_type", length = 20, nullable = false)
     private GiftChoiceType giftChoiceType;
 
-    @Column(name = "start_at", columnDefinition = "TIMESTAMP")
+    @Column(name = "start_at", columnDefinition = "TIMESTAMP", nullable = false)
     private LocalDateTime startAt;
 
-    @Column(name = "end_at", columnDefinition = "TIMESTAMP")
+    @Column(name = "end_at", columnDefinition = "TIMESTAMP", nullable = false)
     private LocalDateTime endAt;
 
     @Column(name = "code", nullable = false)
@@ -82,6 +83,13 @@ public class Event extends BaseEntity {
 
     public static EventBuilder builder(GiftChoiceType giftChoiceType, LocalDateTime startAt, LocalDateTime endAt,
         EventProgressStatus eventProgressStatus, String mainTemplate, Integer maxParticipantCount, Member member) {
+        Objects.requireNonNull(giftChoiceType, "이벤트에서 선물 받을 방법을 선택해야 합니다.");
+        Objects.requireNonNull(startAt, "이벤트 시작 시간은 notnull이어야 합니다.");
+        Objects.requireNonNull(endAt, "이벤트 종료 시간은 notnull이어야 합니다.");
+        Objects.requireNonNull(eventProgressStatus, "이벤트 상태는 notnull이어야 합니다.");
+        Objects.requireNonNull(mainTemplate, "이벤트 대표 이미지 타입은 notnull이어야 합니다.");
+        Objects.requireNonNull(maxParticipantCount, "이벤트 최대 참가자 수는 notnull이어야 합니다.");
+        Objects.requireNonNull(member, "이벤트 생성자는 notnull이어야 합니다.");
         return eventInternalBuilder()
             .giftChoiceType(giftChoiceType)
             .startAt(startAt)
