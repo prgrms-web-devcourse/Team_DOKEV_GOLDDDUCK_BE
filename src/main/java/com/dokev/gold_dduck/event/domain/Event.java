@@ -24,7 +24,6 @@ import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.springframework.util.Assert;
 
 @Getter
 @Entity
@@ -68,9 +67,10 @@ public class Event extends BaseEntity {
     private List<Gift> gifts = new ArrayList<>();
 
     @Builder(builderMethodName = "eventInternalBuilder")
-    private Event(GiftChoiceType giftChoiceType, LocalDateTime startAt, LocalDateTime endAt, UUID code,
-        EventProgressStatus eventProgressStatus, String mainTemplate, Integer maxParticipantCount,
-        Member member) {
+    private Event(
+        GiftChoiceType giftChoiceType, LocalDateTime startAt, LocalDateTime endAt, UUID code,
+        EventProgressStatus eventProgressStatus, String mainTemplate, Integer maxParticipantCount, Member member
+    ) {
         this.giftChoiceType = giftChoiceType;
         this.startAt = startAt;
         this.endAt = endAt;
@@ -81,8 +81,10 @@ public class Event extends BaseEntity {
         this.member = member;
     }
 
-    public static EventBuilder builder(GiftChoiceType giftChoiceType, LocalDateTime startAt, LocalDateTime endAt,
-        EventProgressStatus eventProgressStatus, String mainTemplate, Integer maxParticipantCount, Member member) {
+    public static EventBuilder builder(
+        GiftChoiceType giftChoiceType, LocalDateTime startAt, LocalDateTime endAt,
+        EventProgressStatus eventProgressStatus, String mainTemplate, Integer maxParticipantCount, Member member
+    ) {
         Objects.requireNonNull(giftChoiceType, "이벤트에서 선물 받을 방법을 선택해야 합니다.");
         Objects.requireNonNull(startAt, "이벤트 시작 시간은 notnull이어야 합니다.");
         Objects.requireNonNull(endAt, "이벤트 종료 시간은 notnull이어야 합니다.");
@@ -90,7 +92,9 @@ public class Event extends BaseEntity {
         Objects.requireNonNull(mainTemplate, "이벤트 대표 이미지 타입은 notnull이어야 합니다.");
         Objects.requireNonNull(maxParticipantCount, "이벤트 최대 참가자 수는 notnull이어야 합니다.");
         Objects.requireNonNull(member, "이벤트 생성자는 notnull이어야 합니다.");
+
         return eventInternalBuilder()
+            .code(UUID.randomUUID())
             .giftChoiceType(giftChoiceType)
             .startAt(startAt)
             .endAt(endAt)
