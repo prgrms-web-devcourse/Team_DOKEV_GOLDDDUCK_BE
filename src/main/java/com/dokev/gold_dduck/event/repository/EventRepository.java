@@ -10,8 +10,8 @@ import org.springframework.data.repository.query.Param;
 
 public interface EventRepository extends JpaRepository<Event, Long> {
 
-    Event findEventByCode(@Param("code") UUID code);
+    Event findEventByCode(UUID code);
 
-    @Query(value = "SELECT a FROM Gift AS a WHERE a.event = :eventId")
-    List<Gift> findGiftsByEventId(Long eventId);
+    @Query(value = "SELECT distinct g From Gift g JOIN FETCH g.event")
+    List<Gift> findGiftsByEventId(@Param("id") Long eventId);
 }
