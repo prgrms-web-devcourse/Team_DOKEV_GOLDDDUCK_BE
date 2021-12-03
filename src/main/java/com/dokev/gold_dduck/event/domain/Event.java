@@ -22,8 +22,9 @@ public class Event extends BaseEntity {
     @Column(name = "event_id")
     private Long id;
 
-    @Column(name = "event_type", length = 20)
-    private String eventType;
+    @Enumerated(value = EnumType.STRING)
+    @Column(name = "gift_choice_type", length = 20)
+    private GiftChoiceType giftChoiceType;
 
     @Column(name = "start_at", columnDefinition = "TIMESTAMP")
     private LocalDateTime startAt;
