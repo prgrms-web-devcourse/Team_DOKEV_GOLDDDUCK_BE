@@ -22,7 +22,7 @@ public class EventConverter {
     public EventResponseDto convertToEventResponseDto(Event event, List<GiftResponseDto> giftResponseDtos,
             MemberResponseDto memberResponseDto) {
 
-        return new EventResponseDto(event.getId(), event.getEventType(), event.getStartAt(), event.getEndAt(),
+        return new EventResponseDto(event.getId(), event.getGiftChoiceType(), event.getStartAt(), event.getEndAt(),
                 event.getCode(), event.getEventProgressStatus().toString(), event.getMainTemplate(),
                 event.getMaxParticipantCount(), memberResponseDto, giftResponseDtos);
     }

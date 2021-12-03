@@ -1,5 +1,6 @@
 package com.dokev.gold_dduck.event.dto;
 
+import com.dokev.gold_dduck.event.domain.GiftChoiceType;
 import com.dokev.gold_dduck.gift.dto.GiftResponseDto;
 import com.dokev.gold_dduck.member.dto.MemberResponseDto;
 import java.time.LocalDateTime;
@@ -13,7 +14,7 @@ public class EventResponseDto {
 
     private Long eventId;
 
-    private String eventType;
+    private GiftChoiceType giftChoiceType;
 
     private LocalDateTime startAt;
 
@@ -31,11 +32,11 @@ public class EventResponseDto {
 
     private List<GiftResponseDto> gifts = new ArrayList<>();
 
-    public EventResponseDto(Long eventId, String eventType, LocalDateTime startAt, LocalDateTime endAt,
+    public EventResponseDto(Long eventId, GiftChoiceType giftChoiceType, LocalDateTime startAt, LocalDateTime endAt,
             UUID code, String eventProgressStatus, String mainTemplate, Integer maxParticipantCount,
             MemberResponseDto member, List<GiftResponseDto> gifts) {
         this.eventId = eventId;
-        this.eventType = eventType;
+        this.giftChoiceType = giftChoiceType;
         this.startAt = startAt;
         this.endAt = endAt;
         this.code = code;
