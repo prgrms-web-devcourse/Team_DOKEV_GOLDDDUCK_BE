@@ -3,7 +3,7 @@ package com.dokev.gold_dduck.event.service;
 import com.dokev.gold_dduck.common.ApiResponse;
 import com.dokev.gold_dduck.event.domain.Event;
 import com.dokev.gold_dduck.event.dto.EventConverter;
-import com.dokev.gold_dduck.event.dto.EventResponse;
+import com.dokev.gold_dduck.event.dto.EventResponseDto;
 import com.dokev.gold_dduck.event.repository.EventRepository;
 import com.dokev.gold_dduck.gift.domain.Gift;
 import java.util.List;
@@ -21,14 +21,8 @@ public class EventService {
         this.eventConverter = eventConverter;
     }
 
-    public ApiResponse<EventResponse> findDetailEvent(UUID code) {
+    public EventResponseDto findDetailEvent(UUID code) {
         Event event = eventRepository.findEventByCode(code);
-        List<Gift> gifts = eventRepository.findGiftsByEventId(event.getId());
-
-        for (Gift gift : gifts) {
-            gift.changeEvent(event);
-        }
-
         return eventConverter.convertToApiResponse(event);
     }
 

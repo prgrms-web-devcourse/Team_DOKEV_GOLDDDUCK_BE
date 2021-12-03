@@ -1,8 +1,7 @@
 package com.dokev.gold_dduck.event.dto;
 
-import com.dokev.gold_dduck.event.domain.EventProgressStatus;
-import com.dokev.gold_dduck.gift.domain.Gift;
-import com.dokev.gold_dduck.member.domain.Member;
+import com.dokev.gold_dduck.gift.dto.GiftResponseDto;
+import com.dokev.gold_dduck.member.dto.MemberResponseDto;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -10,7 +9,7 @@ import java.util.UUID;
 import lombok.Getter;
 
 @Getter
-public class EventResponse {
+public class EventResponseDto {
 
     private Long eventId;
 
@@ -22,19 +21,19 @@ public class EventResponse {
 
     private UUID code;
 
-    private EventProgressStatus eventProgressStatus;
+    private String eventProgressStatus;
 
     private String mainTemplate;
 
     private Integer maxParticipantCount;
 
-    private Member member;
+    private MemberResponseDto member;
 
-    private List<Gift> gifts = new ArrayList<>();
+    private List<GiftResponseDto> gifts = new ArrayList<>();
 
-    public EventResponse(Long eventId, String eventType, LocalDateTime startAt, LocalDateTime endAt,
-            UUID code, EventProgressStatus eventProgressStatus, String mainTemplate, Integer maxParticipantCount,
-            Member member, List<Gift> gifts) {
+    public EventResponseDto(Long eventId, String eventType, LocalDateTime startAt, LocalDateTime endAt,
+            UUID code, String eventProgressStatus, String mainTemplate, Integer maxParticipantCount,
+            MemberResponseDto member, List<GiftResponseDto> gifts) {
         this.eventId = eventId;
         this.eventType = eventType;
         this.startAt = startAt;
