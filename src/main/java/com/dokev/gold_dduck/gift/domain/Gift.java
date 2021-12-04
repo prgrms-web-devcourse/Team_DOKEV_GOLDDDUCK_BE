@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -37,7 +38,7 @@ public class Gift extends BaseEntity {
     @Column(name = "item_count")
     private Integer itemCount;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.PERSIST)
     @JoinColumn(name = "event_id")
     private Event event;
 
@@ -47,6 +48,7 @@ public class Gift extends BaseEntity {
     public Gift(String category, Integer itemCount) {
         Objects.requireNonNull(category, "선물 카테고리는 notnull이어야 합니다.");
         Objects.requireNonNull(itemCount, "선물 갯수는 notnull이어야 합니다.");
+
         this.category = category;
         this.itemCount = itemCount;
     }

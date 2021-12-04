@@ -2,6 +2,7 @@ package com.dokev.gold_dduck.gift.domain;
 
 import com.dokev.gold_dduck.common.BaseEntity;
 import java.util.Objects;
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
@@ -38,7 +39,7 @@ public class GiftItem extends BaseEntity {
     @Column(name = "used", nullable = false)
     private boolean used;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.PERSIST)
     @JoinColumn(name = "gift_id")
     private Gift gift;
 
@@ -46,6 +47,7 @@ public class GiftItem extends BaseEntity {
         Objects.requireNonNull(giftType, "선물 유형은 notnull이어야 합니다.");
         Objects.requireNonNull(content, "선물 내용은 notnull이어야 합니다.");
         Objects.requireNonNull(used, "선물 아이템 사용여부는 notnull이어야 합니다.");
+
         this.giftType = giftType;
         this.content = content;
         this.used = used;
