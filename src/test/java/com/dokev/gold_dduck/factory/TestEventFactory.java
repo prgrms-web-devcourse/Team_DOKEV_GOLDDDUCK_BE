@@ -27,7 +27,7 @@ public class TestEventFactory {
             eventSaveRequest.getStartAt(),
             eventSaveRequest.getEndAt(),
             EventProgressStatus.RUNNING,
-            eventSaveRequest.getEventThumbnailType(),
+            eventSaveRequest.getMainTemplate(),
             eventSaveRequest.getMaxParticipantCount(),
             member);
     }

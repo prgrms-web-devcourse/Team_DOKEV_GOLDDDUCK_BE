@@ -13,7 +13,7 @@ public class EventSaveRequest {
     private Long memberId;
     private List<GiftSaveDto> gifts;
     private GiftChoiceType giftChoiceType;
-    private String eventThumbnailType;
+    private String mainTemplate;
     private LocalDateTime startAt;
     private LocalDateTime endAt;
     private int maxParticipantCount;
