@@ -4,6 +4,7 @@ import com.dokev.gold_dduck.event.domain.Event;
 import com.dokev.gold_dduck.event.domain.Event.EventBuilder;
 import com.dokev.gold_dduck.event.domain.EventProgressStatus;
 import com.dokev.gold_dduck.event.domain.GiftChoiceType;
+import com.dokev.gold_dduck.event.dto.EventSaveRequest;
 import com.dokev.gold_dduck.member.domain.Member;
 import java.time.LocalDateTime;
 
@@ -17,6 +18,17 @@ public class TestEventFactory {
             EventProgressStatus.RUNNING,
             "template1",
             60,
+            member);
+    }
+
+    public static EventBuilder dtoUseBuilder(EventSaveRequest eventSaveRequest, Member member) {
+        return Event.builder(
+            eventSaveRequest.getGiftChoiceType(),
+            eventSaveRequest.getStartAt(),
+            eventSaveRequest.getEndAt(),
+            EventProgressStatus.RUNNING,
+            eventSaveRequest.getEventThumbnailType(),
+            eventSaveRequest.getMaxParticipantCount(),
             member);
     }
 }
