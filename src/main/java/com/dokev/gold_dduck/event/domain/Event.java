@@ -64,7 +64,7 @@ public class Event extends BaseEntity {
     private Member member;
 
     @OneToMany(mappedBy = "event")
-    private List<Gift> gifts = new ArrayList<>();
+    private final List<Gift> gifts = new ArrayList<>();
 
     @Builder(builderMethodName = "eventInternalBuilder")
     private Event(

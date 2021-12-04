@@ -69,7 +69,7 @@ public class EventService {
         try {
             Assert.notEmpty(giftItems, "giftItems must not be empty");
             Assert.notEmpty(gifts, "gifts must not be empty");
-        }catch (IllegalArgumentException e){
+        } catch (IllegalArgumentException e) {
             throw new GiftEmptyException(e.getMessage());
         }
 

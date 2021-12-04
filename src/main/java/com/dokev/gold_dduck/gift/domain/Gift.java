@@ -43,7 +43,7 @@ public class Gift extends BaseEntity {
     private Event event;
 
     @OneToMany(mappedBy = "gift")
-    private List<GiftItem> giftItems = new ArrayList<>();
+    private final List<GiftItem> giftItems = new ArrayList<>();
 
     public Gift(String category, Integer itemCount) {
         Objects.requireNonNull(category, "선물 카테고리는 notnull이어야 합니다.");
