@@ -2,6 +2,7 @@ package com.dokev.gold_dduck.member.domain;
 
 import com.dokev.gold_dduck.common.BaseEntity;
 import com.dokev.gold_dduck.event.domain.Event;
+import lombok.AccessLevel;
 import lombok.Getter;
 
 import javax.persistence.*;
@@ -9,7 +10,9 @@ import javax.validation.constraints.Email;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import lombok.NoArgsConstructor;
 
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
 @Entity
 @Table(name = "member")
@@ -38,5 +41,12 @@ public class Member extends BaseEntity {
 
     public Optional<String> getProfileImage() {
         return Optional.ofNullable(profileImage);
+    }
+
+    public Member(String name, String email, String socialId, String profileImage) {
+        this.name = name;
+        this.email = email;
+        this.socialId = socialId;
+        this.profileImage = profileImage;
     }
 }
