@@ -40,3 +40,5 @@ out/
 .DS_Store
 .AppleDouble
 .LSOverride
+
+src/main/resources/

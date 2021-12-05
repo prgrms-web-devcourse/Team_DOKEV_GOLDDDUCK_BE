@@ -44,3 +44,14 @@ asciidoctor {
     inputs.dir snippetsDir
     dependsOn test
 }
+
+processResources.dependsOn('copyConfigSettings')
+
+task copyConfigSettings(type: Copy) {
+    from 'src/main/config'
+    into 'src/main/resources/'
+}
+
+build {
+    dependsOn copyConfigSettings
+}
