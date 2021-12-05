@@ -1,0 +1,3 @@
+[submodule "src/main/config"]
+	path = src/main/config
+	url = https://github.com/prgrms-web-devcourse/Team_DOKEV_GOLDDDUCK_BE_SUB.git
