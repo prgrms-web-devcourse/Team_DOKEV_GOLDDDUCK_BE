@@ -1,7 +1,10 @@
 package com.dokev.gold_dduck.gift.dto;
 
+import lombok.AccessLevel;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
 public class GiftItemDto {
 
