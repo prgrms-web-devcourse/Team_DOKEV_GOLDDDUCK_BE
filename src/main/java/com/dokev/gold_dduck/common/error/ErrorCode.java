@@ -11,7 +11,9 @@ public enum ErrorCode {
     ENTITY_NOT_FOUND("E001", "해당 엔티티를 찾을 수 없습니다. name : %s, id : %s "),
     UNEXPECTED("-1", "Unexpected exception occurred"),
     INVALID_INPUT_VALUE("C004", "Invalid Input Value"),
-    METHOD_NOT_ALLOWED("C005", "Method not allowed");
+    METHOD_NOT_ALLOWED("C005", "Method not allowed"),
+    MEMBER_NOT_FOUND("C006", "Member is not found"),
+    GIFT_NOT_EMPTY("C007", "Gift or GiftItem is must be not empty");
 
     private final String code;
 

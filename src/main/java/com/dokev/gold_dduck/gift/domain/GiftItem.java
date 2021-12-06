@@ -53,6 +53,7 @@ public class GiftItem extends BaseEntity {
     public GiftItem(GiftType giftType, String content, boolean used) {
         Objects.requireNonNull(giftType, "선물 유형은 notnull이어야 합니다.");
         Objects.requireNonNull(content, "선물 내용은 notnull이어야 합니다.");
+
         this.giftType = giftType;
         this.content = content;
         this.used = used;

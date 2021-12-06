@@ -2,14 +2,19 @@ package com.dokev.gold_dduck.member.domain;
 
 import com.dokev.gold_dduck.common.BaseEntity;
 import com.dokev.gold_dduck.event.domain.Event;
-import lombok.AccessLevel;
-import lombok.Getter;
-
-import javax.persistence.*;
-import javax.validation.constraints.Email;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.OneToMany;
+import javax.persistence.Table;
+import javax.validation.constraints.Email;
+import lombok.AccessLevel;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -37,7 +42,7 @@ public class Member extends BaseEntity {
     private String profileImage;
 
     @OneToMany(mappedBy = "member")
-    private List<Event> events = new ArrayList<>();
+    private final List<Event> events = new ArrayList<>();
 
     public Optional<String> getProfileImage() {
         return Optional.ofNullable(profileImage);
