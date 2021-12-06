@@ -4,7 +4,6 @@ import com.dokev.gold_dduck.event.domain.GiftChoiceType;
 import com.dokev.gold_dduck.gift.dto.GiftDto;
 import com.dokev.gold_dduck.member.dto.MemberDto;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import lombok.AccessLevel;
@@ -33,7 +32,7 @@ public class EventDto {
 
     private MemberDto member;
 
-    private List<GiftDto> gifts = new ArrayList<>();
+    private List<GiftDto> gifts;
 
     public EventDto(Long eventId, GiftChoiceType giftChoiceType, LocalDateTime startAt, LocalDateTime endAt,
             UUID code, String eventProgressStatus, String mainTemplate, Integer maxParticipantCount,

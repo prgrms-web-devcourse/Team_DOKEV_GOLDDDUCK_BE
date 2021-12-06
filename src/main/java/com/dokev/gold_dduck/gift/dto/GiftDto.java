@@ -1,6 +1,5 @@
 package com.dokev.gold_dduck.gift.dto;
 
-import java.util.ArrayList;
 import java.util.List;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -16,7 +15,7 @@ public class GiftDto {
 
     private Integer itemCount;
 
-    private List<GiftItemDto> giftItems = new ArrayList<>();
+    private List<GiftItemDto> giftItems;
 
     public GiftDto(Long id, String category, Integer itemCount, List<GiftItemDto> giftItems) {
         this.id = id;
