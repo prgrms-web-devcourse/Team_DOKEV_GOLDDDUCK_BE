@@ -19,6 +19,7 @@ import javax.persistence.Table;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.BatchSize;
 
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -41,6 +42,7 @@ public class Gift extends BaseEntity {
     @JoinColumn(name = "event_id")
     private Event event;
 
+    @BatchSize(size = 50)
     @OneToMany(mappedBy = "gift")
     private List<GiftItem> giftItems = new ArrayList<>();
 
