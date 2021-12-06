@@ -12,12 +12,12 @@ import java.util.List;
 import org.springframework.stereotype.Component;
 
 @Component
-public class EventConverter {
+public class EventFindConverter {
 
     private final MemberConverter memberConverter;
     private final GiftConverter giftConverter;
 
-    public EventConverter(MemberConverter memberConverter, GiftConverter giftConverter) {
+    public EventFindConverter(MemberConverter memberConverter, GiftConverter giftConverter) {
         this.memberConverter = memberConverter;
         this.giftConverter = giftConverter;
     }
