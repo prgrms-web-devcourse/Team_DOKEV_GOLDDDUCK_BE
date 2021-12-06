@@ -8,6 +8,7 @@ import com.dokev.gold_dduck.event.dto.GiftSaveDto;
 import com.dokev.gold_dduck.gift.domain.Gift;
 import com.dokev.gold_dduck.gift.domain.GiftItem;
 import com.dokev.gold_dduck.member.domain.Member;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import org.springframework.stereotype.Component;
@@ -16,29 +17,7 @@ import org.springframework.util.Assert;
 @Component
 public class EventSaveConverter {
 
-    public Event convertToEvent(EventSaveDto eventSaveRequest, Member member) {
-        return Event.builder(eventSaveRequest.getGiftChoiceType(),
-                eventSaveRequest.getStartAt(),
-                eventSaveRequest.getEndAt(),
-                EventProgressStatus.RUNNING,
-                eventSaveRequest.getMainTemplate(),
-                eventSaveRequest.getMaxParticipantCount(),
-                member)
-            .code(UUID.randomUUID())
-            .build();
-    }
-
-    public Gift convertToGift(GiftSaveDto giftSaveDto) {
-        return new Gift(giftSaveDto.getCategory(), giftSaveDto.getGiftItems().size());
-    }
-
-    public GiftItem convertToGiftItem(GiftItemSaveDto giftItemSaveDto) {
-        return new GiftItem(giftItemSaveDto.getGiftType(),
-            giftItemSaveDto.getContent(),
-            false);
-    }
-
-    public Event convertEventSaveDtoToEvent(EventSaveDto eventSaveRequest, Member member)
+    public Event convertToEvent(EventSaveDto eventSaveRequest, Member member)
         throws IllegalArgumentException {
         Event newEvent = Event.builder(eventSaveRequest.getGiftChoiceType(),
                 eventSaveRequest.getStartAt(),
@@ -54,29 +33,61 @@ public class EventSaveConverter {
         Assert.notEmpty(GiftSaveDtos, "gifts must not be empty");
 
         GiftSaveDtos.forEach(giftSaveDto -> {
-            Gift gift = convertGiftSaveDtoToGift(giftSaveDto);
+            Gift gift = convertToGift(giftSaveDto);
             gift.changeEvent(newEvent);
         });
         return newEvent;
     }
 
-    public Gift convertGiftSaveDtoToGift(GiftSaveDto giftSaveDto) throws IllegalArgumentException {
+    public Gift convertToGift(GiftSaveDto giftSaveDto) throws IllegalArgumentException {
         Gift gift = new Gift(giftSaveDto.getCategory(), giftSaveDto.getGiftItems().size());
         List<GiftItemSaveDto> giftItemSaveDtos = giftSaveDto.getGiftItems();
 
         Assert.notEmpty(giftItemSaveDtos, "giftItems must not be empty");
 
         giftItemSaveDtos.forEach(giftItemSaveDto -> {
-            GiftItem giftItem = convertGiftItemSaveDtoToGiftItem(giftItemSaveDto);
+            GiftItem giftItem = convertToGiftItem(giftItemSaveDto);
             giftItem.changeGift(gift);
         });
 
         return gift;
     }
 
-    public GiftItem convertGiftItemSaveDtoToGiftItem(GiftItemSaveDto giftItemSaveDto) {
+    public GiftItem convertToGiftItem(GiftItemSaveDto giftItemSaveDto) {
         return new GiftItem(giftItemSaveDto.getGiftType(),
             giftItemSaveDto.getContent(),
             false);
+    }
+
+    public EventSaveDto convertToEventSaveDto(Event event) {
+        return new EventSaveDto(event.getMember().getId(), convertToGiftSaveDtos(event.getGifts()),
+            event.getGiftChoiceType(), event.getMainTemplate(), event.getStartAt(), event.getEndAt(),
+            event.getMaxParticipantCount());
+    }
+
+    public List<GiftSaveDto> convertToGiftSaveDtos(List<Gift> gifts) {
+        List<GiftSaveDto> giftSaveDtos = new ArrayList<>();
+        gifts.forEach(gift -> {
+            GiftSaveDto giftSaveDto = convertToGiftSaveDto(gift);
+            giftSaveDtos.add(giftSaveDto);
+        });
+        return giftSaveDtos;
+    }
+
+    public GiftSaveDto convertToGiftSaveDto(Gift gift) {
+        return new GiftSaveDto(gift.getCategory(), convertToGiftItemDtos(gift.getGiftItems()));
+    }
+
+    public List<GiftItemSaveDto> convertToGiftItemDtos(List<GiftItem> giftItems) {
+        List<GiftItemSaveDto> giftItemSaveDtos = new ArrayList<>();
+        giftItems.forEach(giftItem -> {
+            GiftItemSaveDto giftItemSaveDto = convertToGiftItemDto(giftItem);
+            giftItemSaveDtos.add(giftItemSaveDto);
+        });
+        return giftItemSaveDtos;
+    }
+
+    private GiftItemSaveDto convertToGiftItemDto(GiftItem giftItem) {
+        return new GiftItemSaveDto(giftItem.getGiftType(), giftItem.getContent());
     }
 }

@@ -79,7 +79,7 @@ public class Event extends BaseEntity {
         this.eventProgressStatus = eventProgressStatus;
         this.mainTemplate = mainTemplate;
         this.maxParticipantCount = maxParticipantCount;
-        this.member = member;
+        changeMember(member);
     }
 
     public static EventBuilder builder(
