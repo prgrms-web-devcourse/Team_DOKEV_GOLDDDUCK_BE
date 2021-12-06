@@ -6,8 +6,6 @@ import com.dokev.gold_dduck.event.converter.EventSaveConverter;
 import com.dokev.gold_dduck.event.domain.Event;
 import com.dokev.gold_dduck.event.dto.EventSaveDto;
 import com.dokev.gold_dduck.event.repository.EventRepository;
-import com.dokev.gold_dduck.gift.repository.GiftItemRepository;
-import com.dokev.gold_dduck.gift.repository.GiftRepository;
 import com.dokev.gold_dduck.member.domain.Member;
 import com.dokev.gold_dduck.member.repository.MemberRepository;
 import java.util.UUID;
@@ -20,17 +18,12 @@ import org.springframework.transaction.annotation.Transactional;
 public class EventService {
 
     private final EventRepository eventRepository;
-    private final GiftRepository giftRepository;
-    private final GiftItemRepository giftItemRepository;
     private final EventSaveConverter eventConverter;
     private final MemberRepository memberRepository;
 
-    public EventService(EventRepository eventRepository, GiftRepository giftRepository,
-        GiftItemRepository giftItemRepository, EventSaveConverter eventConverter,
-        MemberRepository memberRepository) {
+    public EventService(EventRepository eventRepository,
+        EventSaveConverter eventConverter, MemberRepository memberRepository) {
         this.eventRepository = eventRepository;
-        this.giftRepository = giftRepository;
-        this.giftItemRepository = giftItemRepository;
         this.eventConverter = eventConverter;
         this.memberRepository = memberRepository;
     }
@@ -42,7 +35,7 @@ public class EventService {
             .orElseThrow(() -> new MemberNotFoundException(eventSaveRequest.getMemberId()));
 
         try {
-            Event newEvent = eventConverter.convertEventSaveDtoToEvent(eventSaveRequest, member);
+            Event newEvent = eventConverter.convertToEvent(eventSaveRequest, member);
             Event createdEvent = eventRepository.save(newEvent);
             return createdEvent.getCode();
         } catch (IllegalArgumentException e) {
