@@ -38,11 +38,11 @@ public class Gift extends BaseEntity {
     @Column(name = "item_count")
     private Integer itemCount;
 
-    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.PERSIST)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "event_id")
     private Event event;
 
-    @OneToMany(mappedBy = "gift")
+    @OneToMany(mappedBy = "gift", cascade = CascadeType.PERSIST)
     private final List<GiftItem> giftItems = new ArrayList<>();
 
     public Gift(String category, Integer itemCount) {
