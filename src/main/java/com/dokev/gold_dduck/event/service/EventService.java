@@ -4,7 +4,7 @@ import com.dokev.gold_dduck.common.exception.GiftEmptyException;
 import com.dokev.gold_dduck.common.exception.MemberNotFoundException;
 import com.dokev.gold_dduck.event.converter.EventSaveConverter;
 import com.dokev.gold_dduck.event.domain.Event;
-import com.dokev.gold_dduck.event.dto.EventSaveRequest;
+import com.dokev.gold_dduck.event.dto.EventSaveDto;
 import com.dokev.gold_dduck.event.dto.GiftSaveDto;
 import com.dokev.gold_dduck.event.repository.EventRepository;
 import com.dokev.gold_dduck.gift.domain.Gift;
@@ -42,7 +42,7 @@ public class EventService {
     }
 
     @Transactional
-    public UUID saveEvent(EventSaveRequest eventSaveRequest) {
+    public UUID saveEvent(EventSaveDto eventSaveRequest) {
 
         Member member = memberRepository.findById(eventSaveRequest.getMemberId())
             .orElseThrow(() -> new MemberNotFoundException(eventSaveRequest.getMemberId()));

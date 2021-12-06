@@ -1,7 +1,7 @@
 package com.dokev.gold_dduck.factory;
 
 import com.dokev.gold_dduck.event.domain.GiftChoiceType;
-import com.dokev.gold_dduck.event.dto.EventSaveRequest;
+import com.dokev.gold_dduck.event.dto.EventSaveDto;
 import com.dokev.gold_dduck.event.dto.GiftItemSaveDto;
 import com.dokev.gold_dduck.event.dto.GiftSaveDto;
 import com.dokev.gold_dduck.gift.domain.GiftType;
@@ -11,8 +11,8 @@ import java.util.List;
 
 public class TestEventSaveRequestFactory {
 
-    public static EventSaveRequest createTestEventSaveRequest() {
-        return new EventSaveRequest(1L,
+    public static EventSaveDto createTestEventSaveRequest() {
+        return new EventSaveDto(1L,
             createTestGiftSaveDtos(),
             GiftChoiceType.FIFO,
             "template1",

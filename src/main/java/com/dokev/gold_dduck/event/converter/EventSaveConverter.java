@@ -2,7 +2,7 @@ package com.dokev.gold_dduck.event.converter;
 
 import com.dokev.gold_dduck.event.domain.Event;
 import com.dokev.gold_dduck.event.domain.EventProgressStatus;
-import com.dokev.gold_dduck.event.dto.EventSaveRequest;
+import com.dokev.gold_dduck.event.dto.EventSaveDto;
 import com.dokev.gold_dduck.event.dto.GiftItemSaveDto;
 import com.dokev.gold_dduck.event.dto.GiftSaveDto;
 import com.dokev.gold_dduck.gift.domain.Gift;
@@ -14,7 +14,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class EventSaveConverter {
 
-    public Event convertToEvent(EventSaveRequest eventSaveRequest, Member member) {
+    public Event convertToEvent(EventSaveDto eventSaveRequest, Member member) {
         return Event.builder(eventSaveRequest.getGiftChoiceType(),
                 eventSaveRequest.getStartAt(),
                 eventSaveRequest.getEndAt(),

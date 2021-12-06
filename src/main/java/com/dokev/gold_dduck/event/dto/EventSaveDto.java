@@ -8,7 +8,7 @@ import lombok.Getter;
 
 @AllArgsConstructor
 @Getter
-public class EventSaveRequest {
+public class EventSaveDto {
 
     private Long memberId;
     private List<GiftSaveDto> gifts;

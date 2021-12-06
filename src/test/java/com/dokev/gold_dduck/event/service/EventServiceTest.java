@@ -8,7 +8,7 @@ import static org.mockito.BDDMockito.given;
 
 import com.dokev.gold_dduck.event.converter.EventSaveConverter;
 import com.dokev.gold_dduck.event.domain.Event;
-import com.dokev.gold_dduck.event.dto.EventSaveRequest;
+import com.dokev.gold_dduck.event.dto.EventSaveDto;
 import com.dokev.gold_dduck.event.dto.GiftSaveDto;
 import com.dokev.gold_dduck.event.repository.EventRepository;
 import com.dokev.gold_dduck.factory.TestEventFactory;
@@ -58,7 +58,7 @@ class EventServiceTest {
     @DisplayName("이벤트 코드 생성 테스트 - 성공")
     void eventCreateTest() {
         Member testMember = TestMemberFactory.createTestMember();
-        EventSaveRequest testEventSaveRequest = TestEventSaveRequestFactory.createTestEventSaveRequest();
+        EventSaveDto testEventSaveRequest = TestEventSaveRequestFactory.createTestEventSaveRequest();
         Event newEvent = TestEventFactory.dtoUseBuilder(testEventSaveRequest, testMember).build();
 
         List<GiftSaveDto> giftSaveDtos = testEventSaveRequest.getGifts();
