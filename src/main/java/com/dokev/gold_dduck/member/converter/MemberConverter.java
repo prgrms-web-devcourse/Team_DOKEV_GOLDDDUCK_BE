@@ -8,12 +8,7 @@ import org.springframework.stereotype.Component;
 public class MemberConverter {
 
     public MemberDto convertToMemberDto(Member member) {
-        if (member.getProfileImage().isEmpty()) {
-            return new MemberDto(member.getId(), member.getName(), member.getEmail(),
-                    member.getSocialId(), "null");
-        }
-
         return new MemberDto(member.getId(), member.getName(), member.getEmail(),
-                member.getSocialId(), member.getProfileImage().get());
+                member.getSocialId(), member.getProfileImage().orElse(null));
     }
 }

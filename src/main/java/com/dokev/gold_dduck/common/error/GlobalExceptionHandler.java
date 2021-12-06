@@ -3,7 +3,6 @@ package com.dokev.gold_dduck.common.error;
 import com.dokev.gold_dduck.common.ApiResponse;
 import com.dokev.gold_dduck.common.exception.BusinessException;
 import java.util.Arrays;
-import java.util.Optional;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -43,7 +42,8 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(HttpRequestMethodNotSupportedException.class)
-    public ResponseEntity<ApiResponse<?>> handleHttpRequestMethodNotSupportedException(HttpRequestMethodNotSupportedException e) {
+    public ResponseEntity<ApiResponse<?>> handleHttpRequestMethodNotSupportedException(
+        HttpRequestMethodNotSupportedException e) {
         log.warn("handleHttpRequestMethodNotSupportedException", e);
         ErrorCode errorCode = ErrorCode.METHOD_NOT_ALLOWED;
 
