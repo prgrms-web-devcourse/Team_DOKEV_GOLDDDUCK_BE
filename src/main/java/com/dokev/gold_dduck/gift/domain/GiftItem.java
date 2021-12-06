@@ -1,6 +1,8 @@
 package com.dokev.gold_dduck.gift.domain;
 
 import com.dokev.gold_dduck.common.BaseEntity;
+import com.dokev.gold_dduck.common.exception.GiftAlreadyAllocatedException;
+import com.dokev.gold_dduck.member.domain.Member;
 import java.util.Objects;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -16,7 +18,9 @@ import javax.persistence.Table;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 
+@ToString(of = {"id", "giftType", "content", "used"})
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
 @Entity
@@ -42,6 +46,10 @@ public class GiftItem extends BaseEntity {
     @JoinColumn(name = "gift_id")
     private Gift gift;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "member_id")
+    private Member member;
+
     public GiftItem(GiftType giftType, String content, boolean used) {
         Objects.requireNonNull(giftType, "선물 유형은 notnull이어야 합니다.");
         Objects.requireNonNull(content, "선물 내용은 notnull이어야 합니다.");
@@ -57,5 +65,13 @@ public class GiftItem extends BaseEntity {
         }
         this.gift = gift;
         gift.getGiftItems().add(this);
+    }
+
+    public void allocateMember(Member member) {
+        Objects.requireNonNull(member, "member는 notnull이어야 합니다.");
+        if (Objects.nonNull(this.member)) {
+            throw new GiftAlreadyAllocatedException();
+        }
+        this.member = member;
     }
 }
