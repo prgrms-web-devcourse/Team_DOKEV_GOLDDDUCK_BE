@@ -5,7 +5,6 @@ import lombok.Getter;
 @Getter
 public enum ErrorCode {
 
-    GIFT_CHOICE_TYPE_NOT_MATCHED("G002", "선물 선택 방식이 . expected : %s but actual : %s"),
     GIFT_ALREADY_ALLOCATED("G001", "이미 할당된 선물입니다."),
     EVENT_ALREADY_PARTICIPATED("E001", "이미 참여한 이벤트 입니다."),
     GIFT_STOCK_OUT("G001", "선물의 재고가 전부 소진되었습니다."),
