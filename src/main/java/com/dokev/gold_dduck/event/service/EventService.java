@@ -47,7 +47,7 @@ public class EventService {
         Member member = memberRepository.findById(eventSaveRequest.getMemberId())
             .orElseThrow(() -> new MemberNotFoundException(eventSaveRequest.getMemberId()));
 
-        Event event = eventConverter.converterToEvent(eventSaveRequest, member);
+        Event event = eventConverter.convertToEvent(eventSaveRequest, member);
 
         List<GiftSaveDto> giftSaveDtos = eventSaveRequest.getGifts();
 
@@ -55,12 +55,12 @@ public class EventService {
         List<GiftItem> giftItems = new ArrayList<>();
 
         giftSaveDtos.forEach(giftSaveDto -> {
-            Gift gift = eventConverter.converterToGift(giftSaveDto);
+            Gift gift = eventConverter.convertToGift(giftSaveDto);
             gift.changeEvent(event);
             gifts.add(gift);
             giftSaveDto.getGiftItems()
                 .forEach(giftItemSaveDto -> {
-                    GiftItem giftItem = eventConverter.converterToGiftItem(giftItemSaveDto);
+                    GiftItem giftItem = eventConverter.convertToGiftItem(giftItemSaveDto);
                     giftItem.changeGift(gift);
                     giftItems.add(giftItem);
                 });

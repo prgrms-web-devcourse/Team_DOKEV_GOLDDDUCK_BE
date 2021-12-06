@@ -64,7 +64,7 @@ class EventServiceTest {
         List<GiftSaveDto> giftSaveDtos = testEventSaveRequest.getGifts();
 
         given(memberRepository.findById(any())).willReturn(Optional.of(testMember));
-        given(eventConverter.converterToEvent(testEventSaveRequest, testMember)).willReturn(newEvent);
+        given(eventConverter.convertToEvent(testEventSaveRequest, testMember)).willReturn(newEvent);
 
         List<Gift> gifts = new ArrayList<>();
         List<GiftItem> giftItems = new ArrayList<>();
@@ -74,12 +74,12 @@ class EventServiceTest {
                 giftSaveDto.getCategory(),
                 giftSaveDto.getGiftItems().size()
             );
-            given(eventConverter.converterToGift(giftSaveDto)).willReturn(testGift);
+            given(eventConverter.convertToGift(giftSaveDto)).willReturn(testGift);
             gifts.add(testGift);
 
             giftSaveDto.getGiftItems().forEach(giftItemSaveDto -> {
                 GiftItem testGiftItem = TestGiftItemFactory.createTestGiftItem(giftItemSaveDto.getContent());
-                given(eventConverter.converterToGiftItem(giftItemSaveDto)).willReturn(testGiftItem);
+                given(eventConverter.convertToGiftItem(giftItemSaveDto)).willReturn(testGiftItem);
                 giftItems.add(testGiftItem);
             });
         });

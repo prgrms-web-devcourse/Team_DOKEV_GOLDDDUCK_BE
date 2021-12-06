@@ -14,7 +14,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class EventSaveConverter {
 
-    public Event converterToEvent(EventSaveRequest eventSaveRequest, Member member) {
+    public Event convertToEvent(EventSaveRequest eventSaveRequest, Member member) {
         return Event.builder(eventSaveRequest.getGiftChoiceType(),
                 eventSaveRequest.getStartAt(),
                 eventSaveRequest.getEndAt(),
@@ -26,11 +26,11 @@ public class EventSaveConverter {
             .build();
     }
 
-    public Gift converterToGift(GiftSaveDto giftSaveDto) {
+    public Gift convertToGift(GiftSaveDto giftSaveDto) {
         return new Gift(giftSaveDto.getCategory(), giftSaveDto.getGiftItems().size());
     }
 
-    public GiftItem converterToGiftItem(GiftItemSaveDto giftItemSaveDto) {
+    public GiftItem convertToGiftItem(GiftItemSaveDto giftItemSaveDto) {
         return new GiftItem(giftItemSaveDto.getGiftType(),
             giftItemSaveDto.getContent(),
             false);
