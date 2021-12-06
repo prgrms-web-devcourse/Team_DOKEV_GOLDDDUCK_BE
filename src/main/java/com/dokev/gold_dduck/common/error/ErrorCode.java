@@ -12,8 +12,7 @@ public enum ErrorCode {
     UNEXPECTED("-1", "Unexpected exception occurred"),
     INVALID_INPUT_VALUE("C004", "Invalid Input Value"),
     METHOD_NOT_ALLOWED("C005", "Method not allowed"),
-    MEMBER_NOT_FOUND("C006", "Member is not found"),
-    GIFT_NOT_EMPTY("C007", "Gift or GiftItem is must be not empty");
+    GIFT_NOT_EMPTY("C006", "Gift or GiftItem is must be not empty");
 
     private final String code;
 
