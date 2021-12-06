@@ -20,6 +20,7 @@ import javax.persistence.Table;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.BatchSize;
 
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -42,8 +43,9 @@ public class Gift extends BaseEntity {
     @JoinColumn(name = "event_id")
     private Event event;
 
+    @BatchSize(size = 50)
     @OneToMany(mappedBy = "gift", cascade = CascadeType.PERSIST)
-    private final List<GiftItem> giftItems = new ArrayList<>();
+    private List<GiftItem> giftItems = new ArrayList<>();
 
     public Gift(String category, Integer itemCount) {
         Objects.requireNonNull(category, "선물 카테고리는 notnull이어야 합니다.");
