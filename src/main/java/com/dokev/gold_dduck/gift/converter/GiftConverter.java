@@ -23,7 +23,7 @@ public class GiftConverter {
     }
 
     private GiftItemDto convertToGiftItemDto(GiftItem giftItem) {
-        return new GiftItemDto(giftItem.getId(), giftItem.getGiftType().toString(), giftItem.getContent(),
+        return new GiftItemDto(giftItem.getId(), giftItem.getGiftType(), giftItem.getContent(),
                 giftItem.isUsed());
     }
 
