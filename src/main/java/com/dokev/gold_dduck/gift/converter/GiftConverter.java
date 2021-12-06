@@ -19,11 +19,7 @@ public class GiftConverter {
                 .map(this::convertToGiftItemDto)
                 .collect(Collectors.toList());
 
-        if (gift.getItemCount().isEmpty()) {
-            return new GiftDto(gift.getId(), gift.getCategory(), EMPTY, giftItemDtos);
-        }
-
-        return new GiftDto(gift.getId(), gift.getCategory(), gift.getItemCount().get(), giftItemDtos);
+        return new GiftDto(gift.getId(), gift.getCategory(), giftItemDtos.size(), giftItemDtos);
     }
 
     private GiftItemDto convertToGiftItemDto(GiftItem giftItem) {
