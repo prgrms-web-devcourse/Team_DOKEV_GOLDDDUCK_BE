@@ -30,9 +30,11 @@ public class EventSaveDto {
     @NotNull
     private String mainTemplate;
 
+    @NotNull
     @FutureOrPresent
     private LocalDateTime startAt;
 
+    @NotNull
     @Future
     private LocalDateTime endAt;
 
