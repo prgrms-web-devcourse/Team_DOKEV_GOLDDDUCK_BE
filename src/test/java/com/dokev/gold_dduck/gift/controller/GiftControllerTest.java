@@ -65,7 +65,7 @@ class GiftControllerTest {
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(giftFifoChoiceDto))
         );
-        //given
+        //then
         result.andDo(print())
             .andExpectAll(
                 status().isOk(),
@@ -92,7 +92,7 @@ class GiftControllerTest {
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(giftFifoChoiceDto))
         );
-        //given
+        //then
         result.andDo(print())
             .andExpectAll(
                 status().isBadRequest(),
@@ -118,7 +118,7 @@ class GiftControllerTest {
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(giftFifoChoiceDto))
         );
-        //given
+        //then
         result.andDo(print())
             .andExpectAll(
                 status().isBadRequest(),
@@ -146,7 +146,7 @@ class GiftControllerTest {
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(giftFifoChoiceDto))
         );
-        //given
+        //then
         result.andDo(print())
             .andExpectAll(
                 status().isBadRequest(),
@@ -173,7 +173,7 @@ class GiftControllerTest {
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(giftFifoChoiceDto))
         );
-        //given
+        //then
         result.andDo(print())
             .andExpectAll(
                 status().isBadRequest(),
@@ -201,7 +201,7 @@ class GiftControllerTest {
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(giftFifoChoiceDto))
         );
-        //given
+        //then
         result.andDo(print())
             .andExpectAll(
                 status().isBadRequest(),
