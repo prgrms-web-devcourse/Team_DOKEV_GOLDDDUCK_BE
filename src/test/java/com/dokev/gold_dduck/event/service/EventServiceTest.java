@@ -96,7 +96,7 @@ class EventServiceTest {
         //then
         Assertions.assertThat(foundEventDto.getCode()).isEqualTo(event.getCode());
         Assertions.assertThat(foundEventDto.getGifts().size()).isEqualTo(3);
-
+        Assertions.assertThat(foundEventDto.getGifts().get(0).getGiftItems().size()).isEqualTo(3);
     }
 
     private EventDto makeEventDto(UUID eventCode) {
