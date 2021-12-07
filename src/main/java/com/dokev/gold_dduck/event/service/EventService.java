@@ -30,10 +30,8 @@ public class EventService {
 
     @Transactional
     public UUID saveEvent(EventSaveDto eventSaveRequest) {
-
         Member member = memberRepository.findById(eventSaveRequest.getMemberId())
             .orElseThrow(() -> new EntityNotFoundException(Member.class, eventSaveRequest.getMemberId()));
-
         try {
             Event newEvent = eventConverter.convertToEvent(eventSaveRequest, member);
             Event createdEvent = eventRepository.save(newEvent);
