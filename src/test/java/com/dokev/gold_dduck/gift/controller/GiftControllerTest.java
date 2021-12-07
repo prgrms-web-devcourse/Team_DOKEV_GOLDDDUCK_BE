@@ -3,7 +3,7 @@ package com.dokev.gold_dduck.gift.controller;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.nullValue;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.handler;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -60,7 +60,7 @@ class GiftControllerTest {
         GiftItem firstGiftItem = chosenGift.getGiftItems().get(0);
         //when
         ResultActions result = mockMvc.perform(
-            get("/api/v1/gifts/fifo")
+            post("/api/v1/gifts/fifo")
                 .accept(MediaType.APPLICATION_JSON)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(giftFifoChoiceDto))
@@ -87,7 +87,7 @@ class GiftControllerTest {
         GiftFifoChoiceDto giftFifoChoiceDto = new GiftFifoChoiceDto(invalidEventId, 1L, 1L);
         //when
         ResultActions result = mockMvc.perform(
-            get("/api/v1/gifts/fifo")
+            post("/api/v1/gifts/fifo")
                 .accept(MediaType.APPLICATION_JSON)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(giftFifoChoiceDto))
@@ -113,7 +113,7 @@ class GiftControllerTest {
         GiftFifoChoiceDto giftFifoChoiceDto = new GiftFifoChoiceDto(givenEvent.getId(), invalidMemberId, 1L);
         //when
         ResultActions result = mockMvc.perform(
-            get("/api/v1/gifts/fifo")
+            post("/api/v1/gifts/fifo")
                 .accept(MediaType.APPLICATION_JSON)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(giftFifoChoiceDto))
@@ -141,7 +141,7 @@ class GiftControllerTest {
         giftService.chooseGiftItemByFIFO(givenEvent.getId(), givenEvent.getMember().getId(), chosenGift.getId());
         //when
         ResultActions result = mockMvc.perform(
-            get("/api/v1/gifts/fifo")
+            post("/api/v1/gifts/fifo")
                 .accept(MediaType.APPLICATION_JSON)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(giftFifoChoiceDto))
@@ -168,7 +168,7 @@ class GiftControllerTest {
             invalidGiftId);
         //when
         ResultActions result = mockMvc.perform(
-            get("/api/v1/gifts/fifo")
+            post("/api/v1/gifts/fifo")
                 .accept(MediaType.APPLICATION_JSON)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(giftFifoChoiceDto))
@@ -196,7 +196,7 @@ class GiftControllerTest {
             gift.getId());
         //when
         ResultActions result = mockMvc.perform(
-            get("/api/v1/gifts/fifo")
+            post("/api/v1/gifts/fifo")
                 .accept(MediaType.APPLICATION_JSON)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(giftFifoChoiceDto))

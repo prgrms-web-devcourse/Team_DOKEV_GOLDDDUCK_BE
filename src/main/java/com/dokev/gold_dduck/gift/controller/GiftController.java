@@ -4,7 +4,7 @@ import com.dokev.gold_dduck.common.ApiResponse;
 import com.dokev.gold_dduck.gift.dto.GiftFifoChoiceDto;
 import com.dokev.gold_dduck.gift.dto.GiftItemDto;
 import com.dokev.gold_dduck.gift.service.GiftService;
-import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -19,8 +19,8 @@ public class GiftController {
         this.giftService = giftService;
     }
 
-    @GetMapping("v1/gifts/fifo")
-    public ApiResponse<Object> chooseGiftItemByFIFO(@RequestBody GiftFifoChoiceDto giftFifoChoiceDto) {
+    @PostMapping("v1/gifts/fifo")
+    public ApiResponse<GiftItemDto> chooseGiftItemByFIFO(@RequestBody GiftFifoChoiceDto giftFifoChoiceDto) {
         GiftItemDto giftItemDto = giftService.chooseGiftItemByFIFO(giftFifoChoiceDto.getEventId(),
             giftFifoChoiceDto.getMemberId(), giftFifoChoiceDto.getGiftId());
         return ApiResponse.success(giftItemDto);
