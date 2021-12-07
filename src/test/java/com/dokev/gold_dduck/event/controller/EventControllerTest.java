@@ -2,6 +2,7 @@ package com.dokev.gold_dduck.event.controller;
 
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.matchesPattern;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.Matchers.nullValue;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -9,6 +10,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import com.dokev.gold_dduck.common.error.ErrorCode;
 import com.dokev.gold_dduck.event.converter.EventSaveConverter;
 import com.dokev.gold_dduck.event.domain.Event;
 import com.dokev.gold_dduck.event.dto.EventSaveDto;
@@ -19,21 +21,18 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import javax.persistence.EntityManager;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.transaction.annotation.Transactional;
 
 @Transactional
 @AutoConfigureMockMvc
 @SpringBootTest
 class EventControllerTest {
-
-    private Logger logger = LoggerFactory.getLogger(getClass());
 
     @Autowired
     private MockMvc mockMvc;
@@ -58,17 +57,20 @@ class EventControllerTest {
 
         EventSaveDto eventSaveDto = eventSaveConverter.convertToEventSaveDto(newEvent);
 
-        // WHEN, THEN
-        mockMvc.perform(
-                post("/api/v1/events")
-                    .accept(MediaType.APPLICATION_JSON)
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .content(objectMapper.writeValueAsString(eventSaveDto))
-            )
-            .andDo(print())
+        // WHEN
+        ResultActions resultActions = mockMvc.perform(
+            post("/api/v1/events")
+                .accept(MediaType.APPLICATION_JSON)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(eventSaveDto))
+        );
+
+        // THEN
+        resultActions.andDo(print())
             .andExpectAll(status().isOk(),
                 jsonPath("$.success", is(true)),
-                jsonPath("$.data", is(notNullValue()))
+                jsonPath("$.data", is(notNullValue())),
+                jsonPath("$.data", matchesPattern("([a-f0-9]{8}(-[a-f0-9]{4}){4}[a-f0-9]{8})"))
             );
     }
 
@@ -84,18 +86,20 @@ class EventControllerTest {
         EventSaveDto eventSaveDto = eventSaveConverter.convertToEventSaveDto(newEvent);
         eventSaveDto.changedMemberId(eventSaveDto.getMemberId() + 1L);
 
-        // WHEN, THEN
-        mockMvc.perform(
-                post("/api/v1/events")
-                    .accept(MediaType.APPLICATION_JSON)
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .content(objectMapper.writeValueAsString(eventSaveDto))
-            )
-            .andDo(print())
+        // WHEN
+        ResultActions resultActions = mockMvc.perform(
+            post("/api/v1/events")
+                .accept(MediaType.APPLICATION_JSON)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(eventSaveDto))
+        );
+
+        // THEN
+        resultActions.andDo(print())
             .andExpectAll(
                 jsonPath("$.success", is(false)),
                 jsonPath("$.data", is(nullValue())),
-                jsonPath("$.error.code", is("E001")),
+                jsonPath("$.error.code", is(ErrorCode.ENTITY_NOT_FOUND.getCode())),
                 jsonPath("$.error.message", containsString(Member.class.getName()))
             );
     }
@@ -112,19 +116,21 @@ class EventControllerTest {
         EventSaveDto eventSaveDto = eventSaveConverter.convertToEventSaveDto(newEvent);
         eventSaveDto.changedMemberId(eventSaveDto.getMemberId());
 
-        // WHEN, THEN
-        mockMvc.perform(
-                post("/api/v1/events")
-                    .accept(MediaType.APPLICATION_JSON)
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .content(objectMapper.writeValueAsString(eventSaveDto))
-            )
-            .andDo(print())
+        // WHEN
+        ResultActions resultActions = mockMvc.perform(
+            post("/api/v1/events")
+                .accept(MediaType.APPLICATION_JSON)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(eventSaveDto))
+        );
+
+        // THEN
+        resultActions.andDo(print())
             .andExpectAll(
                 jsonPath("$.success", is(false)),
                 jsonPath("$.data", is(nullValue())),
-                jsonPath("$.error.code", is("C004")),
-                jsonPath("$.error.message", containsString("Invalid Input Value"))
+                jsonPath("$.error.code", is(ErrorCode.INVALID_INPUT_VALUE.getCode())),
+                jsonPath("$.error.message", containsString(ErrorCode.INVALID_INPUT_VALUE.getMessage()))
             );
     }
 }
