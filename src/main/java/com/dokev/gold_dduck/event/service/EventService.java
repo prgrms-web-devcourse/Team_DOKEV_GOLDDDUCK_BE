@@ -1,5 +1,6 @@
 package com.dokev.gold_dduck.event.service;
 
+import com.dokev.gold_dduck.common.exception.EntityNotFoundException;
 import com.dokev.gold_dduck.common.exception.GiftEmptyException;
 import com.dokev.gold_dduck.common.exception.MemberNotFoundException;
 import com.dokev.gold_dduck.event.converter.EventFindConverter;
@@ -10,9 +11,7 @@ import com.dokev.gold_dduck.event.dto.EventSaveDto;
 import com.dokev.gold_dduck.event.repository.EventRepository;
 import com.dokev.gold_dduck.member.domain.Member;
 import com.dokev.gold_dduck.member.repository.MemberRepository;
-import java.util.Optional;
 import java.util.UUID;
-import javax.persistence.EntityNotFoundException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -52,11 +51,9 @@ public class EventService {
     }
 
     public EventDto findDetailEventByCode(UUID eventCode) throws EntityNotFoundException {
-        Optional<Event> event = eventRepository.findGiftsByEventCode(eventCode);
-        if (event.isEmpty()) {
-            throw new EntityNotFoundException();
-        }
+        Event event = eventRepository.findGiftsByEventCode(eventCode)
+                .orElseThrow(() -> new EntityNotFoundException(Event.class, eventCode));
 
-        return eventFindConverter.convertToEventDto(event.get());
+        return eventFindConverter.convertToEventDto(event);
     }
 }
