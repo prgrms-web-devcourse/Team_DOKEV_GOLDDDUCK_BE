@@ -198,6 +198,7 @@ class EventControllerTest {
         //when, then
         mockMvc.perform(get("/api/v1/events/{event-code}", UUID.randomUUID()))
                 .andDo(print())
+                .andExpect(status().is4xxClientError())
                 .andExpect(jsonPath("$.success", is(false)))
                 .andExpect(jsonPath("$.data", is(nullValue())))
                 .andExpect(jsonPath("$.error.code", is(ErrorCode.ENTITY_NOT_FOUND.getCode())))
