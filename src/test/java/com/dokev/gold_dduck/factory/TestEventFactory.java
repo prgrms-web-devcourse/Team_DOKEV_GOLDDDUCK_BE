@@ -4,9 +4,14 @@ import com.dokev.gold_dduck.event.domain.Event;
 import com.dokev.gold_dduck.event.domain.Event.EventBuilder;
 import com.dokev.gold_dduck.event.domain.EventProgressStatus;
 import com.dokev.gold_dduck.event.domain.GiftChoiceType;
+import com.dokev.gold_dduck.event.dto.EventDto;
 import com.dokev.gold_dduck.gift.domain.Gift;
+import com.dokev.gold_dduck.gift.dto.GiftDto;
 import com.dokev.gold_dduck.member.domain.Member;
+import com.dokev.gold_dduck.member.dto.MemberDto;
 import java.time.LocalDateTime;
+import java.util.List;
+import java.util.UUID;
 
 public class TestEventFactory {
 
@@ -32,5 +37,18 @@ public class TestEventFactory {
         }
 
         return newEvent;
+    }
+
+    public static EventDto createEventDto(UUID eventCode, MemberDto memberDto, List<GiftDto> giftDtos){
+        return new EventDto(1L,
+                GiftChoiceType.FIFO,
+                LocalDateTime.now(),
+                LocalDateTime.now().plusMinutes(10),
+                eventCode,
+                EventProgressStatus.RUNNING.toString(),
+                "template1",
+                60,
+                memberDto,
+                giftDtos);
     }
 }
