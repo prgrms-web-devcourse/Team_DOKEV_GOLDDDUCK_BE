@@ -14,15 +14,11 @@ import com.dokev.gold_dduck.event.dto.EventDto;
 import com.dokev.gold_dduck.event.dto.EventSaveDto;
 import com.dokev.gold_dduck.event.repository.EventRepository;
 import com.dokev.gold_dduck.factory.TestEventFactory;
-import com.dokev.gold_dduck.factory.TestGiftFactory;
-import com.dokev.gold_dduck.factory.TestGiftItemFactory;
 import com.dokev.gold_dduck.factory.TestMemberFactory;
-import com.dokev.gold_dduck.gift.dto.GiftDto;
-import com.dokev.gold_dduck.gift.dto.GiftItemDto;
+import com.dokev.gold_dduck.gift.converter.GiftConverter;
+import com.dokev.gold_dduck.member.converter.MemberConverter;
 import com.dokev.gold_dduck.member.domain.Member;
-import com.dokev.gold_dduck.member.dto.MemberDto;
 import com.dokev.gold_dduck.member.repository.MemberRepository;
-import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import org.assertj.core.api.Assertions;
@@ -77,36 +73,21 @@ class EventServiceTest {
     @DisplayName("이벤트 코드 통한 이벤트 조회 테스트 - 성공")
     void findDetailEventByCodeTest() {
         //given
-        UUID eventCode = UUID.randomUUID();
-
         Member member = TestMemberFactory.createTestMember();
 
-        Event event = TestEventFactory.builder(member)
-                .code(eventCode)
-                .build();
+        Event event = TestEventFactory.createEvent(member);
+        EventFindConverter eventFindConverter = new EventFindConverter(new MemberConverter(), new GiftConverter());
+        EventDto eventDto = eventFindConverter.convertToEventDto(event);
 
-        EventDto eventDto = makeEventDto(eventCode);
-
-        given(eventRepository.findGiftsByEventCode(eventCode)).willReturn(Optional.of(event));
-        given(eventFindConverter.convertToEventDto(event)).willReturn(eventDto);
+        given(eventRepository.findGiftsByEventCode(event.getCode())).willReturn(Optional.of(event));
+        given(this.eventFindConverter.convertToEventDto(event)).willReturn(eventDto);
 
         //when
-        EventDto foundEventDto = eventService.findDetailEventByCode(eventCode);
+        EventDto foundEventDto = eventService.findDetailEventByCode(event.getCode());
 
         //then
         Assertions.assertThat(foundEventDto.getCode()).isEqualTo(event.getCode());
         Assertions.assertThat(foundEventDto.getGifts().size()).isEqualTo(3);
         Assertions.assertThat(foundEventDto.getGifts().get(0).getGiftItems().size()).isEqualTo(3);
-    }
-
-    private EventDto makeEventDto(UUID eventCode) {
-        MemberDto memberDto = new MemberDto(1L, "dokev", "dokev@gmail.com", "id123",
-                "http://dokev/image.jpg");
-
-        List<GiftItemDto> giftItemDtos = TestGiftItemFactory.createTestGiftItemDtos();
-
-        List<GiftDto> giftDtos = TestGiftFactory.createTestGiftDtos(giftItemDtos);
-
-        return TestEventFactory.createEventDto(eventCode, memberDto, giftDtos);
     }
 }
