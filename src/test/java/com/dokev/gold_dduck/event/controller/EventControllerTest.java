@@ -198,11 +198,10 @@ class EventControllerTest {
         //when, then
         mockMvc.perform(get("/api/v1/events/{event-code}", UUID.randomUUID()))
                 .andDo(print())
-                .andExpect(status().isOk())
                 .andExpect(jsonPath("$.success", is(false)))
                 .andExpect(jsonPath("$.data", is(nullValue())))
                 .andExpect(jsonPath("$.error.code", is(ErrorCode.ENTITY_NOT_FOUND.getCode())))
                 .andExpect(jsonPath("$.error.message",
-                        containsString(ErrorCode.ENTITY_NOT_FOUND.getMessage())));
+                        containsString("해당 엔티티를 찾을 수 없습니다.")));
     }
 }
