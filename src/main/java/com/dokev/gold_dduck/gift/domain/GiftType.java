@@ -1,5 +1,5 @@
 package com.dokev.gold_dduck.gift.domain;
 
 public enum GiftType {
-    URL, TEXT, IMAGE
+    URL, TEXT, IMAGE, DEFAULT
 }

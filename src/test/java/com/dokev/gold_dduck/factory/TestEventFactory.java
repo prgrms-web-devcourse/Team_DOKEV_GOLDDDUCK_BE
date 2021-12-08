@@ -39,16 +39,27 @@ public class TestEventFactory {
         return newEvent;
     }
 
-    public static EventDto createEventDto(UUID eventCode, MemberDto memberDto, List<GiftDto> giftDtos){
+    public static Event createRandomEvent(Member member) {
+        Event newEvent = TestEventFactory.builder(member).giftChoiceType(GiftChoiceType.RANDOM).build();
+
+        Gift testGift = TestGiftFactory.createTestGift("gift", 3, newEvent);
+        for (int j = 0; j < 3; j++) {
+            TestGiftItemFactory.createTestGiftItem("image" + j, testGift);
+        }
+
+        return newEvent;
+    }
+
+    public static EventDto createEventDto(UUID eventCode, MemberDto memberDto, List<GiftDto> giftDtos) {
         return new EventDto(1L,
-                GiftChoiceType.FIFO,
-                LocalDateTime.now(),
-                LocalDateTime.now().plusMinutes(10),
-                eventCode,
-                EventProgressStatus.RUNNING.toString(),
-                "template1",
-                60,
-                memberDto,
-                giftDtos);
+            GiftChoiceType.FIFO,
+            LocalDateTime.now(),
+            LocalDateTime.now().plusMinutes(10),
+            eventCode,
+            EventProgressStatus.RUNNING.toString(),
+            "template1",
+            60,
+            memberDto,
+            giftDtos);
     }
 }
