@@ -12,7 +12,7 @@ public enum ErrorCode {
     GIFT_STOCK_OUT("G002", "선물의 재고가 전부 소진되었습니다."),
     INVALID_INPUT_VALUE("C004", "Invalid Input Value"),
     METHOD_NOT_ALLOWED("C005", "Method not allowed"),
-    GIFT_NOT_EMPTY("C006", "Gift or GiftItem is must be not empty");
+    GIFT_NOT_EMPTY("C006", "Gift or GiftItem is must not be empty");
 
     private final String code;
 

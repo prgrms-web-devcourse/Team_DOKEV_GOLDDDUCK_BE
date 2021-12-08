@@ -25,7 +25,7 @@ public class EventService {
     private final MemberRepository memberRepository;
 
     public EventService(EventRepository eventRepository, EventSaveConverter eventConverter,
-            EventFindConverter eventFindConverter, MemberRepository memberRepository) {
+        EventFindConverter eventFindConverter, MemberRepository memberRepository) {
         this.eventRepository = eventRepository;
         this.eventSaveConverter = eventConverter;
         this.eventFindConverter = eventFindConverter;
@@ -34,9 +34,8 @@ public class EventService {
 
     @Transactional
     public UUID saveEvent(EventSaveDto eventSaveRequest) {
-
         Member member = memberRepository.findById(eventSaveRequest.getMemberId())
-                .orElseThrow(() -> new EntityNotFoundException(Member.class, eventSaveRequest.getMemberId()));
+            .orElseThrow(() -> new EntityNotFoundException(Member.class, eventSaveRequest.getMemberId()));
 
         try {
             Event newEvent = eventSaveConverter.convertToEvent(eventSaveRequest, member);
@@ -49,7 +48,7 @@ public class EventService {
 
     public EventDto findDetailEventByCode(UUID eventCode) throws EntityNotFoundException {
         Event event = eventRepository.findGiftsByEventCode(eventCode)
-                .orElseThrow(() -> new EntityNotFoundException(Event.class, eventCode));
+            .orElseThrow(() -> new EntityNotFoundException(Event.class, eventCode));
 
         return eventFindConverter.convertToEventDto(event);
     }
