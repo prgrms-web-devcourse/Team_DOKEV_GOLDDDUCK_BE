@@ -29,12 +29,7 @@ public class TestEventFactory {
     public static Event createEvent(Member member) {
         Event newEvent = TestEventFactory.builder(member).build();
 
-        for (int i = 0; i < 3; i++) {
-            Gift testGift = TestGiftFactory.createTestGift("gift" + i, 3, newEvent);
-            for (int j = 0; j < 3; j++) {
-                TestGiftItemFactory.createTestGiftItem("image" + i, testGift);
-            }
-        }
+        createGift(newEvent);
 
         return newEvent;
     }
@@ -42,12 +37,18 @@ public class TestEventFactory {
     public static Event createRandomEvent(Member member) {
         Event newEvent = TestEventFactory.builder(member).giftChoiceType(GiftChoiceType.RANDOM).build();
 
-        Gift testGift = TestGiftFactory.createTestGift("gift", 3, newEvent);
-        for (int j = 0; j < 3; j++) {
-            TestGiftItemFactory.createTestGiftItem("image" + j, testGift);
-        }
+        createGift(newEvent);
 
         return newEvent;
+    }
+
+    private static void createGift(Event newEvent) {
+        for (int i = 0; i < 3; i++) {
+            Gift testGift = TestGiftFactory.createTestGift("gift" + i, 3, newEvent);
+            for (int j = 0; j < 3; j++) {
+                TestGiftItemFactory.createTestGiftItem("image" + i, testGift);
+            }
+        }
     }
 
     public static EventDto createEventDto(UUID eventCode, MemberDto memberDto, List<GiftDto> giftDtos) {

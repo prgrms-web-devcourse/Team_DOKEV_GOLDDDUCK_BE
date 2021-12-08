@@ -12,7 +12,6 @@ public enum ErrorCode {
 
     GIFT_ALREADY_ALLOCATED("G001", "이미 할당된 선물입니다."),
     GIFT_STOCK_OUT("G002", "선물의 재고가 전부 소진되었습니다."),
-    GIFT_OVER_FLOW("G003", "랜덤 이벤트 생성 시 선물은 하나만 가능합니다."),
 
     INVALID_INPUT_VALUE("C004", "Invalid Input Value"),
     METHOD_NOT_ALLOWED("C005", "Method not allowed"),

@@ -16,16 +16,14 @@ import com.dokev.gold_dduck.event.converter.EventSaveConverter;
 import com.dokev.gold_dduck.event.domain.Event;
 import com.dokev.gold_dduck.event.dto.EventSaveDto;
 import com.dokev.gold_dduck.factory.TestEventFactory;
-import com.dokev.gold_dduck.factory.TestGiftFactory;
-import com.dokev.gold_dduck.factory.TestGiftItemFactory;
 import com.dokev.gold_dduck.factory.TestMemberFactory;
-import com.dokev.gold_dduck.gift.domain.Gift;
 import com.dokev.gold_dduck.gift.domain.GiftItem;
 import com.dokev.gold_dduck.gift.repository.GiftItemRepository;
 import com.dokev.gold_dduck.member.domain.Member;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.List;
 import javax.persistence.EntityManager;
+import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,6 +34,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.transaction.annotation.Transactional;
 
+@Slf4j
 @Transactional
 @AutoConfigureMockMvc
 @SpringBootTest
@@ -113,39 +112,6 @@ class EventControllerTest {
 
         List<GiftItem> giftItems = giftItemRepository.findAll();
         assertThat(giftItems.size()).isEqualTo(newEvent.getMaxParticipantCount());
-    }
-
-    @Test
-    @DisplayName("랜덤 이벤트 생성 테스트 - 실패 (선물이 여러개인 경우)")
-    void saveRandomEventFailureTest() throws Exception {
-
-        // GIVEN
-        Member testMember = TestMemberFactory.createTestMember();
-        entityManager.persist(testMember);
-
-        Event newEvent = TestEventFactory.createRandomEvent(testMember);
-
-        Gift testGift = TestGiftFactory.createTestGift("잘못된 선물", 0, newEvent);
-        TestGiftItemFactory.createTestGiftItem("선물 아이템", testGift);
-
-        EventSaveDto eventSaveDto = eventSaveConverter.convertToEventSaveDto(newEvent);
-
-        // WHEN
-        ResultActions resultActions = mockMvc.perform(
-            post("/api/v1/events")
-                .accept(MediaType.APPLICATION_JSON)
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(eventSaveDto))
-        );
-
-        // THEN
-        resultActions.andDo(print())
-            .andExpectAll(status().isBadRequest(),
-                jsonPath("$.success", is(false)),
-                jsonPath("$.data", is(nullValue())),
-                jsonPath("$.error.code", is(ErrorCode.GIFT_OVER_FLOW.getCode())),
-                jsonPath("$.error.message", containsString(ErrorCode.GIFT_OVER_FLOW.getMessage()))
-            );
     }
 
     @Test
