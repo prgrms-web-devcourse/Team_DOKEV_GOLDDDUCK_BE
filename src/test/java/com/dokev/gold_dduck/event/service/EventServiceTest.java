@@ -79,7 +79,7 @@ class EventServiceTest {
         EventFindConverter eventFindConverter = new EventFindConverter(new MemberConverter(), new GiftConverter());
         EventDto eventDto = eventFindConverter.convertToEventDto(event);
 
-        given(eventRepository.findGiftsByEventCode(event.getCode())).willReturn(Optional.of(event));
+        given(eventRepository.findEventByCodeWithGift(event.getCode())).willReturn(Optional.of(event));
         given(this.eventFindConverter.convertToEventDto(event)).willReturn(eventDto);
 
         //when
