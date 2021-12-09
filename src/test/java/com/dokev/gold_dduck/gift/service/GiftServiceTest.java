@@ -17,6 +17,7 @@ import com.dokev.gold_dduck.gift.repository.GiftItemRepository;
 import com.dokev.gold_dduck.gift.repository.GiftRepository;
 import com.dokev.gold_dduck.member.domain.Member;
 import com.dokev.gold_dduck.member.repository.MemberRepository;
+import javax.persistence.EntityManager;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,6 +29,9 @@ import org.springframework.context.annotation.Import;
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 @DataJpaTest
 class GiftServiceTest {
+
+    @Autowired
+    private EntityManager entityManager;
 
     @Autowired
     private EventRepository eventRepository;
@@ -51,7 +55,7 @@ class GiftServiceTest {
     @DisplayName("선착순으로 선물 받기 성공 테스트")
     void chooseGiftItemByFIFOSuccessTest() {
         //given
-        Member savedMember = memberRepository.save(TestMemberFactory.createTestMember());
+        Member savedMember = TestMemberFactory.givenMembers(entityManager).getUserMember();
         Event savedEvent = eventRepository.save(TestEventFactory.builder(savedMember).build());
         Gift gift = new Gift("커피", 20);
         gift.changeEvent(savedEvent);

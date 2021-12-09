@@ -8,6 +8,7 @@ import com.dokev.gold_dduck.event.domain.EventLog;
 import com.dokev.gold_dduck.factory.TestEventFactory;
 import com.dokev.gold_dduck.factory.TestMemberFactory;
 import com.dokev.gold_dduck.member.domain.Member;
+import javax.persistence.EntityManager;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,7 +23,7 @@ import org.springframework.context.annotation.Import;
 class EventLogRepositoryTest {
 
     @Autowired
-    private TestEntityManager entityManager;
+    private EntityManager entityManager;
 
     @Autowired
     private EventLogRepository sut;
@@ -31,8 +32,7 @@ class EventLogRepositoryTest {
     @DisplayName("Event Id와 Member Id를 조건으로 일치하는 EventLog 검색 - 성공 테스트")
     void existsByEventIdAndMemberIdSuccessTest() {
         //given
-        Member member = TestMemberFactory.createTestMember();
-        entityManager.persist(member);
+        Member member = TestMemberFactory.givenMembers(entityManager).getUserMember();
         Event event = TestEventFactory.builder(member).build();
         entityManager.persist(event);
         entityManager.persist(new EventLog(event, member, null, null));

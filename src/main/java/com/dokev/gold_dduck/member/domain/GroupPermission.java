@@ -8,8 +8,11 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
+import lombok.AccessLevel;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
 @Table(name = "group_permission")
 @Entity
@@ -27,4 +30,9 @@ public class GroupPermission {
     @ManyToOne(optional = false)
     @JoinColumn(name = "permission_id")
     private Permission permission;
+
+    public GroupPermission(Group group, Permission permission) {
+        this.group = group;
+        this.permission = permission;
+    }
 }

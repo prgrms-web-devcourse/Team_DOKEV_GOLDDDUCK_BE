@@ -228,8 +228,7 @@ class GiftControllerTest {
     }
 
     private Member givenMember() {
-        Member member = TestMemberFactory.createTestMember();
-        entityManager.persist(member);
+        Member member = TestMemberFactory.givenMembers(entityManager).getUserMember();
         return member;
     }
 
