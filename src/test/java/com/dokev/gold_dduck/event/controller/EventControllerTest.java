@@ -183,19 +183,6 @@ class EventControllerTest {
     @Test
     @DisplayName("이벤트 조회 테스트 - 실패")
     void findEventByCodeFailTest() throws Exception {
-        //given
-        Member member = TestMemberFactory.createTestMember();
-        entityManager.persist(member);
-
-        Event event = TestEventFactory.createEvent(member);
-        event.changeMember(member);
-        entityManager.persist(event);
-
-        entityManager.clear();
-
-        EventDto eventDto = eventFindConverter.convertToEventDto(event);
-
-        //when, then
         mockMvc.perform(get("/api/v1/events/{event-code}", UUID.randomUUID()))
                 .andDo(print())
                 .andExpect(status().is4xxClientError())

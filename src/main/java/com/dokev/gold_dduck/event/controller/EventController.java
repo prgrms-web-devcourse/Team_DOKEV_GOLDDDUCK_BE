@@ -32,8 +32,8 @@ public class EventController {
     }
 
     @GetMapping(value = "/v1/events/{event-code}")
-    public ApiResponse<EventDto> findEventByCode(@PathVariable("event-code") String eventCode) {
-        EventDto eventDto = eventService.findDetailEventByCode(UUID.fromString(eventCode));
+    public ApiResponse<EventDto> findEventByCode(@PathVariable("event-code") UUID eventCode) {
+        EventDto eventDto = eventService.findDetailEventByCode(eventCode);
         return ApiResponse.success(eventDto);
     }
 }
