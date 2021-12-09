@@ -66,7 +66,7 @@ class EventRepositoryTest {
         entityManager.persist(giftItem4);
 
         entityManager.clear();
-        Optional<Event> findByCodeEvent = eventRepository.findGiftsByEventCode(eventCode);
+        Optional<Event> findByCodeEvent = eventRepository.findEventByCodeWithGift(eventCode);
 
         Assertions.assertThat(findByCodeEvent.get().getId()).isEqualTo(event.getId());
         Assertions.assertThat(findByCodeEvent.get().getGifts().size()).isEqualTo(2);

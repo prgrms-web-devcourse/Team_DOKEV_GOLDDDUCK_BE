@@ -9,15 +9,20 @@ import com.dokev.gold_dduck.member.converter.MemberConverter;
 import com.dokev.gold_dduck.member.dto.MemberDto;
 import java.util.ArrayList;
 import java.util.List;
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Component
-public class EventConverter {
+public class EventFindConverter {
 
-    private final MemberConverter memberConverter;
-    private final GiftConverter giftConverter;
+    private MemberConverter memberConverter;
+    private GiftConverter giftConverter;
 
-    public EventConverter(MemberConverter memberConverter, GiftConverter giftConverter) {
+    @Autowired
+    public EventFindConverter(MemberConverter memberConverter, GiftConverter giftConverter) {
         this.memberConverter = memberConverter;
         this.giftConverter = giftConverter;
     }
