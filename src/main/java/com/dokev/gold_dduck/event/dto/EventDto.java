@@ -1,5 +1,6 @@
 package com.dokev.gold_dduck.event.dto;
 
+import com.dokev.gold_dduck.event.domain.EventProgressStatus;
 import com.dokev.gold_dduck.event.domain.GiftChoiceType;
 import com.dokev.gold_dduck.gift.dto.GiftDto;
 import com.dokev.gold_dduck.member.dto.MemberDto;
@@ -28,7 +29,7 @@ public class EventDto {
 
     private UUID code;
 
-    private String eventProgressStatus;
+    private EventProgressStatus eventProgressStatus;
 
     private String mainTemplate;
 
@@ -39,7 +40,7 @@ public class EventDto {
     private List<GiftDto> gifts;
 
     public EventDto(Long eventId, GiftChoiceType giftChoiceType, LocalDateTime startAt, LocalDateTime endAt,
-        UUID code, String eventProgressStatus, String mainTemplate, Integer maxParticipantCount,
+        UUID code, EventProgressStatus eventProgressStatus, String mainTemplate, Integer maxParticipantCount,
         MemberDto member, List<GiftDto> gifts) {
         this.eventId = eventId;
         this.giftChoiceType = giftChoiceType;
