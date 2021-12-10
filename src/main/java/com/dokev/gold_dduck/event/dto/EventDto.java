@@ -20,10 +20,10 @@ public class EventDto {
 
     private GiftChoiceType giftChoiceType;
 
-    @JsonFormat(shape = Shape.OBJECT, timezone = "Asia/Seoul")
+    @JsonFormat(shape = Shape.STRING, timezone = "Asia/Seoul")
     private LocalDateTime startAt;
 
-    @JsonFormat(shape = Shape.OBJECT, timezone = "Asia/Seoul")
+    @JsonFormat(shape = Shape.STRING, timezone = "Asia/Seoul")
     private LocalDateTime endAt;
 
     private UUID code;
