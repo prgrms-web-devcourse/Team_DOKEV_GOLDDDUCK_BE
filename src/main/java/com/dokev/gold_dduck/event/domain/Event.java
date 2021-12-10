@@ -37,6 +37,9 @@ public class Event extends BaseEntity {
     @Column(name = "event_id")
     private Long id;
 
+    @Column(name = "title", length = 50, nullable = false)
+    private String title;
+
     @Enumerated(value = EnumType.STRING)
     @Column(name = "gift_choice_type", length = 20, nullable = false)
     private GiftChoiceType giftChoiceType;
@@ -69,9 +72,10 @@ public class Event extends BaseEntity {
 
     @Builder(builderMethodName = "eventInternalBuilder")
     private Event(
-        GiftChoiceType giftChoiceType, LocalDateTime startAt, LocalDateTime endAt, UUID code,
+        String title, GiftChoiceType giftChoiceType, LocalDateTime startAt, LocalDateTime endAt, UUID code,
         EventProgressStatus eventProgressStatus, String mainTemplate, Integer maxParticipantCount, Member member
     ) {
+        this.title = title;
         this.giftChoiceType = giftChoiceType;
         this.startAt = startAt;
         this.endAt = endAt;
@@ -83,7 +87,7 @@ public class Event extends BaseEntity {
     }
 
     public static EventBuilder builder(
-        GiftChoiceType giftChoiceType, LocalDateTime startAt, LocalDateTime endAt,
+        String title, GiftChoiceType giftChoiceType, LocalDateTime startAt, LocalDateTime endAt,
         EventProgressStatus eventProgressStatus, String mainTemplate, Integer maxParticipantCount, Member member
     ) {
         Objects.requireNonNull(giftChoiceType, "이벤트에서 선물 받을 방법을 선택해야 합니다.");
@@ -95,6 +99,7 @@ public class Event extends BaseEntity {
         Objects.requireNonNull(member, "이벤트 생성자는 notnull이어야 합니다.");
 
         return eventInternalBuilder()
+            .title(title)
             .code(UUID.randomUUID())
             .giftChoiceType(giftChoiceType)
             .startAt(startAt)

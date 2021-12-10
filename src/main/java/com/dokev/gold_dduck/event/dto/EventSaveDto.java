@@ -21,6 +21,9 @@ public class EventSaveDto {
     private Long memberId;
 
     @NotNull
+    private String title;
+
+    @NotNull
     @Size(min = 1, max = 100)
     private List<GiftSaveDto> gifts;
 
