@@ -11,6 +11,7 @@ import java.util.ArrayList;
 import java.util.List;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -20,6 +21,7 @@ public class EventFindConverter {
     private MemberConverter memberConverter;
     private GiftConverter giftConverter;
 
+    @Autowired
     public EventFindConverter(MemberConverter memberConverter, GiftConverter giftConverter) {
         this.memberConverter = memberConverter;
         this.giftConverter = giftConverter;
@@ -33,8 +35,8 @@ public class EventFindConverter {
             giftDtos.add(giftConverter.convertToGiftDto(gift));
         }
 
-        return new EventDto(event.getId(), event.getGiftChoiceType(), event.getStartAt(), event.getEndAt(),
-                event.getCode(), event.getEventProgressStatus().toString(), event.getMainTemplate(),
-                event.getMaxParticipantCount(), memberDto, giftDtos);
+        return new EventDto(event.getId(), event.getTitle(), event.getGiftChoiceType(), event.getStartAt(),
+            event.getEndAt(), event.getCode(), event.getEventProgressStatus(), event.getMainTemplate(),
+            event.getMaxParticipantCount(), memberDto, giftDtos);
     }
 }

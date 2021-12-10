@@ -19,7 +19,8 @@ public class EventSaveConverter {
 
     public Event convertToEvent(EventSaveDto eventSaveRequest, Member member)
         throws IllegalArgumentException {
-        Event newEvent = Event.builder(eventSaveRequest.getGiftChoiceType(),
+        Event newEvent = Event.builder(eventSaveRequest.getTitle(),
+                eventSaveRequest.getGiftChoiceType(),
                 eventSaveRequest.getStartAt(),
                 eventSaveRequest.getEndAt(),
                 EventProgressStatus.RUNNING,
@@ -60,7 +61,7 @@ public class EventSaveConverter {
     }
 
     public EventSaveDto convertToEventSaveDto(Event event) {
-        return new EventSaveDto(event.getMember().getId(), convertToGiftSaveDtos(event.getGifts()),
+        return new EventSaveDto(event.getMember().getId(), event.getTitle(), convertToGiftSaveDtos(event.getGifts()),
             event.getGiftChoiceType(), event.getMainTemplate(), event.getStartAt(), event.getEndAt(),
             event.getMaxParticipantCount());
     }

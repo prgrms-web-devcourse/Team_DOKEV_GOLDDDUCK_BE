@@ -95,7 +95,7 @@ public class EventService {
     }
 
     public EventDto findDetailEventByCode(UUID eventCode) throws EntityNotFoundException {
-        Event event = eventRepository.findGiftsByEventCode(eventCode)
+        Event event = eventRepository.findEventByCodeWithGift(eventCode)
             .orElseThrow(() -> new EntityNotFoundException(Event.class, eventCode));
 
         return eventFindConverter.convertToEventDto(event);

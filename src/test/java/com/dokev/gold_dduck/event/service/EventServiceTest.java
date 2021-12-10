@@ -51,7 +51,7 @@ class EventServiceTest {
     @DisplayName("이벤트 코드 생성 테스트 - 성공")
     void eventCreateTest() {
         // GIVEN
-        Member testMember = TestMemberFactory.createTestMember();
+        Member testMember = mock(Member.class);
 
         Event newEvent = TestEventFactory.createEvent(testMember);
 
@@ -73,13 +73,13 @@ class EventServiceTest {
     @DisplayName("이벤트 코드 통한 이벤트 조회 테스트 - 성공")
     void findDetailEventByCodeTest() {
         //given
-        Member member = TestMemberFactory.createTestMember();
+        Member member = mock(Member.class);
 
         Event event = TestEventFactory.createEvent(member);
         EventFindConverter eventFindConverter = new EventFindConverter(new MemberConverter(), new GiftConverter());
         EventDto eventDto = eventFindConverter.convertToEventDto(event);
 
-        given(eventRepository.findGiftsByEventCode(event.getCode())).willReturn(Optional.of(event));
+        given(eventRepository.findEventByCodeWithGift(event.getCode())).willReturn(Optional.of(event));
         given(this.eventFindConverter.convertToEventDto(event)).willReturn(eventDto);
 
         //when

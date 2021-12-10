@@ -6,6 +6,7 @@ import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.matchesPattern;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.Matchers.nullValue;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.multipart;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
@@ -13,8 +14,10 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import com.dokev.gold_dduck.common.error.ErrorCode;
+import com.dokev.gold_dduck.event.converter.EventFindConverter;
 import com.dokev.gold_dduck.event.converter.EventSaveConverter;
 import com.dokev.gold_dduck.event.domain.Event;
+import com.dokev.gold_dduck.event.dto.EventDto;
 import com.dokev.gold_dduck.event.dto.EventSaveDto;
 import com.dokev.gold_dduck.event.dto.GiftItemSaveDto;
 import com.dokev.gold_dduck.factory.TestEventFactory;
@@ -23,8 +26,10 @@ import com.dokev.gold_dduck.gift.domain.GiftItem;
 import com.dokev.gold_dduck.gift.domain.GiftType;
 import com.dokev.gold_dduck.gift.repository.GiftItemRepository;
 import com.dokev.gold_dduck.member.domain.Member;
+import com.dokev.gold_dduck.security.WithMockJwtAuthentication;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.List;
+import java.util.UUID;
 import javax.persistence.EntityManager;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.DisplayName;
@@ -38,6 +43,7 @@ import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.transaction.annotation.Transactional;
 
 @Slf4j
+@WithMockJwtAuthentication
 @Transactional
 @AutoConfigureMockMvc
 @SpringBootTest
@@ -58,12 +64,14 @@ class EventControllerTest {
     @Autowired
     private GiftItemRepository giftItemRepository;
 
+    @Autowired
+    private EventFindConverter eventFindConverter;
+
     @Test
     @DisplayName("선착순 이벤트 생성 테스트 - 성공")
     void saveEventTest() throws Exception {
         // GIVEN
-        Member testMember = TestMemberFactory.createTestMember();
-        entityManager.persist(testMember);
+        Member testMember = TestMemberFactory.getUserMember(entityManager);
 
         EventSaveDto eventSaveDto = TestEventFactory.createEventSaveDto(testMember);
 
@@ -88,7 +96,7 @@ class EventControllerTest {
     @DisplayName("랜덤 이벤트 생성 테스트 - 성공")
     void saveRandomEventTest() throws Exception {
         // GIVEN
-        Member testMember = TestMemberFactory.createTestMember();
+        Member testMember = TestMemberFactory.createTestMember(entityManager);
         entityManager.persist(testMember);
 
         Event newEvent = TestEventFactory.createRandomEvent(testMember);
@@ -116,16 +124,54 @@ class EventControllerTest {
     }
 
     @Test
+    @DisplayName("이벤트 조회 테스트 - 성공")
+    void findEventByCode() throws Exception {
+        //given
+        Member member = TestMemberFactory.getUserMember(entityManager);
+
+        Event event = TestEventFactory.createEvent(member);
+        event.changeMember(member);
+        entityManager.persist(event);
+
+        entityManager.clear();
+
+        EventDto eventDto = eventFindConverter.convertToEventDto(event);
+
+        //when, then
+        mockMvc.perform(get("/api/v1/events/{event-code}", event.getCode()))
+            .andDo(print())
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.success", is(true)))
+            .andExpect(jsonPath("$.data.eventId", is(eventDto.getEventId().intValue())))
+            .andExpect(jsonPath("$.data.title", is(eventDto.getTitle())))
+            .andExpect(jsonPath("$.data.giftChoiceType", is(eventDto.getGiftChoiceType().toString())))
+            .andExpect(jsonPath("$.data.code", is(eventDto.getCode().toString())))
+            .andExpect(jsonPath("$.data.eventProgressStatus", is(eventDto.getEventProgressStatus().toString())))
+            .andExpect(jsonPath("$.data.mainTemplate", is(eventDto.getMainTemplate())))
+            .andExpect(jsonPath("$.data.maxParticipantCount", is(eventDto.getMaxParticipantCount())))
+            .andExpect(jsonPath("$.data.member.id", is(eventDto.getMember().getId().intValue())))
+            .andExpect(jsonPath("$.data.gifts[0].id", is(eventDto.getGifts().get(0).getId().intValue())))
+            .andExpect(jsonPath("$.data.gifts[1].id", is(eventDto.getGifts().get(1).getId().intValue())))
+            .andExpect(jsonPath("$.data.gifts[2].id", is(eventDto.getGifts().get(2).getId().intValue())))
+            .andExpect(jsonPath("$.data.gifts[0].giftItems[0].id",
+                is(eventDto.getGifts().get(0).getGiftItems().get(0).getId().intValue())))
+            .andExpect(jsonPath("$.data.gifts[0].giftItems[1].id",
+                is(eventDto.getGifts().get(0).getGiftItems().get(1).getId().intValue())))
+            .andExpect(jsonPath("$.data.gifts[0].giftItems[2].id",
+                is(eventDto.getGifts().get(0).getGiftItems().get(2).getId().intValue())))
+            .andExpect(jsonPath("$.error", is(nullValue())));
+    }
+
+    @Test
     @DisplayName("이벤트 생성 실패 (존재하지 않는 memberId)")
     void saveEventFailureTest() throws Exception {
         // GIVEN
-        Member testMember = TestMemberFactory.createTestMember();
-        entityManager.persist(testMember);
+        Member testMember = TestMemberFactory.getUserMember(entityManager);
 
         Event newEvent = TestEventFactory.createEvent(testMember);
 
         EventSaveDto eventSaveDto = eventSaveConverter.convertToEventSaveDto(newEvent);
-        eventSaveDto.changedMemberId(eventSaveDto.getMemberId() + 1L);
+        eventSaveDto.changedMemberId(-1L);
 
         // WHEN
         ResultActions resultActions = mockMvc.perform(
@@ -149,8 +195,7 @@ class EventControllerTest {
     @DisplayName("이벤트 생성 실패 (Invalid Input Value - 선물이 비어 있는 경우)")
     void saveEventFailureTest2() throws Exception {
         // GIVEN
-        Member testMember = TestMemberFactory.createTestMember();
-        entityManager.persist(testMember);
+        Member testMember = TestMemberFactory.getUserMember(entityManager);
 
         Event newEvent = TestEventFactory.builder(testMember).build();
 
@@ -179,7 +224,7 @@ class EventControllerTest {
     @DisplayName("선착순 이벤트 생성 테스트 - 실패(선물 아이템에 텍스트, 파일 아무것도 없는 경우)")
     void saveEventFailureTest3() throws Exception {
         // GIVEN
-        Member testMember = TestMemberFactory.createTestMember();
+        Member testMember = TestMemberFactory.createTestMember(entityManager);
         entityManager.persist(testMember);
 
         EventSaveDto eventSaveDto = TestEventFactory.createEventSaveDto(testMember);
@@ -202,5 +247,19 @@ class EventControllerTest {
                 jsonPath("$.error.code", is(ErrorCode.GIFT_NOT_EMPTY.getCode())),
                 jsonPath("$.error.message", containsString(ErrorCode.GIFT_NOT_EMPTY.getMessage()))
             );
+    }
+
+    @Test
+    @DisplayName("이벤트 조회 테스트 - 실패")
+    void findEventByCodeFailTest() throws Exception {
+        mockMvc.perform(get("/api/v1/events/{event-code}", UUID.randomUUID()))
+            .andDo(print())
+            .andExpect(status().is4xxClientError())
+            .andExpect(jsonPath("$.success", is(false)))
+            .andExpect(jsonPath("$.data", is(nullValue())))
+            .andExpect(jsonPath("$.error.code", is(ErrorCode.ENTITY_NOT_FOUND.getCode())))
+            .andExpect(jsonPath("$.error.message",
+                containsString("해당 엔티티를 찾을 수 없습니다.")));
+
     }
 }

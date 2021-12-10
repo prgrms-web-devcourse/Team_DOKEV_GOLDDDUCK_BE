@@ -8,8 +8,10 @@ import com.dokev.gold_dduck.gift.domain.Gift;
 import com.dokev.gold_dduck.gift.domain.GiftItem;
 import com.dokev.gold_dduck.gift.domain.GiftType;
 import com.dokev.gold_dduck.member.domain.Member;
+import com.dokev.gold_dduck.member.repository.MemberRepository;
 import java.util.Optional;
 import java.util.UUID;
+import javax.persistence.EntityManager;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -25,7 +27,7 @@ import org.springframework.context.annotation.Import;
 class EventRepositoryTest {
 
     @Autowired
-    private TestEntityManager entityManager;
+    private EntityManager entityManager;
 
     @Autowired
     private EventRepository eventRepository;
@@ -35,8 +37,7 @@ class EventRepositoryTest {
     void findGiftsByEventCode() {
         UUID eventCode = UUID.randomUUID();
 
-        Member member = TestMemberFactory.createTestMember();
-        entityManager.persist(member);
+        Member member = TestMemberFactory.getUserMember(entityManager);
 
         Event event = TestEventFactory.builder(member)
                 .code(eventCode)
@@ -65,7 +66,7 @@ class EventRepositoryTest {
         entityManager.persist(giftItem4);
 
         entityManager.clear();
-        Optional<Event> findByCodeEvent = eventRepository.findGiftsByEventCode(eventCode);
+        Optional<Event> findByCodeEvent = eventRepository.findEventByCodeWithGift(eventCode);
 
         Assertions.assertThat(findByCodeEvent.get().getId()).isEqualTo(event.getId());
         Assertions.assertThat(findByCodeEvent.get().getGifts().size()).isEqualTo(2);

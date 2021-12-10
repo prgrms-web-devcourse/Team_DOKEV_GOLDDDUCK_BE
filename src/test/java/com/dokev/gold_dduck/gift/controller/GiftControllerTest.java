@@ -20,6 +20,7 @@ import com.dokev.gold_dduck.gift.domain.GiftItem;
 import com.dokev.gold_dduck.gift.dto.GiftFifoChoiceDto;
 import com.dokev.gold_dduck.gift.service.GiftService;
 import com.dokev.gold_dduck.member.domain.Member;
+import com.dokev.gold_dduck.security.WithMockJwtAuthentication;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import javax.persistence.EntityManager;
 import org.junit.jupiter.api.DisplayName;
@@ -32,6 +33,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.transaction.annotation.Transactional;
 
+@WithMockJwtAuthentication
 @Transactional
 @AutoConfigureMockMvc
 @SpringBootTest
@@ -228,8 +230,7 @@ class GiftControllerTest {
     }
 
     private Member givenMember() {
-        Member member = TestMemberFactory.createTestMember();
-        entityManager.persist(member);
+        Member member = TestMemberFactory.getUserMember(entityManager);
         return member;
     }
 
