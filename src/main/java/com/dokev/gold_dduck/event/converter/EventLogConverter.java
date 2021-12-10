@@ -20,10 +20,12 @@ public class EventLogConverter {
     public List<EventLogDto> convertToEventLogDtos(List<EventLog> eventLogs) {
         List<EventLogDto> eventLogDtos = new ArrayList<>();
         Map<Gift, List<EventLog>> giftListMap = makeGroup(eventLogs);
-        for (int i = 0; i < giftListMap.size(); i++) {
-            List<EventLog> groupedEventLogs = giftListMap.get(i);
+
+        for (Gift gift : giftListMap.keySet()) {
+            List<EventLog> groupedEventLogs = giftListMap.get(gift);
             eventLogDtos.add(convertToEventLogDto(groupedEventLogs));
         }
+
         return eventLogDtos;
     }
 
