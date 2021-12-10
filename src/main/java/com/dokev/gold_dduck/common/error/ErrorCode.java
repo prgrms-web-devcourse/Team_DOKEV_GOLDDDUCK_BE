@@ -15,7 +15,9 @@ public enum ErrorCode {
 
     INVALID_INPUT_VALUE("C004", "Invalid Input Value"),
     METHOD_NOT_ALLOWED("C005", "Method not allowed"),
-    GIFT_NOT_EMPTY("C006", "Gift or GiftItem is must not be empty");
+    GIFT_NOT_EMPTY("C006", "Gift or GiftItem is must not be empty"),
+
+    FILE_UPLOAD_FAILURE("F001", "파일 업로드에 실패하였습니다.");
 
     private final String code;
 
