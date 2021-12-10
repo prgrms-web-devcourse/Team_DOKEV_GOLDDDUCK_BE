@@ -10,8 +10,9 @@ import javax.persistence.EntityManager;
 
 public class TestMemberFactory {
 
-    public static Member createTestMember() {
-        return new Member("dokev", "dokev@gmail.com", "id123", "http://dokev/image.jpg");
+    public static Member createTestMember(EntityManager entityManager) {
+        Group group = entityManager.find(Group.class, 1L);
+        return new Member("dokev", "kakao", "id123", "http://dokev/image.jpg", group);
     }
 
     public static Member getUserMember(EntityManager entityManager) {

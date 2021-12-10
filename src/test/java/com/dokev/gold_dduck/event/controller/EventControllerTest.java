@@ -98,26 +98,27 @@ class EventControllerTest {
 
         //when, then
         mockMvc.perform(get("/api/v1/events/{event-code}", event.getCode()))
-                .andDo(print())
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.success", is(true)))
-                .andExpect(jsonPath("$.data.eventId", is(eventDto.getEventId().intValue())))
-                .andExpect(jsonPath("$.data.giftChoiceType", is(eventDto.getGiftChoiceType().toString())))
-                .andExpect(jsonPath("$.data.code", is(eventDto.getCode().toString())))
-                .andExpect(jsonPath("$.data.eventProgressStatus", is(eventDto.getEventProgressStatus().toString())))
-                .andExpect(jsonPath("$.data.mainTemplate", is(eventDto.getMainTemplate())))
-                .andExpect(jsonPath("$.data.maxParticipantCount", is(eventDto.getMaxParticipantCount())))
-                .andExpect(jsonPath("$.data.member.id", is(eventDto.getMember().getId().intValue())))
-                .andExpect(jsonPath("$.data.gifts[0].id", is(eventDto.getGifts().get(0).getId().intValue())))
-                .andExpect(jsonPath("$.data.gifts[1].id", is(eventDto.getGifts().get(1).getId().intValue())))
-                .andExpect(jsonPath("$.data.gifts[2].id", is(eventDto.getGifts().get(2).getId().intValue())))
-                .andExpect(jsonPath("$.data.gifts[0].giftItems[0].id",
-                        is(eventDto.getGifts().get(0).getGiftItems().get(0).getId().intValue())))
-                .andExpect(jsonPath("$.data.gifts[0].giftItems[1].id",
-                        is(eventDto.getGifts().get(0).getGiftItems().get(1).getId().intValue())))
-                .andExpect(jsonPath("$.data.gifts[0].giftItems[2].id",
-                        is(eventDto.getGifts().get(0).getGiftItems().get(2).getId().intValue())))
-                .andExpect(jsonPath("$.error", is(nullValue())));
+            .andDo(print())
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.success", is(true)))
+            .andExpect(jsonPath("$.data.eventId", is(eventDto.getEventId().intValue())))
+            .andExpect(jsonPath("$.data.title", is(eventDto.getTitle())))
+            .andExpect(jsonPath("$.data.giftChoiceType", is(eventDto.getGiftChoiceType().toString())))
+            .andExpect(jsonPath("$.data.code", is(eventDto.getCode().toString())))
+            .andExpect(jsonPath("$.data.eventProgressStatus", is(eventDto.getEventProgressStatus().toString())))
+            .andExpect(jsonPath("$.data.mainTemplate", is(eventDto.getMainTemplate())))
+            .andExpect(jsonPath("$.data.maxParticipantCount", is(eventDto.getMaxParticipantCount())))
+            .andExpect(jsonPath("$.data.member.id", is(eventDto.getMember().getId().intValue())))
+            .andExpect(jsonPath("$.data.gifts[0].id", is(eventDto.getGifts().get(0).getId().intValue())))
+            .andExpect(jsonPath("$.data.gifts[1].id", is(eventDto.getGifts().get(1).getId().intValue())))
+            .andExpect(jsonPath("$.data.gifts[2].id", is(eventDto.getGifts().get(2).getId().intValue())))
+            .andExpect(jsonPath("$.data.gifts[0].giftItems[0].id",
+                is(eventDto.getGifts().get(0).getGiftItems().get(0).getId().intValue())))
+            .andExpect(jsonPath("$.data.gifts[0].giftItems[1].id",
+                is(eventDto.getGifts().get(0).getGiftItems().get(1).getId().intValue())))
+            .andExpect(jsonPath("$.data.gifts[0].giftItems[2].id",
+                is(eventDto.getGifts().get(0).getGiftItems().get(2).getId().intValue())))
+            .andExpect(jsonPath("$.error", is(nullValue())));
     }
 
     @Test
@@ -182,12 +183,12 @@ class EventControllerTest {
     @DisplayName("이벤트 조회 테스트 - 실패")
     void findEventByCodeFailTest() throws Exception {
         mockMvc.perform(get("/api/v1/events/{event-code}", UUID.randomUUID()))
-                .andDo(print())
-                .andExpect(status().is4xxClientError())
-                .andExpect(jsonPath("$.success", is(false)))
-                .andExpect(jsonPath("$.data", is(nullValue())))
-                .andExpect(jsonPath("$.error.code", is(ErrorCode.ENTITY_NOT_FOUND.getCode())))
-                .andExpect(jsonPath("$.error.message",
-                        containsString("해당 엔티티를 찾을 수 없습니다.")));
+            .andDo(print())
+            .andExpect(status().is4xxClientError())
+            .andExpect(jsonPath("$.success", is(false)))
+            .andExpect(jsonPath("$.data", is(nullValue())))
+            .andExpect(jsonPath("$.error.code", is(ErrorCode.ENTITY_NOT_FOUND.getCode())))
+            .andExpect(jsonPath("$.error.message",
+                containsString("해당 엔티티를 찾을 수 없습니다.")));
     }
 }

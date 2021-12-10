@@ -17,6 +17,7 @@ public class TestEventFactory {
 
     public static EventBuilder builder(Member member) {
         return Event.builder(
+            "title1",
             GiftChoiceType.FIFO,
             LocalDateTime.now().plusMinutes(1),
             LocalDateTime.now().plusMinutes(10),
@@ -39,16 +40,17 @@ public class TestEventFactory {
         return newEvent;
     }
 
-    public static EventDto createEventDto(UUID eventCode, MemberDto memberDto, List<GiftDto> giftDtos){
+    public static EventDto createEventDto(UUID eventCode, MemberDto memberDto, List<GiftDto> giftDtos) {
         return new EventDto(1L,
-                GiftChoiceType.FIFO,
-                LocalDateTime.now(),
-                LocalDateTime.now().plusMinutes(10),
-                eventCode,
-                EventProgressStatus.RUNNING,
-                "template1",
-                60,
-                memberDto,
-                giftDtos);
+            "title1",
+            GiftChoiceType.FIFO,
+            LocalDateTime.now(),
+            LocalDateTime.now().plusMinutes(10),
+            eventCode,
+            EventProgressStatus.RUNNING,
+            "template1",
+            60,
+            memberDto,
+            giftDtos);
     }
 }

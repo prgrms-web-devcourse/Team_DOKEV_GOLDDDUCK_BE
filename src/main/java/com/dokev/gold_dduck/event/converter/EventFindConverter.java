@@ -35,8 +35,8 @@ public class EventFindConverter {
             giftDtos.add(giftConverter.convertToGiftDto(gift));
         }
 
-        return new EventDto(event.getId(), event.getGiftChoiceType(), event.getStartAt(), event.getEndAt(),
-                event.getCode(), event.getEventProgressStatus(), event.getMainTemplate(),
-                event.getMaxParticipantCount(), memberDto, giftDtos);
+        return new EventDto(event.getId(), event.getTitle(), event.getGiftChoiceType(), event.getStartAt(),
+            event.getEndAt(), event.getCode(), event.getEventProgressStatus(), event.getMainTemplate(),
+            event.getMaxParticipantCount(), memberDto, giftDtos);
     }
 }
