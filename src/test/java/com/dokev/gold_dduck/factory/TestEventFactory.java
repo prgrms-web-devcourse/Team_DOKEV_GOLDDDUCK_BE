@@ -45,7 +45,7 @@ public class TestEventFactory {
                 LocalDateTime.now(),
                 LocalDateTime.now().plusMinutes(10),
                 eventCode,
-                EventProgressStatus.RUNNING.toString(),
+                EventProgressStatus.RUNNING,
                 "template1",
                 60,
                 memberDto,
