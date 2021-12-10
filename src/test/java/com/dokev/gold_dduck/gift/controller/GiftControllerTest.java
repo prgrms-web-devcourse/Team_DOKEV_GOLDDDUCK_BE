@@ -230,7 +230,7 @@ class GiftControllerTest {
     }
 
     private Member givenMember() {
-        Member member = TestMemberFactory.givenMembers(entityManager).getUserMember();
+        Member member = TestMemberFactory.getUserMember(entityManager);
         return member;
     }
 

@@ -37,7 +37,7 @@ class EventRepositoryTest {
     void findGiftsByEventCode() {
         UUID eventCode = UUID.randomUUID();
 
-        Member member = TestMemberFactory.givenMembers(entityManager).getUserMember();
+        Member member = TestMemberFactory.getUserMember(entityManager);
 
         Event event = TestEventFactory.builder(member)
                 .code(eventCode)

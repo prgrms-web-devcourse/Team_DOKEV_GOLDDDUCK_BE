@@ -14,7 +14,6 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
-import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
 import org.springframework.context.annotation.Import;
 
 @Import(JpaAuditingConfiguration.class)
@@ -32,7 +31,7 @@ class EventLogRepositoryTest {
     @DisplayName("Event Id와 Member Id를 조건으로 일치하는 EventLog 검색 - 성공 테스트")
     void existsByEventIdAndMemberIdSuccessTest() {
         //given
-        Member member = TestMemberFactory.givenMembers(entityManager).getUserMember();
+        Member member = TestMemberFactory.getUserMember(entityManager);
         Event event = TestEventFactory.builder(member).build();
         entityManager.persist(event);
         entityManager.persist(new EventLog(event, member, null, null));

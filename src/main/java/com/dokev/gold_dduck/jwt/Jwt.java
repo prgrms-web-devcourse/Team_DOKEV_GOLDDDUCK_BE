@@ -52,7 +52,7 @@ public class Jwt {
         return new Claims(jwtVerifier.verify(token));
     }
 
-    @ToString(of = {"id", "username", "roles", "iat", "exp"})
+    @ToString(of = {"userId", "username", "roles", "iat", "exp"})
     @NoArgsConstructor(access = AccessLevel.PRIVATE)
     static public class Claims {
 

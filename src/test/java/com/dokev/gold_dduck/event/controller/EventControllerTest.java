@@ -59,7 +59,7 @@ class EventControllerTest {
     @DisplayName("이벤트 생성 테스트 - 성공")
     void saveEventTest() throws Exception {
         // GIVEN
-        Member testMember = TestMemberFactory.givenMembers(entityManager).getUserMember();
+        Member testMember = TestMemberFactory.getUserMember(entityManager);
 
         Event newEvent = TestEventFactory.createEvent(testMember);
 
@@ -86,7 +86,7 @@ class EventControllerTest {
     @DisplayName("이벤트 조회 테스트 - 성공")
     void findEventByCode() throws Exception {
         //given
-        Member member = TestMemberFactory.givenMembers(entityManager).getUserMember();
+        Member member = TestMemberFactory.getUserMember(entityManager);
 
         Event event = TestEventFactory.createEvent(member);
         event.changeMember(member);
@@ -124,7 +124,7 @@ class EventControllerTest {
     @DisplayName("이벤트 생성 실패 (존재하지 않는 memberId)")
     void saveEventFailureTest() throws Exception {
         // GIVEN
-        Member testMember = TestMemberFactory.givenMembers(entityManager).getUserMember();
+        Member testMember = TestMemberFactory.getUserMember(entityManager);
 
         Event newEvent = TestEventFactory.createEvent(testMember);
 
@@ -153,7 +153,7 @@ class EventControllerTest {
     @DisplayName("이벤트 생성 실패 (Invalid Input Value - 선물, 선물 아이템이 비어 있는 경우)")
     void saveEventFailureTest2() throws Exception {
         // GIVEN
-        Member testMember = TestMemberFactory.givenMembers(entityManager).getUserMember();
+        Member testMember = TestMemberFactory.getUserMember(entityManager);
 
         Event newEvent = TestEventFactory.builder(testMember).build();
 

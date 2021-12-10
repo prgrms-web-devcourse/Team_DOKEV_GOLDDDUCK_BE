@@ -55,7 +55,7 @@ class GiftServiceTest {
     @DisplayName("선착순으로 선물 받기 성공 테스트")
     void chooseGiftItemByFIFOSuccessTest() {
         //given
-        Member savedMember = TestMemberFactory.givenMembers(entityManager).getUserMember();
+        Member savedMember = TestMemberFactory.getUserMember(entityManager);
         Event savedEvent = eventRepository.save(TestEventFactory.builder(savedMember).build());
         Gift gift = new Gift("커피", 20);
         gift.changeEvent(savedEvent);
