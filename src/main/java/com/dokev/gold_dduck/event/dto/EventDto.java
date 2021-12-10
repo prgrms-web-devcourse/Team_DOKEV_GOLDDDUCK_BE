@@ -4,6 +4,8 @@ import com.dokev.gold_dduck.event.domain.EventProgressStatus;
 import com.dokev.gold_dduck.event.domain.GiftChoiceType;
 import com.dokev.gold_dduck.gift.dto.GiftDto;
 import com.dokev.gold_dduck.member.dto.MemberDto;
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonFormat.Shape;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
@@ -19,8 +21,10 @@ public class EventDto {
 
     private GiftChoiceType giftChoiceType;
 
+    @JsonFormat(shape = Shape.STRING, timezone = "Asia/Seoul")
     private LocalDateTime startAt;
 
+    @JsonFormat(shape = Shape.STRING, timezone = "Asia/Seoul")
     private LocalDateTime endAt;
 
     private UUID code;
