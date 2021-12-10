@@ -6,6 +6,7 @@ import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.matchesPattern;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.Matchers.nullValue;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.multipart;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -15,9 +16,11 @@ import com.dokev.gold_dduck.common.error.ErrorCode;
 import com.dokev.gold_dduck.event.converter.EventSaveConverter;
 import com.dokev.gold_dduck.event.domain.Event;
 import com.dokev.gold_dduck.event.dto.EventSaveDto;
+import com.dokev.gold_dduck.event.dto.GiftItemSaveDto;
 import com.dokev.gold_dduck.factory.TestEventFactory;
 import com.dokev.gold_dduck.factory.TestMemberFactory;
 import com.dokev.gold_dduck.gift.domain.GiftItem;
+import com.dokev.gold_dduck.gift.domain.GiftType;
 import com.dokev.gold_dduck.gift.repository.GiftItemRepository;
 import com.dokev.gold_dduck.member.domain.Member;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -62,13 +65,11 @@ class EventControllerTest {
         Member testMember = TestMemberFactory.createTestMember();
         entityManager.persist(testMember);
 
-        Event newEvent = TestEventFactory.createEvent(testMember);
-
-        EventSaveDto eventSaveDto = eventSaveConverter.convertToEventSaveDto(newEvent);
+        EventSaveDto eventSaveDto = TestEventFactory.createEventSaveDto(testMember);
 
         // WHEN
         ResultActions resultActions = mockMvc.perform(
-            post("/api/v1/events")
+            multipart("/api/v1/events")
                 .accept(MediaType.APPLICATION_JSON)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(eventSaveDto))
@@ -145,7 +146,7 @@ class EventControllerTest {
     }
 
     @Test
-    @DisplayName("이벤트 생성 실패 (Invalid Input Value - 선물, 선물 아이템이 비어 있는 경우)")
+    @DisplayName("이벤트 생성 실패 (Invalid Input Value - 선물이 비어 있는 경우)")
     void saveEventFailureTest2() throws Exception {
         // GIVEN
         Member testMember = TestMemberFactory.createTestMember();
@@ -171,6 +172,35 @@ class EventControllerTest {
                 jsonPath("$.data", is(nullValue())),
                 jsonPath("$.error.code", is(ErrorCode.INVALID_INPUT_VALUE.getCode())),
                 jsonPath("$.error.message", containsString(ErrorCode.INVALID_INPUT_VALUE.getMessage()))
+            );
+    }
+
+    @Test
+    @DisplayName("선착순 이벤트 생성 테스트 - 실패(선물 아이템에 텍스트, 파일 아무것도 없는 경우)")
+    void saveEventFailureTest3() throws Exception {
+        // GIVEN
+        Member testMember = TestMemberFactory.createTestMember();
+        entityManager.persist(testMember);
+
+        EventSaveDto eventSaveDto = TestEventFactory.createEventSaveDto(testMember);
+
+        GiftItemSaveDto giftItemSaveDto = new GiftItemSaveDto(GiftType.IMAGE, null, null);
+        eventSaveDto.getGifts().get(0).getGiftItems().add(giftItemSaveDto);
+
+        // WHEN
+        ResultActions resultActions = mockMvc.perform(
+            multipart("/api/v1/events")
+                .accept(MediaType.APPLICATION_JSON)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(eventSaveDto))
+        );
+
+        // THEN
+        resultActions.andDo(print())
+            .andExpectAll(status().isBadRequest(),
+                jsonPath("$.success", is(false)),
+                jsonPath("$.error.code", is(ErrorCode.GIFT_NOT_EMPTY.getCode())),
+                jsonPath("$.error.message", containsString(ErrorCode.GIFT_NOT_EMPTY.getMessage()))
             );
     }
 }
