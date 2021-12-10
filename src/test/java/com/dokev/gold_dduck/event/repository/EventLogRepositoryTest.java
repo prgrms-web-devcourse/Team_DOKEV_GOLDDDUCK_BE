@@ -11,22 +11,24 @@ import com.dokev.gold_dduck.gift.domain.Gift;
 import com.dokev.gold_dduck.gift.domain.GiftItem;
 import com.dokev.gold_dduck.gift.domain.GiftType;
 import com.dokev.gold_dduck.member.domain.Member;
+import com.dokev.gold_dduck.security.WithMockJwtAuthentication;
+import javax.persistence.EntityManager;
 import java.util.List;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
-import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
 import org.springframework.context.annotation.Import;
 
+@WithMockJwtAuthentication
 @Import(JpaAuditingConfiguration.class)
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 @DataJpaTest
 class EventLogRepositoryTest {
 
     @Autowired
-    private TestEntityManager entityManager;
+    private EntityManager entityManager;
 
     @Autowired
     private EventLogRepository sut;
@@ -35,8 +37,7 @@ class EventLogRepositoryTest {
     @DisplayName("Event Id와 Member Id를 조건으로 일치하는 EventLog 검색 - 성공 테스트")
     void existsByEventIdAndMemberIdSuccessTest() {
         //given
-        Member member = TestMemberFactory.createTestMember();
-        entityManager.persist(member);
+        Member member = TestMemberFactory.getUserMember(entityManager);
         Event event = TestEventFactory.builder(member).build();
         entityManager.persist(event);
         entityManager.persist(new EventLog(event, member, null, null));
@@ -56,13 +57,13 @@ class EventLogRepositoryTest {
     @DisplayName("Event id가 주어진 eventId와 일치하고 선물을 받은 로그만 검색 - 성공 테스트")
     void findWinnerLogsByEventIdTest() {
         //given
-        Member member1 = TestMemberFactory.createTestMember();
+        Member member1 = TestMemberFactory.createTestMember(entityManager);
         entityManager.persist(member1);
 
-        Member member2 = TestMemberFactory.createTestMember();
+        Member member2 = TestMemberFactory.createTestMember(entityManager);
         entityManager.persist(member2);
 
-        Member member3 = TestMemberFactory.createTestMember();
+        Member member3 = TestMemberFactory.createTestMember(entityManager);
         entityManager.persist(member3);
 
         Event event = TestEventFactory.builder(member1).build();
