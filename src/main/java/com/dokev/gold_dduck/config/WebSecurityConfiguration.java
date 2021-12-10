@@ -20,6 +20,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.oauth2.client.web.AuthorizationRequestRepository;
 import org.springframework.security.oauth2.core.endpoint.OAuth2AuthorizationRequest;
+import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.security.web.access.AccessDeniedHandler;
 import org.springframework.security.web.context.SecurityContextPersistenceFilter;
 
@@ -54,11 +55,11 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter {
     @Bean
     public OAuth2AuthenticationSuccessHandler oAuth2AuthenticationSuccessHandler() {
         Jwt jwt = getApplicationContext().getBean(Jwt.class);
-        return new OAuth2AuthenticationSuccessHandler(jwt, memberService);
+        return new OAuth2AuthenticationSuccessHandler(jwt, memberService, authorizationRequestRepository());
     }
 
     @Bean
-    public AuthorizationRequestRepository<OAuth2AuthorizationRequest> authorizationRequestRepository() {
+    public HttpCookieOAuth2AuthorizationRequestRepository authorizationRequestRepository() {
         return new HttpCookieOAuth2AuthorizationRequestRepository();
     }
 
@@ -68,29 +69,39 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter {
             Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
             Object principal = authentication != null ? authentication.getPrincipal() : null;
             log.warn("{} is denied", principal, e);
-            response.setStatus(HttpServletResponse.SC_FORBIDDEN);
-            response.setContentType("text/plain;charset=UTF-8");
-            response.getWriter().write("ACCESS DENIED");
-            response.getWriter().flush();
-            response.getWriter().close();
+            response.sendError(
+                HttpServletResponse.SC_FORBIDDEN,
+                e.getMessage()
+            );
+        };
+    }
+
+    @Bean
+    public AuthenticationEntryPoint authenticationEntryPoint() {
+        return (request, response, e) -> {
+            log.warn("request is denied", e);
+            response.sendError(
+                HttpServletResponse.SC_UNAUTHORIZED,
+                e.getMessage()
+            );
         };
     }
 
     @Override
     public void configure(WebSecurity web) throws Exception {
         web.ignoring().antMatchers(
+            "login/**",
+            "oauth2/**",
             "/h2-console/**",
             "/swagger-ui/**",
             "/v3/api-docs/**",
-            "/swagger-ui/**",
-            "/swagger-resources/**",
-            "/swagger-resources");
+            "/swagger-resources/**");
     }
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         http.authorizeRequests()
-            .antMatchers("/api/**").hasAnyRole(RoleType.USER.getCode(), RoleType.ADMIN.getCode())
+            .antMatchers("/api/**").hasAnyAuthority(RoleType.USER.getCode(), RoleType.ADMIN.getCode())
             .anyRequest().authenticated()
             .and()
             .csrf().disable()
@@ -108,6 +119,7 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter {
             .successHandler(oAuth2AuthenticationSuccessHandler())
             .and()
             .exceptionHandling()
+            .authenticationEntryPoint(authenticationEntryPoint())
             .accessDeniedHandler(accessDeniedHandler())
             .and()
             .addFilterAfter(jwtAuthenticationFilter(), SecurityContextPersistenceFilter.class);

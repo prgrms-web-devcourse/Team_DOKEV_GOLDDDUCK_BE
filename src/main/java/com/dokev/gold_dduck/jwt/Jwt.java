@@ -39,6 +39,7 @@ public class Jwt {
         JWTCreator.Builder builder = com.auth0.jwt.JWT.create();
         builder.withIssuer(issuer)
             .withIssuedAt(now)
+            .withClaim("userId", claims.userId)
             .withClaim("username", claims.username)
             .withArrayClaim("roles", claims.roles);
         if (expirySeconds > 0) {
@@ -51,9 +52,11 @@ public class Jwt {
         return new Claims(jwtVerifier.verify(token));
     }
 
-    @ToString(of = {"username", "roles", "iat", "exp"})
+    @ToString(of = {"id", "username", "roles", "iat", "exp"})
     @NoArgsConstructor(access = AccessLevel.PRIVATE)
     static public class Claims {
+
+        Long userId;
 
         String username;
 
@@ -64,6 +67,10 @@ public class Jwt {
         Date exp;
 
         Claims(DecodedJWT decodedJWT) {
+            Claim userId = decodedJWT.getClaim("userId");
+            if (!userId.isNull()) {
+                this.userId = userId.asLong();
+            }
             Claim username = decodedJWT.getClaim("username");
             if (!username.isNull()) {
                 this.username = username.asString();
@@ -76,8 +83,9 @@ public class Jwt {
             this.exp = decodedJWT.getExpiresAt();
         }
 
-        public static Claims from(String username, String[] roles) {
+        public static Claims of(Long userId, String username, String[] roles) {
             Claims claims = new Claims();
+            claims.userId = userId;
             claims.username = username;
             claims.roles = roles;
             return claims;
@@ -85,6 +93,7 @@ public class Jwt {
 
         public Map<String, Object> asMap() {
             HashMap<String, Object> map = new HashMap<>();
+            map.put("userId", userId);
             map.put("username", username);
             map.put("roles", roles);
             map.put("iat", iat());

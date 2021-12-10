@@ -1,11 +1,11 @@
 package com.dokev.gold_dduck.jwt;
 
 import java.util.Collection;
-import org.apache.commons.lang3.builder.ToStringBuilder;
-import org.apache.commons.lang3.builder.ToStringStyle;
+import lombok.ToString;
 import org.springframework.security.authentication.AbstractAuthenticationToken;
 import org.springframework.security.core.GrantedAuthority;
 
+@ToString(of = {"principal", "credentials"})
 public class JwtAuthenticationToken extends AbstractAuthenticationToken {
 
     private final Object principal;
@@ -21,8 +21,8 @@ public class JwtAuthenticationToken extends AbstractAuthenticationToken {
     }
 
     public JwtAuthenticationToken(
-        Collection<? extends GrantedAuthority> authorities,
-        Object principal, String credentials
+        Object principal, String credentials,
+        Collection<? extends GrantedAuthority> authorities
     ) {
         super(authorities);
         super.setAuthenticated(true);
@@ -53,13 +53,5 @@ public class JwtAuthenticationToken extends AbstractAuthenticationToken {
     public void eraseCredentials() {
         super.eraseCredentials();
         this.credentials = null;
-    }
-
-    @Override
-    public String toString() {
-        return new ToStringBuilder(this, ToStringStyle.SHORT_PREFIX_STYLE)
-            .append("principal", principal)
-            .append("credentials", credentials)
-            .toString();
     }
 }

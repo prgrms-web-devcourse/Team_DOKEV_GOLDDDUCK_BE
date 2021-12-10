@@ -1,8 +1,11 @@
 package com.dokev.gold_dduck.oauth2;
 
+import static com.dokev.gold_dduck.oauth2.HttpCookieOAuth2AuthorizationRequestRepository.REDIRECT_URI_PARAM_COOKIE_NAME;
+
 import com.dokev.gold_dduck.common.util.CookieUtil;
 import com.dokev.gold_dduck.jwt.Jwt;
 import com.dokev.gold_dduck.member.domain.Member;
+import com.dokev.gold_dduck.member.domain.RoleType;
 import com.dokev.gold_dduck.member.service.MemberService;
 import java.io.IOException;
 import java.util.Optional;
@@ -24,11 +27,13 @@ public class OAuth2AuthenticationSuccessHandler extends SavedRequestAwareAuthent
 
     private final MemberService memberService;
 
-    public final static String REDIRECT_URI_PARAM_COOKIE_NAME = "redirect_uri";
+    private final HttpCookieOAuth2AuthorizationRequestRepository authorizationRequestRepository;
 
-    public OAuth2AuthenticationSuccessHandler(Jwt jwt, MemberService memberService) {
+    public OAuth2AuthenticationSuccessHandler(Jwt jwt, MemberService memberService,
+        HttpCookieOAuth2AuthorizationRequestRepository authorizationRequestRepository) {
         this.jwt = jwt;
         this.memberService = memberService;
+        this.authorizationRequestRepository = authorizationRequestRepository;
     }
 
     @Override
@@ -44,7 +49,7 @@ public class OAuth2AuthenticationSuccessHandler extends SavedRequestAwareAuthent
             OAuth2AuthenticationToken oauth2Token = (OAuth2AuthenticationToken) authentication;
             OAuth2User oauth2User = oauth2Token.getPrincipal();
             String provider = oauth2Token.getAuthorizedClientRegistrationId();
-            Member member = processMemberOAuth2UserJoin(oauth2User, provider);
+            Member member = memberService.join(oauth2User, provider);
             String token = generateToken(member);
             String redirectUri = determineTargetUrl(request, response, authentication);
             String targetUrl = UriComponentsBuilder
@@ -52,19 +57,13 @@ public class OAuth2AuthenticationSuccessHandler extends SavedRequestAwareAuthent
                 .build().toUriString();
             clearAuthenticationAttributes(request, response);
             getRedirectStrategy().sendRedirect(request, response, targetUrl);
-            log.info("redirectUri : {}", redirectUri);
-            log.info("targetUrl : {}", targetUrl);
         } else {
             super.onAuthenticationSuccess(request, response, authentication);
         }
     }
 
-    private Member processMemberOAuth2UserJoin(OAuth2User oauth2User, String provider) {
-        return memberService.join(oauth2User, provider);
-    }
-
     private String generateToken(Member member) {
-        return jwt.sign(Jwt.Claims.from(member.getName(), new String[]{"ROLE_USER"}));
+        return jwt.sign(Jwt.Claims.of(member.getId(), member.getName(), new String[]{RoleType.USER.getCode()}));
     }
 
     @Override
@@ -76,7 +75,7 @@ public class OAuth2AuthenticationSuccessHandler extends SavedRequestAwareAuthent
     }
 
     protected void clearAuthenticationAttributes(HttpServletRequest request, HttpServletResponse response) {
-//        super.clearAuthenticationAttributes(request);
-//        authorizationRequestRepository.removeAuthorizationRequestCookies(request, response);
+        super.clearAuthenticationAttributes(request);
+        authorizationRequestRepository.removeAuthorizationRequestCookies(request, response);
     }
 }

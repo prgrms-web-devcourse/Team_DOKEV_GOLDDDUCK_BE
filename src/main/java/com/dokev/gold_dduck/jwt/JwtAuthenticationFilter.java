@@ -1,12 +1,15 @@
 package com.dokev.gold_dduck.jwt;
 
+import static java.util.Objects.nonNull;
+import static org.apache.commons.lang3.StringUtils.isNotEmpty;
+import static org.springframework.util.CollectionUtils.isEmpty;
+
 import com.dokev.gold_dduck.jwt.Jwt.Claims;
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
-import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
-import java.util.stream.Collectors;
+import java.util.regex.Pattern;
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
@@ -14,15 +17,16 @@ import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.authority.AuthorityUtils;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.web.filter.GenericFilterBean;
 
 @Slf4j
 public class JwtAuthenticationFilter extends GenericFilterBean {
+
+    private static final Pattern BEARER = Pattern.compile("^Bearer$", Pattern.CASE_INSENSITIVE);
 
     private final String headerKey;
 
@@ -44,15 +48,16 @@ public class JwtAuthenticationFilter extends GenericFilterBean {
             String token = getToken(req);
             if (token != null) {
                 try {
-                    Claims claims = verify(token);
+                    Claims claims = jwt.verify(token);
                     log.debug("Jwt parse result: {}", claims);
 
+                    Long userId = claims.userId;
                     String username = claims.username;
-                    List<GrantedAuthority> authorities = getAuthorities(claims);
+                    List<GrantedAuthority> authorities = AuthorityUtils.createAuthorityList(claims.roles);
 
-                    if (username != null && !username.isEmpty() && authorities.size() > 0) {
-                        UsernamePasswordAuthenticationToken authentication
-                            = new UsernamePasswordAuthenticationToken(username, null, authorities);
+                    if (nonNull(userId) && isNotEmpty(username) && !isEmpty(authorities)) {
+                        JwtAuthenticationToken authentication
+                            = new JwtAuthenticationToken(new JwtAuthentication(userId, username), null, authorities);
                         authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(req));
                         SecurityContextHolder.getContext().setAuthentication(authentication);
                     }
@@ -73,22 +78,17 @@ public class JwtAuthenticationFilter extends GenericFilterBean {
         if (token != null && !token.isEmpty()) {
             log.debug("Jwt token detected : {}", token);
             try {
-                return URLDecoder.decode(token, "UTF-8");
-            } catch (Exception e) {
+                String decodeToken = URLDecoder.decode(token, "UTF-8");
+                String[] parts = decodeToken.split(" ");
+                if (parts.length == 2) {
+                    String scheme = parts[0];
+                    String credentials = parts[1];
+                    return BEARER.matcher(scheme).matches() ? credentials : null;
+                }
+            } catch (UnsupportedEncodingException e) {
                 logger.error(e.getMessage(), e);
             }
         }
         return null;
-    }
-
-    private Jwt.Claims verify(String token) {
-        return jwt.verify(token);
-    }
-
-    private List<GrantedAuthority> getAuthorities(Claims claims) {
-        String[] roles = claims.roles;
-        return roles == null || roles.length == 0
-            ? Collections.emptyList()
-            : Arrays.stream(roles).map(SimpleGrantedAuthority::new).collect(Collectors.toList());
     }
 }
