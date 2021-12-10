@@ -19,7 +19,9 @@ import javax.validation.constraints.Email;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 
+@ToString(of = {"id", "name", "email"})
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
 @Entity

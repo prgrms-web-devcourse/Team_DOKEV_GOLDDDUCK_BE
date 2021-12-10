@@ -1,5 +1,6 @@
 package com.dokev.gold_dduck.member.dto;
 
+import com.dokev.gold_dduck.member.domain.Member;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -24,5 +25,12 @@ public class MemberDto {
         this.email = email;
         this.socialId = socialId;
         this.profileImage = profileImage;
+    }
+
+    public MemberDto(Member member) {
+        this.id = member.getId();
+        this.name = member.getName();
+        this.email = member.getEmail();
+        this.profileImage = member.getProfileImage().orElse(null);
     }
 }
