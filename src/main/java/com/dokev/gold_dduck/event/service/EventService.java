@@ -58,7 +58,11 @@ public class EventService {
         return eventFindConverter.convertToEventDto(event);
     }
 
-    public EventSimpleListDto searchSimpleDescByMember(Long memberId, EventSearchCondition eventSearchCondition, Pageable pageable) {
+    public EventSimpleListDto searchSimpleDescByMember(
+        Long memberId,
+        EventSearchCondition eventSearchCondition,
+        Pageable pageable
+    ) {
         if (!memberRepository.existsById(memberId)) {
             throw new EntityNotFoundException(Member.class, memberId);
         }
