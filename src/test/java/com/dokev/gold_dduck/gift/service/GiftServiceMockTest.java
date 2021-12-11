@@ -64,6 +64,7 @@ class GiftServiceMockTest {
         Member mockMember = mock(Member.class);
         Gift mockGift = mock(Gift.class);
         GiftItem targetGiftItem = new GiftItem(GiftType.IMAGE, "coffee", false);
+        targetGiftItem.changeGift(mockGift);
         given(eventRepository.findById(anyLong())).willReturn(Optional.of(mockEvent));
         given(memberRepository.findById(anyLong())).willReturn(Optional.of(mockMember));
         given(eventLogRepository.existsByEventIdAndMemberId(anyLong(), anyLong())).willReturn(false);

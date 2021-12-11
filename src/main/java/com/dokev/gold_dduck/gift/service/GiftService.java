@@ -10,12 +10,15 @@ import com.dokev.gold_dduck.event.repository.EventRepository;
 import com.dokev.gold_dduck.gift.domain.Gift;
 import com.dokev.gold_dduck.gift.domain.GiftItem;
 import com.dokev.gold_dduck.gift.dto.GiftItemDto;
+import com.dokev.gold_dduck.gift.dto.GiftItemListDto;
+import com.dokev.gold_dduck.gift.dto.GiftItemSearchCondition;
 import com.dokev.gold_dduck.gift.repository.GiftItemRepository;
 import com.dokev.gold_dduck.gift.repository.GiftRepository;
 import com.dokev.gold_dduck.member.domain.Member;
 import com.dokev.gold_dduck.member.repository.MemberRepository;
 import java.util.List;
 import java.util.Optional;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -68,6 +71,19 @@ public class GiftService {
             return new GiftItemDto(chosenGiftItem.get());
         }
         throw new GiftStockOutException();
+    }
+
+    public GiftItemListDto searchDescByMember(
+        Long memberId,
+        GiftItemSearchCondition giftItemSearchCondition,
+        Pageable pageable
+    ) {
+        if (!memberRepository.existsById(memberId)) {
+            throw new EntityNotFoundException(Member.class, memberId);
+        }
+        Page<GiftItemDto> page = giftItemRepository.searchDescByMember(memberId, giftItemSearchCondition, pageable)
+            .map(GiftItemDto::new);
+        return new GiftItemListDto(page);
     }
 
     private Optional<GiftItem> findGiftItemByFIFO(Long giftId) {

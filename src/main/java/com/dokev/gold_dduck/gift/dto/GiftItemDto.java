@@ -18,6 +18,8 @@ public class GiftItemDto {
 
     private boolean used;
 
+    private String category;
+
     public GiftItemDto(Long id, GiftType giftType, String content, boolean used) {
         this.id = id;
         this.giftType = giftType;
@@ -30,5 +32,6 @@ public class GiftItemDto {
         this.giftType = giftItem.getGiftType();
         this.content = giftItem.getContent();
         this.used = giftItem.isUsed();
+        this.category = giftItem.getGift().getCategory();
     }
 }
