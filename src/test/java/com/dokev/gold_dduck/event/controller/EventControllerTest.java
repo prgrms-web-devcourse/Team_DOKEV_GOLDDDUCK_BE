@@ -1,13 +1,14 @@
 package com.dokev.gold_dduck.event.controller;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.contains;
-import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.matchesPattern;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.Matchers.nullValue;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.multipart;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.handler;
@@ -21,13 +22,19 @@ import com.dokev.gold_dduck.event.domain.Event;
 import com.dokev.gold_dduck.event.domain.EventProgressStatus;
 import com.dokev.gold_dduck.event.dto.EventDto;
 import com.dokev.gold_dduck.event.dto.EventSaveDto;
+import com.dokev.gold_dduck.event.dto.GiftItemSaveDto;
 import com.dokev.gold_dduck.factory.TestEventFactory;
 import com.dokev.gold_dduck.factory.TestMemberFactory;
+import com.dokev.gold_dduck.gift.domain.GiftItem;
+import com.dokev.gold_dduck.gift.domain.GiftType;
+import com.dokev.gold_dduck.gift.repository.GiftItemRepository;
 import com.dokev.gold_dduck.member.domain.Member;
 import com.dokev.gold_dduck.security.WithMockJwtAuthentication;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import java.util.List;
 import java.util.UUID;
 import javax.persistence.EntityManager;
+import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,6 +45,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.transaction.annotation.Transactional;
 
+@Slf4j
 @WithMockJwtAuthentication
 @Transactional
 @AutoConfigureMockMvc
@@ -57,15 +65,44 @@ class EventControllerTest {
     private EventSaveConverter eventSaveConverter;
 
     @Autowired
+    private GiftItemRepository giftItemRepository;
+
+    @Autowired
     private EventFindConverter eventFindConverter;
 
     @Test
-    @DisplayName("이벤트 생성 테스트 - 성공")
+    @DisplayName("선착순 이벤트 생성 테스트 - 성공")
     void saveEventTest() throws Exception {
         // GIVEN
         Member testMember = TestMemberFactory.getUserMember(entityManager);
 
-        Event newEvent = TestEventFactory.createEvent(testMember);
+        EventSaveDto eventSaveDto = TestEventFactory.createEventSaveDto(testMember);
+
+        // WHEN
+        ResultActions resultActions = mockMvc.perform(
+            multipart("/api/v1/events")
+                .accept(MediaType.APPLICATION_JSON)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(eventSaveDto))
+        );
+
+        // THEN
+        resultActions.andDo(print())
+            .andExpectAll(status().isOk(),
+                jsonPath("$.success", is(true)),
+                jsonPath("$.data", is(notNullValue())),
+                jsonPath("$.data", matchesPattern("([a-f0-9]{8}(-[a-f0-9]{4}){4}[a-f0-9]{8})"))
+            );
+    }
+
+    @Test
+    @DisplayName("랜덤 이벤트 생성 테스트 - 성공")
+    void saveRandomEventTest() throws Exception {
+        // GIVEN
+        Member testMember = TestMemberFactory.createTestMember(entityManager);
+        entityManager.persist(testMember);
+
+        Event newEvent = TestEventFactory.createRandomEvent(testMember);
 
         EventSaveDto eventSaveDto = eventSaveConverter.convertToEventSaveDto(newEvent);
 
@@ -84,6 +121,9 @@ class EventControllerTest {
                 jsonPath("$.data", is(notNullValue())),
                 jsonPath("$.data", matchesPattern("([a-f0-9]{8}(-[a-f0-9]{4}){4}[a-f0-9]{8})"))
             );
+
+        List<GiftItem> giftItems = giftItemRepository.findAll();
+        assertThat(giftItems.size()).isEqualTo(newEvent.getMaxParticipantCount());
     }
 
     @Test
@@ -155,7 +195,7 @@ class EventControllerTest {
     }
 
     @Test
-    @DisplayName("이벤트 생성 실패 (Invalid Input Value - 선물, 선물 아이템이 비어 있는 경우)")
+    @DisplayName("이벤트 생성 실패 (Invalid Input Value - 선물이 비어 있는 경우)")
     void saveEventFailureTest2() throws Exception {
         // GIVEN
         Member testMember = TestMemberFactory.getUserMember(entityManager);
@@ -184,6 +224,35 @@ class EventControllerTest {
     }
 
     @Test
+    @DisplayName("선착순 이벤트 생성 테스트 - 실패(선물 아이템에 텍스트, 파일 아무것도 없는 경우)")
+    void saveEventFailureTest3() throws Exception {
+        // GIVEN
+        Member testMember = TestMemberFactory.createTestMember(entityManager);
+        entityManager.persist(testMember);
+
+        EventSaveDto eventSaveDto = TestEventFactory.createEventSaveDto(testMember);
+
+        GiftItemSaveDto giftItemSaveDto = new GiftItemSaveDto(GiftType.IMAGE, null, null);
+        eventSaveDto.getGifts().get(0).getGiftItems().add(giftItemSaveDto);
+
+        // WHEN
+        ResultActions resultActions = mockMvc.perform(
+            multipart("/api/v1/events")
+                .accept(MediaType.APPLICATION_JSON)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(eventSaveDto))
+        );
+
+        // THEN
+        resultActions.andDo(print())
+            .andExpectAll(status().isBadRequest(),
+                jsonPath("$.success", is(false)),
+                jsonPath("$.error.code", is(ErrorCode.GIFT_NOT_EMPTY.getCode())),
+                jsonPath("$.error.message", containsString(ErrorCode.GIFT_NOT_EMPTY.getMessage()))
+            );
+    }
+
+    @Test
     @DisplayName("이벤트 조회 테스트 - 실패")
     void findEventByCodeFailTest() throws Exception {
         mockMvc.perform(get("/api/v1/events/{event-code}", UUID.randomUUID()))
@@ -194,6 +263,7 @@ class EventControllerTest {
             .andExpect(jsonPath("$.error.code", is(ErrorCode.ENTITY_NOT_FOUND.getCode())))
             .andExpect(jsonPath("$.error.message",
                 containsString("해당 엔티티를 찾을 수 없습니다.")));
+
     }
 
     @Test
