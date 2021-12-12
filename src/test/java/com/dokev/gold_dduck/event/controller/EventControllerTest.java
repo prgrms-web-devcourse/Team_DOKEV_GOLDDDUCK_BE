@@ -1,5 +1,7 @@
 package com.dokev.gold_dduck.event.controller;
 
+import static org.hamcrest.Matchers.contains;
+import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.matchesPattern;
@@ -8,6 +10,7 @@ import static org.hamcrest.Matchers.nullValue;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.handler;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -15,6 +18,7 @@ import com.dokev.gold_dduck.common.error.ErrorCode;
 import com.dokev.gold_dduck.event.converter.EventFindConverter;
 import com.dokev.gold_dduck.event.converter.EventSaveConverter;
 import com.dokev.gold_dduck.event.domain.Event;
+import com.dokev.gold_dduck.event.domain.EventProgressStatus;
 import com.dokev.gold_dduck.event.dto.EventDto;
 import com.dokev.gold_dduck.event.dto.EventSaveDto;
 import com.dokev.gold_dduck.factory.TestEventFactory;
@@ -191,4 +195,173 @@ class EventControllerTest {
             .andExpect(jsonPath("$.error.message",
                 containsString("해당 엔티티를 찾을 수 없습니다.")));
     }
+
+    @Test
+    @DisplayName("Member가 생성한 Event 최신순으로 페이징 조회 성공 테스트 - (page = null, size = null, 이벤트상태 = null)")
+    void searchSimpleDescByMemberSuccessTest() throws Exception {
+        //given
+        Member userMember = TestMemberFactory.getUserMember(entityManager);
+        Event closedEvent = TestEventFactory.builder(userMember)
+            .eventProgressStatus(EventProgressStatus.CLOSED)
+            .build();
+        Event runningEvent = TestEventFactory.builder(userMember)
+            .eventProgressStatus(EventProgressStatus.RUNNING)
+            .build();
+        Event readyEvent = TestEventFactory.builder(userMember)
+            .eventProgressStatus(EventProgressStatus.READY)
+            .build();
+        entityManager.persist(closedEvent);
+        entityManager.persist(runningEvent);
+        entityManager.persist(readyEvent);
+        //when
+        ResultActions result = mockMvc.perform(
+            get("/api/v1/members/{memberId}/events", userMember.getId())
+                .accept(MediaType.APPLICATION_JSON)
+                .contentType(MediaType.APPLICATION_JSON)
+        );
+        //then
+        result.andDo(print())
+            .andExpectAll(
+                status().isOk(),
+                handler().handlerType(EventController.class),
+                handler().methodName("searchSimpleDescByMember"),
+                jsonPath("$.success", is(true)),
+                jsonPath("$.error", is(nullValue())),
+                jsonPath("$.data.simpleEventList[*].eventId",
+                    contains(readyEvent.getId().intValue(),
+                        runningEvent.getId().intValue(),
+                        closedEvent.getId().intValue())),
+                jsonPath("$.data.pagination.totalPages", is(1)),
+                jsonPath("$.data.pagination.totalElements", is(3)),
+                jsonPath("$.data.pagination.currentPage", is(0)),
+                jsonPath("$.data.pagination.offset", is(0)),
+                jsonPath("$.data.pagination.size", is(4))
+            );
+    }
+
+    @Test
+    @DisplayName("Member가 생성한 Event 최신순으로 페이징 조회 성공 테스트 - (page = null, size = null, 이벤트상태 = 완료)")
+    void searchSimpleDescByMemberSuccessTest2() throws Exception {
+        //given
+        Member userMember = TestMemberFactory.getUserMember(entityManager);
+        Event closedEvent = TestEventFactory.builder(userMember)
+            .eventProgressStatus(EventProgressStatus.CLOSED)
+            .build();
+        Event runningEvent = TestEventFactory.builder(userMember)
+            .eventProgressStatus(EventProgressStatus.RUNNING)
+            .build();
+        Event readyEvent = TestEventFactory.builder(userMember)
+            .eventProgressStatus(EventProgressStatus.READY)
+            .build();
+        entityManager.persist(closedEvent);
+        entityManager.persist(runningEvent);
+        entityManager.persist(readyEvent);
+        //when
+        ResultActions result = mockMvc.perform(
+            get("/api/v1/members/{memberId}/events", userMember.getId())
+                .accept(MediaType.APPLICATION_JSON)
+                .contentType(MediaType.APPLICATION_JSON)
+                .param("eventProgressStatus", EventProgressStatus.CLOSED.name())
+        );
+        //then
+        result.andDo(print())
+            .andExpectAll(
+                status().isOk(),
+                handler().handlerType(EventController.class),
+                handler().methodName("searchSimpleDescByMember"),
+                jsonPath("$.success", is(true)),
+                jsonPath("$.error", is(nullValue())),
+                jsonPath("$.data..eventId", contains(closedEvent.getId().intValue())),
+                jsonPath("$.data.pagination.totalPages", is(1)),
+                jsonPath("$.data.pagination.totalElements", is(1)),
+                jsonPath("$.data.pagination.currentPage", is(0)),
+                jsonPath("$.data.pagination.offset", is(0)),
+                jsonPath("$.data.pagination.size", is(4))
+            );
+    }
+
+    @Test
+    @DisplayName("Member가 생성한 Event 최신순으로 페이징 조회 성공 테스트 - (page = 1, size = 2, 이벤트상태 = 진행)")
+    void searchSimpleDescByMemberSuccessTest3() throws Exception {
+        //given
+        Member userMember = TestMemberFactory.getUserMember(entityManager);
+        Event closedEvent = TestEventFactory.builder(userMember)
+            .eventProgressStatus(EventProgressStatus.CLOSED)
+            .build();
+        Event runningEvent = TestEventFactory.builder(userMember)
+            .eventProgressStatus(EventProgressStatus.RUNNING)
+            .build();
+        Event runningEvent2 = TestEventFactory.builder(userMember)
+            .eventProgressStatus(EventProgressStatus.RUNNING)
+            .build();
+        Event runningEvent3 = TestEventFactory.builder(userMember)
+            .eventProgressStatus(EventProgressStatus.RUNNING)
+            .build();
+        Event runningEvent4 = TestEventFactory.builder(userMember)
+            .eventProgressStatus(EventProgressStatus.RUNNING)
+            .build();
+        Event runningEvent5 = TestEventFactory.builder(userMember)
+            .eventProgressStatus(EventProgressStatus.RUNNING)
+            .build();
+        Event readyEvent = TestEventFactory.builder(userMember)
+            .eventProgressStatus(EventProgressStatus.READY)
+            .build();
+        entityManager.persist(closedEvent);
+        entityManager.persist(runningEvent);
+        entityManager.persist(runningEvent2);
+        entityManager.persist(runningEvent3);
+        entityManager.persist(runningEvent4);
+        entityManager.persist(runningEvent5);
+        entityManager.persist(readyEvent);
+        //when
+        ResultActions result = mockMvc.perform(
+            get("/api/v1/members/{memberId}/events", userMember.getId())
+                .accept(MediaType.APPLICATION_JSON)
+                .contentType(MediaType.APPLICATION_JSON)
+                .param("eventProgressStatus", EventProgressStatus.RUNNING.name())
+                .param("page", "1")
+                .param("size", "2")
+        );
+        //then
+        result.andDo(print())
+            .andExpectAll(
+                status().isOk(),
+                handler().handlerType(EventController.class),
+                handler().methodName("searchSimpleDescByMember"),
+                jsonPath("$.success", is(true)),
+                jsonPath("$.error", is(nullValue())),
+                jsonPath("$.data.simpleEventList.length()", is(2)),
+                jsonPath("$.data.simpleEventList[*].eventId",
+                    contains(runningEvent3.getId().intValue(), runningEvent2.getId().intValue())),
+                jsonPath("$.data.pagination.totalPages", is(3)),
+                jsonPath("$.data.pagination.totalElements", is(5)),
+                jsonPath("$.data.pagination.currentPage", is(1)),
+                jsonPath("$.data.pagination.offset", is(2)),
+                jsonPath("$.data.pagination.size", is(2))
+            );
+    }
+
+    @Test
+    @DisplayName("Member가 생성한 Event 최신순으로 페이징 조회 실패 테스트 - (잘못된 memberId)")
+    void searchSimpleDescByMemberFailureTest() throws Exception {
+        //given
+        Long invalidMemberId = -1L;
+        //when
+        ResultActions result = mockMvc.perform(
+            get("/api/v1/members/{memberId}/events", invalidMemberId)
+                .accept(MediaType.APPLICATION_JSON)
+                .contentType(MediaType.APPLICATION_JSON)
+        );
+        //then
+        result.andDo(print())
+            .andExpectAll(
+                status().is4xxClientError(),
+                handler().handlerType(EventController.class),
+                handler().methodName("searchSimpleDescByMember"),
+                jsonPath("$.success", is(false)),
+                jsonPath("$.error.code", is(ErrorCode.ENTITY_NOT_FOUND.getCode())),
+                jsonPath("$.error.message", containsString(Member.class.getName()))
+            );
+    }
+
 }
