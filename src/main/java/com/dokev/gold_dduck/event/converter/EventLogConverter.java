@@ -26,22 +26,23 @@ public class EventLogConverter {
 
     public List<EventLogDto> convertToEventLogDtos(List<EventLog> eventLogs) {
         List<EventLogDto> eventLogDtos = new ArrayList<>();
-        Map<Gift, List<EventLog>> giftListMap = makeGroup(eventLogs);
+        Map<String, List<EventLog>> giftListMap = makeGroup(eventLogs);
 
-        for (Gift gift : giftListMap.keySet()) {
-            List<EventLog> groupedEventLogs = giftListMap.get(gift);
+        for (String category : giftListMap.keySet()) {
+            List<EventLog> groupedEventLogs = giftListMap.get(category);
             eventLogDtos.add(convertToEventLogDto(groupedEventLogs));
         }
 
         return eventLogDtos;
     }
 
-    private Map<Gift, List<EventLog>> makeGroup(List<EventLog> eventLogs) {
+    private Map<String, List<EventLog>> makeGroup(List<EventLog> eventLogs) {
         if (eventLogs.isEmpty()) {
             return new HashMap<>();
         }
+
         return eventLogs.stream()
-            .collect(Collectors.groupingBy(EventLog::getGift));
+            .collect(Collectors.groupingBy(eventLog -> eventLog.getGift().getCategory()));
     }
 
     private EventLogDto convertToEventLogDto(List<EventLog> eventLogs) {
