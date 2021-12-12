@@ -5,6 +5,6 @@ import com.dokev.gold_dduck.common.error.ErrorCode;
 public class GiftEmptyException extends BusinessException {
 
     public GiftEmptyException(String message) {
-        super(message, ErrorCode.GIFT_NOT_EMPTY);
+        super(ErrorCode.GIFT_NOT_EMPTY);
     }
 }

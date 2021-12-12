@@ -74,4 +74,8 @@ public class GiftItem extends BaseEntity {
         }
         this.member = member;
     }
+
+    public void changeUsed(boolean used) {
+        this.used = used;
+    }
 }

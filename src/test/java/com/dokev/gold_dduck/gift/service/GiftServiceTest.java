@@ -9,10 +9,12 @@ import com.dokev.gold_dduck.event.repository.EventLogRepository;
 import com.dokev.gold_dduck.event.repository.EventRepository;
 import com.dokev.gold_dduck.factory.TestEventFactory;
 import com.dokev.gold_dduck.factory.TestMemberFactory;
+import com.dokev.gold_dduck.gift.converter.GiftConverter;
 import com.dokev.gold_dduck.gift.domain.Gift;
 import com.dokev.gold_dduck.gift.domain.GiftItem;
 import com.dokev.gold_dduck.gift.domain.GiftType;
 import com.dokev.gold_dduck.gift.dto.GiftItemDto;
+import com.dokev.gold_dduck.gift.repository.GiftItemQueryRepository;
 import com.dokev.gold_dduck.gift.repository.GiftItemRepository;
 import com.dokev.gold_dduck.gift.repository.GiftRepository;
 import com.dokev.gold_dduck.member.domain.Member;
@@ -25,7 +27,7 @@ import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabas
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.context.annotation.Import;
 
-@Import({JpaAuditingConfiguration.class, GiftService.class})
+@Import({JpaAuditingConfiguration.class, GiftService.class, GiftItemQueryRepository.class, GiftConverter.class})
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 @DataJpaTest
 class GiftServiceTest {
