@@ -81,22 +81,18 @@ public class TestEventFactory {
         List<GiftItemSaveDto> giftItemSaveDtos = new ArrayList<>();
 
         File imageFile = new File(System.getProperty("user.dir") + "/test-photo/test.png");
+
         MockMultipartFile image = new MockMultipartFile("images", "test.png", null,
-            Files.readAllBytes(imageFile.toPath()));
-        MockMultipartFile image2 = new MockMultipartFile("images", "test.jpg", null,
             Files.readAllBytes(imageFile.toPath()));
 
         GiftItemSaveDto giftItemSaveDto1 = new GiftItemSaveDto(GiftType.IMAGE, image.getOriginalFilename(),
             image.getBytes());
         GiftItemSaveDto giftItemSaveDto2 = new GiftItemSaveDto(GiftType.TEXT, "text1");
         GiftItemSaveDto giftItemSaveDto3 = new GiftItemSaveDto(GiftType.TEXT, "text2");
-        GiftItemSaveDto giftItemSaveDto4 = new GiftItemSaveDto(GiftType.IMAGE, image2.getOriginalFilename(),
-            image2.getBytes());
 
         giftItemSaveDtos.add(giftItemSaveDto1);
         giftItemSaveDtos.add(giftItemSaveDto2);
         giftItemSaveDtos.add(giftItemSaveDto3);
-        giftItemSaveDtos.add(giftItemSaveDto4);
 
         GiftSaveDto giftSaveDto = new GiftSaveDto("gift1", giftItemSaveDtos);
 

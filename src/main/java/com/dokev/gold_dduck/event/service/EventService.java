@@ -10,6 +10,9 @@ import com.dokev.gold_dduck.event.domain.Event;
 import com.dokev.gold_dduck.event.domain.GiftChoiceType;
 import com.dokev.gold_dduck.event.dto.EventDto;
 import com.dokev.gold_dduck.event.dto.EventSaveDto;
+import com.dokev.gold_dduck.event.dto.EventSearchCondition;
+import com.dokev.gold_dduck.event.dto.EventSimpleDto;
+import com.dokev.gold_dduck.event.dto.EventSimpleListDto;
 import com.dokev.gold_dduck.event.dto.GiftItemSaveDto;
 import com.dokev.gold_dduck.event.repository.EventRepository;
 import com.dokev.gold_dduck.gift.domain.Gift;
@@ -25,6 +28,8 @@ import java.util.List;
 import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.http.entity.ContentType;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -101,7 +106,6 @@ public class EventService {
         return eventFindConverter.convertToEventDto(event);
     }
 
-
     private List<GiftItem> fillDefaultGiftItem(Event event, int maxParticipantCount) {
 
         List<GiftItem> shuffleGiftItems = new ArrayList<>();
@@ -138,5 +142,18 @@ public class EventService {
         } catch (IOException e) {
             throw new FileUploadException(multipartFile.getName() + " 업로드 실패");
         }
+    }
+
+    public EventSimpleListDto searchSimpleDescByMember(
+        Long memberId,
+        EventSearchCondition eventSearchCondition,
+        Pageable pageable
+    ) {
+        if (!memberRepository.existsById(memberId)) {
+            throw new EntityNotFoundException(Member.class, memberId);
+        }
+        Page<EventSimpleDto> page = eventRepository.searchSimpleDescByMember(memberId, eventSearchCondition, pageable)
+            .map(eventFindConverter::convertToEventSimpleDto);
+        return new EventSimpleListDto(page);
     }
 }

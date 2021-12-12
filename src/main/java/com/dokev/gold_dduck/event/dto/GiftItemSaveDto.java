@@ -1,7 +1,6 @@
 package com.dokev.gold_dduck.event.dto;
 
 import com.dokev.gold_dduck.gift.domain.GiftType;
-import java.io.Serializable;
 import javax.validation.constraints.NotNull;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -12,9 +11,7 @@ import org.springframework.web.multipart.MultipartFile;
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
-public class GiftItemSaveDto implements Serializable {
-
-    private static final long serialVersionUID = 1L;
+public class GiftItemSaveDto {
 
     @NotNull
     private GiftType giftType;

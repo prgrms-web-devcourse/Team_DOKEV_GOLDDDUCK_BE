@@ -2,6 +2,7 @@ package com.dokev.gold_dduck.event.converter;
 
 import com.dokev.gold_dduck.event.domain.Event;
 import com.dokev.gold_dduck.event.dto.EventDto;
+import com.dokev.gold_dduck.event.dto.EventSimpleDto;
 import com.dokev.gold_dduck.gift.converter.GiftConverter;
 import com.dokev.gold_dduck.gift.domain.Gift;
 import com.dokev.gold_dduck.gift.dto.GiftDto;
@@ -38,5 +39,11 @@ public class EventFindConverter {
         return new EventDto(event.getId(), event.getTitle(), event.getGiftChoiceType(), event.getStartAt(),
             event.getEndAt(), event.getCode(), event.getEventProgressStatus(), event.getMainTemplate(),
             event.getMaxParticipantCount(), memberDto, giftDtos);
+    }
+
+    public EventSimpleDto convertToEventSimpleDto(Event event) {
+        return new EventSimpleDto(event.getId(), event.getTitle(), event.getGiftChoiceType(), event.getStartAt(),
+            event.getEndAt(), event.getCode(), event.getEventProgressStatus(), event.getMainTemplate(),
+            event.getMaxParticipantCount(), event.getCreatedAt());
     }
 }
