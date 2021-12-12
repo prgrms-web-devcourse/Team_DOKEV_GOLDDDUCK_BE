@@ -108,9 +108,7 @@ public class GiftService {
             .orElseThrow(() -> new EntityNotFoundException(GiftItem.class, giftItemId));
         Optional.ofNullable(giftItem.getMember())
             .filter(member -> member.getId().equals(memberId))
-            .orElseThrow(() -> {
-                throw new MemberGiftNotMatchedException(memberId, giftItemId);
-            });
+            .orElseThrow(() -> new MemberGiftNotMatchedException(memberId, giftItemId));
         giftItem.changeUsed(giftItemUpdateDto.getUsed());
     }
 
