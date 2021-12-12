@@ -1,8 +1,10 @@
 package com.dokev.gold_dduck.gift.controller;
 
+import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.nullValue;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.handler;
@@ -11,6 +13,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import com.dokev.gold_dduck.common.error.ErrorCode;
 import com.dokev.gold_dduck.event.domain.Event;
+import com.dokev.gold_dduck.event.domain.EventLog;
 import com.dokev.gold_dduck.factory.TestEventFactory;
 import com.dokev.gold_dduck.factory.TestGiftFactory;
 import com.dokev.gold_dduck.factory.TestGiftItemFactory;
@@ -215,6 +218,153 @@ class GiftControllerTest {
             );
     }
 
+    @Test
+    @Transactional
+    @DisplayName("Member가 받은 GiftItem 수령일 최신순으로 페이징 조회 성공 테스트 - (page = null, size = null, 사용여부 = null)")
+    void searchDescByMemberSuccessTest() throws Exception {
+        //given
+        Event givenEvent1 = givenCompleteEvent();
+        Event givenEvent2 = givenCompleteEvent();
+        Member givenMember = givenEvent1.getMember();
+        Gift gift1 = givenEvent1.getGifts().get(0);
+        Gift gift2 = givenEvent2.getGifts().get(0);
+        GiftItem targetGiftItem1 = gift1.getGiftItems().get(0);
+        GiftItem targetGiftItem2 = gift2.getGiftItems().get(0);
+        targetGiftItem1.changeUsed(true);
+        entityManager.persist(new EventLog(givenEvent1, givenMember, gift1, targetGiftItem1));
+        entityManager.persist(new EventLog(givenEvent2, givenMember, gift2, targetGiftItem2));
+        //when
+        ResultActions result = mockMvc.perform(
+            get("/api/v1/members/{memberId}/gifts", givenMember.getId())
+                .accept(MediaType.APPLICATION_JSON)
+                .contentType(MediaType.APPLICATION_JSON)
+        );
+        //then
+        result.andDo(print())
+            .andExpectAll(
+                status().isOk(),
+                handler().handlerType(GiftController.class),
+                handler().methodName("searchDescByMember"),
+                jsonPath("$.success", is(true)),
+                jsonPath("$.error", is(nullValue())),
+                jsonPath("$.data.giftItemList.length()", is(2)),
+                jsonPath("$.data.giftItemList[*].id",
+                    contains(targetGiftItem2.getId().intValue(), targetGiftItem1.getId().intValue())),
+                jsonPath("$.data.pagination.totalPages", is(1)),
+                jsonPath("$.data.pagination.totalElements", is(2)),
+                jsonPath("$.data.pagination.currentPage", is(0)),
+                jsonPath("$.data.pagination.offset", is(0)),
+                jsonPath("$.data.pagination.size", is(4))
+            );
+    }
+
+    @Test
+    @Transactional
+    @DisplayName("Member가 받은 GiftItem 수령일 최신순으로 페이징 조회 성공 테스트 - (page = 1, size = 2, 사용여부 = 사용)")
+    void searchDescByMemberSuccessTest2() throws Exception {
+        //given
+        Event givenEvent1 = givenCompleteEvent();
+        Event givenEvent2 = givenCompleteEvent();
+        Member givenMember = givenEvent1.getMember();
+        Gift gift1 = givenEvent1.getGifts().get(0);
+        Gift gift2 = givenEvent2.getGifts().get(0);
+        GiftItem targetGiftItem1 = gift1.getGiftItems().get(0);
+        GiftItem targetGiftItem2 = gift1.getGiftItems().get(1);
+        GiftItem targetGiftItem3 = gift2.getGiftItems().get(0);
+        GiftItem targetGiftItem4 = gift2.getGiftItems().get(1);
+        GiftItem targetGiftItem5 = gift2.getGiftItems().get(2);
+        targetGiftItem1.changeUsed(true);
+        targetGiftItem2.changeUsed(true);
+        targetGiftItem3.changeUsed(true);
+        targetGiftItem4.changeUsed(true);
+        entityManager.persist(new EventLog(givenEvent1, givenMember, gift1, targetGiftItem1));
+        entityManager.persist(new EventLog(givenEvent1, givenMember, gift1, targetGiftItem2));
+        entityManager.persist(new EventLog(givenEvent2, givenMember, gift2, targetGiftItem3));
+        entityManager.persist(new EventLog(givenEvent2, givenMember, gift2, targetGiftItem4));
+        entityManager.persist(new EventLog(givenEvent2, givenMember, gift2, targetGiftItem5));
+        //when
+        ResultActions result = mockMvc.perform(
+            get("/api/v1/members/{memberId}/gifts", givenMember.getId())
+                .accept(MediaType.APPLICATION_JSON)
+                .contentType(MediaType.APPLICATION_JSON)
+                .param("page", "1")
+                .param("size", "2")
+                .param("used", "true")
+        );
+        //then
+        result.andDo(print())
+            .andExpectAll(
+                status().isOk(),
+                handler().handlerType(GiftController.class),
+                handler().methodName("searchDescByMember"),
+                jsonPath("$.success", is(true)),
+                jsonPath("$.error", is(nullValue())),
+                jsonPath("$.data.giftItemList.length()", is(2)),
+                jsonPath("$.data.giftItemList[*].id",
+                    contains(targetGiftItem2.getId().intValue(), targetGiftItem1.getId().intValue())),
+                jsonPath("$.data.pagination.totalPages", is(2)),
+                jsonPath("$.data.pagination.totalElements", is(4)),
+                jsonPath("$.data.pagination.currentPage", is(1)),
+                jsonPath("$.data.pagination.offset", is(2)),
+                jsonPath("$.data.pagination.size", is(2))
+            );
+    }
+
+    @Test
+    @Transactional
+    @DisplayName("Member가 받은 GiftItem 수령일 최신순으로 페이징 조회 성공 테스트 - (dto 값 검증)")
+    void searchDescByMemberSuccessTest3() throws Exception {
+        //given
+        Event givenEvent1 = givenCompleteEvent();
+        Member givenMember = givenEvent1.getMember();
+        Gift gift1 = givenEvent1.getGifts().get(0);
+        GiftItem targetGiftItem1 = gift1.getGiftItems().get(0);
+        targetGiftItem1.changeUsed(true);
+        entityManager.persist(new EventLog(givenEvent1, givenMember, gift1, targetGiftItem1));
+        //when
+        ResultActions result = mockMvc.perform(
+            get("/api/v1/members/{memberId}/gifts", givenMember.getId())
+                .accept(MediaType.APPLICATION_JSON)
+                .contentType(MediaType.APPLICATION_JSON)
+        );
+        //then
+        result.andDo(print())
+            .andExpectAll(
+                status().isOk(),
+                handler().handlerType(GiftController.class),
+                handler().methodName("searchDescByMember"),
+                jsonPath("$.success", is(true)),
+                jsonPath("$.error", is(nullValue())),
+                jsonPath("$.data.giftItemList.length()", is(1)),
+                jsonPath("$.data.giftItemList[0].id", is(targetGiftItem1.getId().intValue())),
+                jsonPath("$.data.giftItemList[0].category", is(gift1.getCategory())),
+                jsonPath("$.data.giftItemList[0].mainTemplate", is(givenEvent1.getMainTemplate()))
+            );
+    }
+
+    @Test
+    @DisplayName("Member가 생성한 Event 최신순으로 페이징 조회 실패 테스트 - (잘못된 memberId)")
+    void searchDescByMemberFailureTest() throws Exception {
+        //given
+        Long invalidMemberId = -1L;
+        //when
+        ResultActions result = mockMvc.perform(
+            get("/api/v1/members/{memberId}/gifts", invalidMemberId)
+                .accept(MediaType.APPLICATION_JSON)
+                .contentType(MediaType.APPLICATION_JSON)
+        );
+        //then
+        result.andDo(print())
+            .andExpectAll(
+                status().is4xxClientError(),
+                handler().handlerType(GiftController.class),
+                handler().methodName("searchDescByMember"),
+                jsonPath("$.success", is(false)),
+                jsonPath("$.error.code", is(ErrorCode.ENTITY_NOT_FOUND.getCode())),
+                jsonPath("$.error.message", containsString(Member.class.getName()))
+            );
+    }
+
     private Event givenCompleteEvent() {
         Member member = givenMember();
         Event event = TestEventFactory.createEvent(member);
@@ -230,8 +380,7 @@ class GiftControllerTest {
     }
 
     private Member givenMember() {
-        Member member = TestMemberFactory.getUserMember(entityManager);
-        return member;
+        return TestMemberFactory.getUserMember(entityManager);
     }
 
     private Gift givenGift(Event event) {
