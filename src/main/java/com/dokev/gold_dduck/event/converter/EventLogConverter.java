@@ -3,7 +3,8 @@ package com.dokev.gold_dduck.event.converter;
 import com.dokev.gold_dduck.event.domain.EventLog;
 import com.dokev.gold_dduck.event.dto.EventLogDto;
 import com.dokev.gold_dduck.gift.domain.Gift;
-import com.dokev.gold_dduck.member.domain.Member;
+import com.dokev.gold_dduck.member.converter.MemberConverter;
+import com.dokev.gold_dduck.member.dto.MemberDto;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -16,6 +17,12 @@ import org.springframework.stereotype.Component;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Component
 public class EventLogConverter {
+
+    private MemberConverter memberConverter;
+
+    public EventLogConverter(MemberConverter memberConverter) {
+        this.memberConverter = memberConverter;
+    }
 
     public List<EventLogDto> convertToEventLogDtos(List<EventLog> eventLogs) {
         List<EventLogDto> eventLogDtos = new ArrayList<>();
@@ -38,10 +45,11 @@ public class EventLogConverter {
     }
 
     private EventLogDto convertToEventLogDto(List<EventLog> eventLogs) {
-        List<Member> members = new ArrayList<>();
+        List<MemberDto> members = new ArrayList<>();
 
         for (EventLog eventLog : eventLogs) {
-            members.add(eventLog.getMember());
+            MemberDto memberDto = memberConverter.convertToMemberDto(eventLog.getMember());
+            members.add(memberDto);
         }
         return new EventLogDto(eventLogs.get(0).getGift().getCategory(), members);
     }
