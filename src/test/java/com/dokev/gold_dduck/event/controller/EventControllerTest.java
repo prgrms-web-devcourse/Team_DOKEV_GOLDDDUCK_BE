@@ -197,7 +197,7 @@ class EventControllerTest {
     }
 
     @Test
-    @DisplayName("Member가 생성한 Event 최신순으로 페이징 조회 성공 테스트 - (page = 0, size = 4, 이벤트상태 = 전체)")
+    @DisplayName("Member가 생성한 Event 최신순으로 페이징 조회 성공 테스트 - (page = null, size = null, 이벤트상태 = null)")
     void searchSimpleDescByMemberSuccessTest() throws Exception {
         //given
         Member userMember = TestMemberFactory.getUserMember(entityManager);
@@ -227,10 +227,10 @@ class EventControllerTest {
                 handler().methodName("searchSimpleDescByMember"),
                 jsonPath("$.success", is(true)),
                 jsonPath("$.error", is(nullValue())),
-                jsonPath("$.data..eventId",
-                    containsInAnyOrder(closedEvent.getId().intValue(),
+                jsonPath("$.data.simpleEventList[*].eventId",
+                    contains(readyEvent.getId().intValue(),
                         runningEvent.getId().intValue(),
-                        readyEvent.getId().intValue())),
+                        closedEvent.getId().intValue())),
                 jsonPath("$.data.pagination.totalPages", is(1)),
                 jsonPath("$.data.pagination.totalElements", is(3)),
                 jsonPath("$.data.pagination.currentPage", is(0)),
@@ -240,7 +240,7 @@ class EventControllerTest {
     }
 
     @Test
-    @DisplayName("Member가 생성한 Event 최신순으로 페이징 조회 성공 테스트 - (page = 0, size = 4, 이벤트상태 = 완료)")
+    @DisplayName("Member가 생성한 Event 최신순으로 페이징 조회 성공 테스트 - (page = null, size = null, 이벤트상태 = 완료)")
     void searchSimpleDescByMemberSuccessTest2() throws Exception {
         //given
         Member userMember = TestMemberFactory.getUserMember(entityManager);
@@ -281,7 +281,7 @@ class EventControllerTest {
     }
 
     @Test
-    @DisplayName("Member가 생성한 Event 최신순으로 페이징 조회 성공 테스트 - (page = 1, size = 4, 이벤트상태 = 진행)")
+    @DisplayName("Member가 생성한 Event 최신순으로 페이징 조회 성공 테스트 - (page = 1, size = 2, 이벤트상태 = 진행)")
     void searchSimpleDescByMemberSuccessTest3() throws Exception {
         //given
         Member userMember = TestMemberFactory.getUserMember(entityManager);
@@ -320,6 +320,7 @@ class EventControllerTest {
                 .contentType(MediaType.APPLICATION_JSON)
                 .param("eventProgressStatus", EventProgressStatus.RUNNING.name())
                 .param("page", "1")
+                .param("size", "2")
         );
         //then
         result.andDo(print())
@@ -329,12 +330,14 @@ class EventControllerTest {
                 handler().methodName("searchSimpleDescByMember"),
                 jsonPath("$.success", is(true)),
                 jsonPath("$.error", is(nullValue())),
-                jsonPath("$.data.simpleEventList[0].eventId", is(runningEvent.getId().intValue())),
-                jsonPath("$.data.pagination.totalPages", is(2)),
+                jsonPath("$.data.simpleEventList.length()", is(2)),
+                jsonPath("$.data.simpleEventList[*].eventId",
+                    contains(runningEvent3.getId().intValue(), runningEvent2.getId().intValue())),
+                jsonPath("$.data.pagination.totalPages", is(3)),
                 jsonPath("$.data.pagination.totalElements", is(5)),
                 jsonPath("$.data.pagination.currentPage", is(1)),
-                jsonPath("$.data.pagination.offset", is(4)),
-                jsonPath("$.data.pagination.size", is(4))
+                jsonPath("$.data.pagination.offset", is(2)),
+                jsonPath("$.data.pagination.size", is(2))
             );
     }
 
