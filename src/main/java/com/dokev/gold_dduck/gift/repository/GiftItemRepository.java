@@ -9,7 +9,7 @@ import org.springframework.data.jpa.repository.Lock;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
-public interface GiftItemRepository extends JpaRepository<GiftItem, Long>, GiftItemRepositoryCustom{
+public interface GiftItemRepository extends JpaRepository<GiftItem, Long> {
 
     @Lock(LockModeType.PESSIMISTIC_WRITE)
     @Query("select gl from GiftItem gl"

@@ -16,10 +16,12 @@ import com.dokev.gold_dduck.event.domain.Event;
 import com.dokev.gold_dduck.event.domain.EventLog;
 import com.dokev.gold_dduck.event.repository.EventLogRepository;
 import com.dokev.gold_dduck.event.repository.EventRepository;
+import com.dokev.gold_dduck.gift.converter.GiftConverter;
 import com.dokev.gold_dduck.gift.domain.Gift;
 import com.dokev.gold_dduck.gift.domain.GiftItem;
 import com.dokev.gold_dduck.gift.domain.GiftType;
 import com.dokev.gold_dduck.gift.dto.GiftItemDto;
+import com.dokev.gold_dduck.gift.repository.GiftItemQueryRepository;
 import com.dokev.gold_dduck.gift.repository.GiftItemRepository;
 import com.dokev.gold_dduck.gift.repository.GiftRepository;
 import com.dokev.gold_dduck.member.domain.Member;
@@ -33,6 +35,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 @ExtendWith(MockitoExtension.class)
@@ -52,6 +55,12 @@ class GiftServiceMockTest {
 
     @Mock
     private EventLogRepository eventLogRepository;
+
+    @Mock
+    private GiftItemQueryRepository giftItemQueryRepository;
+
+    @Spy
+    private GiftConverter giftConverter;
 
     @InjectMocks
     private GiftService sut;

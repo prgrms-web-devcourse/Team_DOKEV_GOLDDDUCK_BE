@@ -7,11 +7,14 @@ import com.dokev.gold_dduck.event.domain.Event;
 import com.dokev.gold_dduck.event.domain.EventLog;
 import com.dokev.gold_dduck.event.repository.EventLogRepository;
 import com.dokev.gold_dduck.event.repository.EventRepository;
+import com.dokev.gold_dduck.gift.converter.GiftConverter;
 import com.dokev.gold_dduck.gift.domain.Gift;
 import com.dokev.gold_dduck.gift.domain.GiftItem;
+import com.dokev.gold_dduck.gift.dto.GiftItemDetailDto;
 import com.dokev.gold_dduck.gift.dto.GiftItemDto;
 import com.dokev.gold_dduck.gift.dto.GiftItemListDto;
 import com.dokev.gold_dduck.gift.dto.GiftItemSearchCondition;
+import com.dokev.gold_dduck.gift.repository.GiftItemQueryRepository;
 import com.dokev.gold_dduck.gift.repository.GiftItemRepository;
 import com.dokev.gold_dduck.gift.repository.GiftRepository;
 import com.dokev.gold_dduck.member.domain.Member;
@@ -37,18 +40,26 @@ public class GiftService {
 
     private final EventLogRepository eventLogRepository;
 
+    private final GiftItemQueryRepository giftItemQueryRepository;
+
+    private final GiftConverter giftConverter;
+
     public GiftService(
         EventRepository eventRepository,
         GiftRepository giftRepository,
         GiftItemRepository giftItemRepository,
         MemberRepository memberRepository,
-        EventLogRepository eventLogRepository
+        EventLogRepository eventLogRepository,
+        GiftItemQueryRepository giftItemQueryRepository,
+        GiftConverter giftConverter
     ) {
         this.eventRepository = eventRepository;
         this.giftRepository = giftRepository;
         this.giftItemRepository = giftItemRepository;
         this.memberRepository = memberRepository;
         this.eventLogRepository = eventLogRepository;
+        this.giftItemQueryRepository = giftItemQueryRepository;
+        this.giftConverter = giftConverter;
     }
 
     @Transactional
@@ -68,7 +79,7 @@ public class GiftService {
         eventLogRepository.save(new EventLog(event, member, gift, chosenGiftItem.orElse(null)));
         if (chosenGiftItem.isPresent()) {
             chosenGiftItem.get().allocateMember(member);
-            return new GiftItemDto(chosenGiftItem.get());
+            return giftConverter.convertToGiftItemDto(chosenGiftItem.get());
         }
         throw new GiftStockOutException();
     }
@@ -81,8 +92,8 @@ public class GiftService {
         if (!memberRepository.existsById(memberId)) {
             throw new EntityNotFoundException(Member.class, memberId);
         }
-        Page<GiftItemDto> page = giftItemRepository.searchDescByMember(memberId, giftItemSearchCondition, pageable)
-            .map(GiftItemDto::new);
+        Page<GiftItemDetailDto> page = giftItemQueryRepository.searchDescByMember(memberId, giftItemSearchCondition,
+            pageable);
         return new GiftItemListDto(page);
     }
 

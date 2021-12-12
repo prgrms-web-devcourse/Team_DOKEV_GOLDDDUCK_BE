@@ -311,6 +311,38 @@ class GiftControllerTest {
     }
 
     @Test
+    @Transactional
+    @DisplayName("Member가 받은 GiftItem 수령일 최신순으로 페이징 조회 성공 테스트 - (dto 값 검증)")
+    void searchDescByMemberSuccessTest3() throws Exception {
+        //given
+        Event givenEvent1 = givenCompleteEvent();
+        Member givenMember = givenEvent1.getMember();
+        Gift gift1 = givenEvent1.getGifts().get(0);
+        GiftItem targetGiftItem1 = gift1.getGiftItems().get(0);
+        targetGiftItem1.changeUsed(true);
+        entityManager.persist(new EventLog(givenEvent1, givenMember, gift1, targetGiftItem1));
+        //when
+        ResultActions result = mockMvc.perform(
+            get("/api/v1/members/{memberId}/gifts", givenMember.getId())
+                .accept(MediaType.APPLICATION_JSON)
+                .contentType(MediaType.APPLICATION_JSON)
+        );
+        //then
+        result.andDo(print())
+            .andExpectAll(
+                status().isOk(),
+                handler().handlerType(GiftController.class),
+                handler().methodName("searchDescByMember"),
+                jsonPath("$.success", is(true)),
+                jsonPath("$.error", is(nullValue())),
+                jsonPath("$.data.giftItemList.length()", is(1)),
+                jsonPath("$.data.giftItemList[0].id", is(targetGiftItem1.getId().intValue())),
+                jsonPath("$.data.giftItemList[0].category", is(gift1.getCategory())),
+                jsonPath("$.data.giftItemList[0].mainTemplate", is(givenEvent1.getMainTemplate()))
+            );
+    }
+
+    @Test
     @DisplayName("Member가 생성한 Event 최신순으로 페이징 조회 실패 테스트 - (잘못된 memberId)")
     void searchDescByMemberFailureTest() throws Exception {
         //given
@@ -348,8 +380,7 @@ class GiftControllerTest {
     }
 
     private Member givenMember() {
-        Member member = TestMemberFactory.getUserMember(entityManager);
-        return member;
+        return TestMemberFactory.getUserMember(entityManager);
     }
 
     private Gift givenGift(Event event) {

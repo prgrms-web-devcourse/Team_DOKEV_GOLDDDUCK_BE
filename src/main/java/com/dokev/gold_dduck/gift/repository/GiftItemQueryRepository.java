@@ -1,11 +1,13 @@
 package com.dokev.gold_dduck.gift.repository;
 
+import static com.dokev.gold_dduck.event.domain.QEvent.event;
 import static com.dokev.gold_dduck.event.domain.QEventLog.eventLog;
 import static com.dokev.gold_dduck.gift.domain.QGift.gift;
 import static com.dokev.gold_dduck.gift.domain.QGiftItem.giftItem;
 
-import com.dokev.gold_dduck.gift.domain.GiftItem;
+import com.dokev.gold_dduck.gift.dto.GiftItemDetailDto;
 import com.dokev.gold_dduck.gift.dto.GiftItemSearchCondition;
+import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import java.util.List;
@@ -13,27 +15,36 @@ import javax.persistence.EntityManager;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
+import org.springframework.stereotype.Repository;
 
-public class GiftItemRepositoryCustomImpl implements GiftItemRepositoryCustom {
+@Repository
+public class GiftItemQueryRepository {
 
     private final JPAQueryFactory queryFactory;
 
-    public GiftItemRepositoryCustomImpl(EntityManager entityManager) {
+    public GiftItemQueryRepository(EntityManager entityManager) {
         this.queryFactory = new JPAQueryFactory(entityManager);
     }
 
-    @Override
-    public Page<GiftItem> searchDescByMember(
+    public Page<GiftItemDetailDto> searchDescByMember(
         Long memberId,
         GiftItemSearchCondition giftItemSearchCondition,
         Pageable pageable
     ) {
-        List<GiftItem> content = queryFactory
-            .select(eventLog.giftItem)
+        List<GiftItemDetailDto> content = queryFactory
+            .select(Projections.fields(GiftItemDetailDto.class,
+                giftItem.id,
+                giftItem.giftType,
+                giftItem.content,
+                giftItem.used,
+                gift.category,
+                event.mainTemplate
+            ))
             .from(eventLog)
             .join(eventLog.giftItem, giftItem)
             .on(eventLog.member.id.eq(memberId))
-            .join(giftItem.gift, gift).fetchJoin()
+            .join(giftItem.gift, gift)
+            .join(eventLog.event, event)
             .where(usedEq(giftItemSearchCondition.getUsed()))
             .orderBy(eventLog.createdAt.desc())
             .offset(pageable.getOffset())
