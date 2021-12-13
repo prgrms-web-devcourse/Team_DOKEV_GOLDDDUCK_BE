@@ -2,7 +2,6 @@ package com.dokev.gold_dduck.event.converter;
 
 import com.dokev.gold_dduck.event.domain.EventLog;
 import com.dokev.gold_dduck.event.dto.EventLogDto;
-import com.dokev.gold_dduck.gift.domain.Gift;
 import com.dokev.gold_dduck.member.converter.MemberConverter;
 import com.dokev.gold_dduck.member.dto.MemberDto;
 import java.util.ArrayList;

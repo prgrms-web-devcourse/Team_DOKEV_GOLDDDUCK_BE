@@ -26,8 +26,8 @@ public class GiftItemSaveDto {
 
     public GiftItemSaveDto(GiftType giftType, String fileName, byte[] file) {
         this.giftType = giftType;
-        this.fileName = fileName;
         this.file = file;
+        this.fileName = fileName;
     }
 
     public GiftItemSaveDto(GiftType giftType, String content) {

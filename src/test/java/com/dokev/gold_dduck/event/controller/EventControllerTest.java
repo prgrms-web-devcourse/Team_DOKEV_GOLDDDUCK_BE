@@ -1,6 +1,5 @@
 package com.dokev.gold_dduck.event.controller;
 
-import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.is;
@@ -31,7 +30,6 @@ import com.dokev.gold_dduck.factory.TestMemberFactory;
 import com.dokev.gold_dduck.gift.domain.Gift;
 import com.dokev.gold_dduck.gift.domain.GiftItem;
 import com.dokev.gold_dduck.gift.domain.GiftType;
-import com.dokev.gold_dduck.gift.repository.GiftItemRepository;
 import com.dokev.gold_dduck.member.converter.MemberConverter;
 import com.dokev.gold_dduck.member.domain.Member;
 import com.dokev.gold_dduck.security.WithMockJwtAuthentication;
@@ -71,9 +69,6 @@ class EventControllerTest {
     private EventSaveConverter eventSaveConverter;
 
     @Autowired
-    private GiftItemRepository giftItemRepository;
-
-    @Autowired
     private EventFindConverter eventFindConverter;
 
     @Autowired
@@ -83,7 +78,7 @@ class EventControllerTest {
     private MemberConverter memberConverter;
 
     @Test
-    @DisplayName("선착순 이벤트 생성 테스트 - 성공")
+    @DisplayName("이벤트 생성 테스트 - 성공")
     void saveEventTest() throws Exception {
         // GIVEN
         Member testMember = TestMemberFactory.getUserMember(entityManager);
@@ -105,37 +100,6 @@ class EventControllerTest {
                 jsonPath("$.data", is(notNullValue())),
                 jsonPath("$.data", matchesPattern("([a-f0-9]{8}(-[a-f0-9]{4}){4}[a-f0-9]{8})"))
             );
-    }
-
-    @Test
-    @DisplayName("랜덤 이벤트 생성 테스트 - 성공")
-    void saveRandomEventTest() throws Exception {
-        // GIVEN
-        Member testMember = TestMemberFactory.createTestMember(entityManager);
-        entityManager.persist(testMember);
-
-        Event newEvent = TestEventFactory.createRandomEvent(testMember);
-
-        EventSaveDto eventSaveDto = eventSaveConverter.convertToEventSaveDto(newEvent);
-
-        // WHEN
-        ResultActions resultActions = mockMvc.perform(
-            post("/api/v1/events")
-                .accept(MediaType.APPLICATION_JSON)
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(eventSaveDto))
-        );
-
-        // THEN
-        resultActions.andDo(print())
-            .andExpectAll(status().isOk(),
-                jsonPath("$.success", is(true)),
-                jsonPath("$.data", is(notNullValue())),
-                jsonPath("$.data", matchesPattern("([a-f0-9]{8}(-[a-f0-9]{4}){4}[a-f0-9]{8})"))
-            );
-
-        List<GiftItem> giftItems = giftItemRepository.findAll();
-        assertThat(giftItems.size()).isEqualTo(newEvent.getMaxParticipantCount());
     }
 
     @Test
