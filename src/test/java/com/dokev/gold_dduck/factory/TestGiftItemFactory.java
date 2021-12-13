@@ -10,7 +10,7 @@ import java.util.List;
 public class TestGiftItemFactory {
 
     public static GiftItem createTestGiftItem(String content, Gift gift) {
-        GiftItem giftItem = new GiftItem(GiftType.IMAGE, content, false);
+        GiftItem giftItem = new GiftItem(GiftType.TEXT, content, false);
         giftItem.changeGift(gift);
         return giftItem;
     }

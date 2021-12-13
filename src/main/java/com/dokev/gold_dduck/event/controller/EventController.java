@@ -15,11 +15,12 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
+import org.springframework.http.MediaType;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -39,8 +40,8 @@ public class EventController {
         this.eventLogService = eventLogService;
     }
 
-    @PostMapping(value = "/v1/events")
-    public ApiResponse<UUID> saveEvent(@RequestBody @Validated EventSaveDto eventSaveDto) {
+    @PostMapping(value = "/v1/events", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ApiResponse<UUID> saveEvent(@ModelAttribute(value = "eventSaveDto") @Validated EventSaveDto eventSaveDto) {
         UUID eventCode = eventService.saveEvent(eventSaveDto);
         return ApiResponse.success(eventCode);
     }

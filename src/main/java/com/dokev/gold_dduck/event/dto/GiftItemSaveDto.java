@@ -6,11 +6,13 @@ import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 import org.springframework.web.multipart.MultipartFile;
 
+@Setter
+@Getter
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@Getter
 public class GiftItemSaveDto {
 
     @NotNull
@@ -18,17 +20,7 @@ public class GiftItemSaveDto {
 
     private String content;
 
-    private String fileName;
-
-    private byte[] file;
-
     private MultipartFile image;
-
-    public GiftItemSaveDto(GiftType giftType, String fileName, byte[] file) {
-        this.giftType = giftType;
-        this.file = file;
-        this.fileName = fileName;
-    }
 
     public GiftItemSaveDto(GiftType giftType, String content) {
         this.giftType = giftType;
@@ -38,7 +30,6 @@ public class GiftItemSaveDto {
     public GiftItemSaveDto(GiftType giftType, MultipartFile image) {
         this.giftType = giftType;
         this.image = image;
-        this.fileName = image.getOriginalFilename();
     }
 
     public void changedContent(String content) {
