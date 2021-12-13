@@ -2,7 +2,6 @@ package com.dokev.gold_dduck.event.converter;
 
 import com.dokev.gold_dduck.event.domain.EventLog;
 import com.dokev.gold_dduck.event.dto.EventLogDto;
-import com.dokev.gold_dduck.gift.domain.Gift;
 import com.dokev.gold_dduck.member.converter.MemberConverter;
 import com.dokev.gold_dduck.member.dto.MemberDto;
 import java.util.ArrayList;
@@ -12,6 +11,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -20,6 +20,7 @@ public class EventLogConverter {
 
     private MemberConverter memberConverter;
 
+    @Autowired
     public EventLogConverter(MemberConverter memberConverter) {
         this.memberConverter = memberConverter;
     }
