@@ -117,4 +117,8 @@ public class Event extends BaseEntity {
         this.member = member;
         member.getEvents().add(this);
     }
+
+    public void changeEventStatus(EventProgressStatus eventProgressStatus) {
+        this.eventProgressStatus = eventProgressStatus;
+    }
 }

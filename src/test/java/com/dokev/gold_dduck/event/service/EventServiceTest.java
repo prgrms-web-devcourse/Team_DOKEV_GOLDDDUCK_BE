@@ -10,10 +10,12 @@ import static org.mockito.Mockito.mock;
 import com.dokev.gold_dduck.event.converter.EventFindConverter;
 import com.dokev.gold_dduck.event.converter.EventSaveConverter;
 import com.dokev.gold_dduck.event.domain.Event;
+import com.dokev.gold_dduck.event.domain.EventProgressStatus;
 import com.dokev.gold_dduck.event.dto.EventDto;
 import com.dokev.gold_dduck.event.dto.EventSaveDto;
 import com.dokev.gold_dduck.event.repository.EventRepository;
 import com.dokev.gold_dduck.factory.TestEventFactory;
+import com.dokev.gold_dduck.factory.TestMemberFactory;
 import com.dokev.gold_dduck.gift.converter.GiftConverter;
 import com.dokev.gold_dduck.member.converter.MemberConverter;
 import com.dokev.gold_dduck.member.domain.Member;
@@ -88,5 +90,19 @@ class EventServiceTest {
         Assertions.assertThat(foundEventDto.getCode()).isEqualTo(event.getCode());
         Assertions.assertThat(foundEventDto.getGifts().size()).isEqualTo(3);
         Assertions.assertThat(foundEventDto.getGifts().get(0).getGiftItems().size()).isEqualTo(3);
+    }
+
+    @Test
+    @DisplayName("멤버 아이디와 이벤트 아이디를 통해 삭제 테스트 - 성공")
+    void deleteEvent(){
+        Member member = mock(Member.class);
+        Event event = TestEventFactory.createEvent(member);
+
+        given(eventRepository.findById(event.getId())).willReturn(Optional.of(event));
+
+        Long deletedEventId = eventService.deleteEvent(member.getId(), event.getId());
+
+        Assertions.assertThat(deletedEventId).isEqualTo(event.getId());
+        Assertions.assertThat(event.getEventProgressStatus()).isEqualTo(EventProgressStatus.CLOSED);
     }
 }

@@ -7,6 +7,7 @@ import com.dokev.gold_dduck.common.exception.GiftEmptyException;
 import com.dokev.gold_dduck.event.converter.EventFindConverter;
 import com.dokev.gold_dduck.event.converter.EventSaveConverter;
 import com.dokev.gold_dduck.event.domain.Event;
+import com.dokev.gold_dduck.event.domain.EventProgressStatus;
 import com.dokev.gold_dduck.event.dto.EventDto;
 import com.dokev.gold_dduck.event.dto.EventSaveDto;
 import com.dokev.gold_dduck.event.dto.EventSearchCondition;
@@ -121,5 +122,23 @@ public class EventService {
         Page<EventSimpleDto> page = eventRepository.searchSimpleDescByMember(memberId, eventSearchCondition, pageable)
             .map(eventFindConverter::convertToEventSimpleDto);
         return new EventSimpleListDto(page);
+    }
+
+    private void updateEventProgressStatusToEnd(Event event) {
+        event.changeEventStatus(EventProgressStatus.CLOSED);
+    }
+
+    @Transactional
+    public Long deleteEvent(Long memberId, Long eventId) {
+        Event event = eventRepository.findById(eventId)
+            .orElseThrow(() -> new EntityNotFoundException(Event.class, eventId));
+
+        if (!event.getMember().getId().equals(memberId)) {
+            throw new EntityNotFoundException(Event.class, eventId);
+        }
+
+        updateEventProgressStatusToEnd(event);
+
+        return eventId;
     }
 }

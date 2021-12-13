@@ -6,6 +6,8 @@ import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.matchesPattern;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.Matchers.nullValue;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.multipart;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -47,6 +49,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
+import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.transaction.annotation.Transactional;
 
 @Slf4j
@@ -481,4 +484,20 @@ class EventControllerTest {
             .andExpect(jsonPath("$.error", is(nullValue())));
     }
 
+    @Test
+    @DisplayName("이벤트 삭제 테스트 - 성공")
+    void deleteEvent() throws Exception {
+        Member member = TestMemberFactory.createTestMember(entityManager);
+        entityManager.persist(member);
+        Event event = TestEventFactory.createEvent(member);
+        entityManager.persist(event);
+
+        entityManager.clear();
+
+        mockMvc.perform(delete("/api/v1/members/{memberId}/{eventId}", member.getId(), event.getId()))
+            .andDo(print())
+            .andExpect(jsonPath("$.success", is(true)))
+            .andExpect(jsonPath("$.data", is(event.getId().intValue())))
+            .andExpect(jsonPath("$.error", is(nullValue())));
+    }
 }
