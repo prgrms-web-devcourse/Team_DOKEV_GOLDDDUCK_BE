@@ -468,16 +468,12 @@ class EventControllerTest {
         entityManager.persist(member8);
 
         Event event = TestEventFactory.createEvent(member1);
-        event.changeMember(member1);
 
         entityManager.persist(event);
 
         Gift gift1 = event.getGifts().get(0);
         Gift gift2 = event.getGifts().get(1);
         Gift gift3 = event.getGifts().get(2);
-        gift1.changeEvent(event);
-        gift2.changeEvent(event);
-        gift3.changeEvent(event);
 
         GiftItem giftItem1 = gift1.getGiftItems().get(0);
         GiftItem giftItem2 = gift1.getGiftItems().get(1);
