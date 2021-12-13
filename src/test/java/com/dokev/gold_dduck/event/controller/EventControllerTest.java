@@ -17,20 +17,26 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import com.dokev.gold_dduck.common.error.ErrorCode;
 import com.dokev.gold_dduck.event.converter.EventFindConverter;
+import com.dokev.gold_dduck.event.converter.EventLogConverter;
 import com.dokev.gold_dduck.event.converter.EventSaveConverter;
 import com.dokev.gold_dduck.event.domain.Event;
+import com.dokev.gold_dduck.event.domain.EventLog;
 import com.dokev.gold_dduck.event.domain.EventProgressStatus;
 import com.dokev.gold_dduck.event.dto.EventDto;
+import com.dokev.gold_dduck.event.dto.EventLogDto;
 import com.dokev.gold_dduck.event.dto.EventSaveDto;
 import com.dokev.gold_dduck.event.dto.GiftItemSaveDto;
 import com.dokev.gold_dduck.factory.TestEventFactory;
 import com.dokev.gold_dduck.factory.TestMemberFactory;
+import com.dokev.gold_dduck.gift.domain.Gift;
 import com.dokev.gold_dduck.gift.domain.GiftItem;
 import com.dokev.gold_dduck.gift.domain.GiftType;
 import com.dokev.gold_dduck.gift.repository.GiftItemRepository;
+import com.dokev.gold_dduck.member.converter.MemberConverter;
 import com.dokev.gold_dduck.member.domain.Member;
 import com.dokev.gold_dduck.security.WithMockJwtAuthentication;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
 import javax.persistence.EntityManager;
@@ -69,6 +75,12 @@ class EventControllerTest {
 
     @Autowired
     private EventFindConverter eventFindConverter;
+
+    @Autowired
+    private EventLogConverter eventLogConverter;
+
+    @Autowired
+    private MemberConverter memberConverter;
 
     @Test
     @DisplayName("선착순 이벤트 생성 테스트 - 성공")
@@ -432,6 +444,77 @@ class EventControllerTest {
                 jsonPath("$.error.code", is(ErrorCode.ENTITY_NOT_FOUND.getCode())),
                 jsonPath("$.error.message", containsString(Member.class.getName()))
             );
+    }
+
+    @Test
+    @DisplayName("Member가 생성한 이벤트의 당첨자 조회 테스트 - 성공")
+    void searchWinners() throws Exception {
+        Member member1 = TestMemberFactory.createTestMember(entityManager);
+        Member member2 = TestMemberFactory.createTestMember(entityManager);
+        Member member3 = TestMemberFactory.createTestMember(entityManager);
+        Member member4 = TestMemberFactory.createTestMember(entityManager);
+        Member member5 = TestMemberFactory.createTestMember(entityManager);
+        Member member6 = TestMemberFactory.createTestMember(entityManager);
+        Member member7 = TestMemberFactory.createTestMember(entityManager);
+        Member member8 = TestMemberFactory.createTestMember(entityManager);
+
+        entityManager.persist(member1);
+        entityManager.persist(member2);
+        entityManager.persist(member3);
+        entityManager.persist(member4);
+        entityManager.persist(member5);
+        entityManager.persist(member6);
+        entityManager.persist(member7);
+        entityManager.persist(member8);
+
+        Event event = TestEventFactory.createEvent(member1);
+
+        entityManager.persist(event);
+
+        Gift gift1 = event.getGifts().get(0);
+        Gift gift2 = event.getGifts().get(1);
+        Gift gift3 = event.getGifts().get(2);
+
+        GiftItem giftItem1 = gift1.getGiftItems().get(0);
+        GiftItem giftItem2 = gift1.getGiftItems().get(1);
+        GiftItem giftItem3 = gift2.getGiftItems().get(0);
+        GiftItem giftItem4 = gift2.getGiftItems().get(1);
+        GiftItem giftItem5 = gift3.getGiftItems().get(0);
+
+        EventLog eventLog2 = new EventLog(event, member2, gift1, giftItem1);
+        EventLog eventLog3 = new EventLog(event, member3, gift1, giftItem2);
+
+        EventLog eventLog4 = new EventLog(event, member4, gift2, giftItem3);
+        EventLog eventLog5 = new EventLog(event, member5, gift2, giftItem4);
+
+        EventLog eventLog6 = new EventLog(event, member6, gift3, giftItem5);
+        EventLog eventLog7 = new EventLog(event, member7, gift3, null);
+        EventLog eventLog8 = new EventLog(event, member8, gift3, null);
+
+        entityManager.persist(eventLog2);
+        entityManager.persist(eventLog3);
+        entityManager.persist(eventLog4);
+        entityManager.persist(eventLog5);
+        entityManager.persist(eventLog6);
+        entityManager.persist(eventLog7);
+        entityManager.persist(eventLog8);
+
+        entityManager.clear();
+
+        List<EventLog> eventLogs = Arrays.asList(eventLog2, eventLog3, eventLog4, eventLog5, eventLog6);
+        List<EventLogDto> eventLogDtos = eventLogConverter.convertToEventLogDtos(eventLogs);
+
+        mockMvc.perform(get("/api/v1/members/{memberId}/{eventId}/winners", member1.getId(), event.getId()))
+            .andDo(print())
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.success", is(true)))
+            .andExpect(jsonPath("$.data[0].category", is(eventLogDtos.get(0).getCategory())))
+            .andExpect(jsonPath("$.data[1].category", is(eventLogDtos.get(1).getCategory())))
+            .andExpect(jsonPath("$.data[2].category", is(eventLogDtos.get(2).getCategory())))
+            .andExpect(jsonPath("$.data[0].winners.size()", is(2)))
+            .andExpect(jsonPath("$.data[1].winners.size()", is(2)))
+            .andExpect(jsonPath("$.data[2].winners.size()", is(1)))
+            .andExpect(jsonPath("$.error", is(nullValue())));
     }
 
 }

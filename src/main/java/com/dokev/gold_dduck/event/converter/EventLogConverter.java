@@ -12,6 +12,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -20,6 +21,7 @@ public class EventLogConverter {
 
     private MemberConverter memberConverter;
 
+    @Autowired
     public EventLogConverter(MemberConverter memberConverter) {
         this.memberConverter = memberConverter;
     }

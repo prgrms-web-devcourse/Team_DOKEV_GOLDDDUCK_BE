@@ -3,12 +3,16 @@ package com.dokev.gold_dduck.event.controller;
 import com.dokev.gold_dduck.common.ApiResponse;
 import com.dokev.gold_dduck.event.domain.EventProgressStatus;
 import com.dokev.gold_dduck.event.dto.EventDto;
+import com.dokev.gold_dduck.event.dto.EventLogDto;
 import com.dokev.gold_dduck.event.dto.EventSaveDto;
 import com.dokev.gold_dduck.event.dto.EventSearchCondition;
 import com.dokev.gold_dduck.event.dto.EventSimpleListDto;
+import com.dokev.gold_dduck.event.service.EventLogService;
 import com.dokev.gold_dduck.event.service.EventService;
+import java.util.List;
 import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.validation.annotation.Validated;
@@ -26,9 +30,13 @@ import org.springframework.web.bind.annotation.RestController;
 public class EventController {
 
     private final EventService eventService;
+    private final EventLogService eventLogService;
 
-    public EventController(EventService eventService) {
+    @Autowired
+    public EventController(EventService eventService,
+        EventLogService eventLogService) {
         this.eventService = eventService;
+        this.eventLogService = eventLogService;
     }
 
     @PostMapping(value = "/v1/events")
@@ -51,5 +59,10 @@ public class EventController {
     ) {
         EventSearchCondition eventSearchCondition = new EventSearchCondition(eventProgressStatus);
         return ApiResponse.success(eventService.searchSimpleDescByMember(memberId, eventSearchCondition, pageable));
+    }
+
+    @GetMapping(value = "/v1/members/{memberId}/{eventId}/winners")
+    public ApiResponse<List<EventLogDto>> searchWinners(@PathVariable Long memberId, @PathVariable Long eventId) {
+        return ApiResponse.success(eventLogService.findEventWinnerLogs(eventId));
     }
 }
