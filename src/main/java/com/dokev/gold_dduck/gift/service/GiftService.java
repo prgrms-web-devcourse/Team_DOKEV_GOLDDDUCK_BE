@@ -3,6 +3,7 @@ package com.dokev.gold_dduck.gift.service;
 import com.dokev.gold_dduck.common.exception.EntityNotFoundException;
 import com.dokev.gold_dduck.common.exception.EventAlreadyParticipatedException;
 import com.dokev.gold_dduck.common.exception.GiftStockOutException;
+import com.dokev.gold_dduck.common.exception.MemberGiftNotMatchedException;
 import com.dokev.gold_dduck.event.domain.Event;
 import com.dokev.gold_dduck.event.domain.EventLog;
 import com.dokev.gold_dduck.event.repository.EventLogRepository;
@@ -14,6 +15,7 @@ import com.dokev.gold_dduck.gift.dto.GiftItemDetailDto;
 import com.dokev.gold_dduck.gift.dto.GiftItemDto;
 import com.dokev.gold_dduck.gift.dto.GiftItemListDto;
 import com.dokev.gold_dduck.gift.dto.GiftItemSearchCondition;
+import com.dokev.gold_dduck.gift.dto.GiftItemUpdateDto;
 import com.dokev.gold_dduck.gift.repository.GiftItemQueryRepository;
 import com.dokev.gold_dduck.gift.repository.GiftItemRepository;
 import com.dokev.gold_dduck.gift.repository.GiftRepository;
@@ -95,6 +97,19 @@ public class GiftService {
         Page<GiftItemDetailDto> page = giftItemQueryRepository.searchDescByMember(memberId, giftItemSearchCondition,
             pageable);
         return new GiftItemListDto(page);
+    }
+
+    @Transactional
+    public void updateGiftItem(Long memberId, Long giftItemId, GiftItemUpdateDto giftItemUpdateDto) {
+        if (!memberRepository.existsById(memberId)) {
+            throw new EntityNotFoundException(Member.class, memberId);
+        }
+        GiftItem giftItem = giftItemRepository.findById(giftItemId)
+            .orElseThrow(() -> new EntityNotFoundException(GiftItem.class, giftItemId));
+        Optional.ofNullable(giftItem.getMember())
+            .filter(member -> member.getId().equals(memberId))
+            .orElseThrow(() -> new MemberGiftNotMatchedException(memberId, giftItemId));
+        giftItem.changeUsed(giftItemUpdateDto.getUsed());
     }
 
     private Optional<GiftItem> findGiftItemByFIFO(Long giftId) {
