@@ -15,7 +15,6 @@ import com.dokev.gold_dduck.event.dto.EventDto;
 import com.dokev.gold_dduck.event.dto.EventSaveDto;
 import com.dokev.gold_dduck.event.repository.EventRepository;
 import com.dokev.gold_dduck.factory.TestEventFactory;
-import com.dokev.gold_dduck.factory.TestMemberFactory;
 import com.dokev.gold_dduck.gift.converter.GiftConverter;
 import com.dokev.gold_dduck.member.converter.MemberConverter;
 import com.dokev.gold_dduck.member.domain.Member;
@@ -94,7 +93,7 @@ class EventServiceTest {
 
     @Test
     @DisplayName("멤버 아이디와 이벤트 아이디를 통해 삭제 테스트 - 성공")
-    void deleteEvent(){
+    void deleteEvent() {
         Member member = mock(Member.class);
         Event event = TestEventFactory.createEvent(member);
 
