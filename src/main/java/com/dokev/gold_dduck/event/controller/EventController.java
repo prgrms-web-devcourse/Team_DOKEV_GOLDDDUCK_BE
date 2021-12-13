@@ -62,7 +62,7 @@ public class EventController {
     }
 
     @GetMapping(value = "/v1/members/{memberId}/{eventId}/winners")
-    public ApiResponse<List<EventLogDto>> searchWinners(@PathVariable Long memberId, @PathVariable Long eventId){
+    public ApiResponse<List<EventLogDto>> searchWinners(@PathVariable Long memberId, @PathVariable Long eventId) {
         return ApiResponse.success(eventLogService.findEventWinnerLogs(eventId));
     }
 }

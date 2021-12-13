@@ -27,8 +27,6 @@ import com.dokev.gold_dduck.event.dto.EventLogDto;
 import com.dokev.gold_dduck.event.dto.EventSaveDto;
 import com.dokev.gold_dduck.event.dto.GiftItemSaveDto;
 import com.dokev.gold_dduck.factory.TestEventFactory;
-import com.dokev.gold_dduck.factory.TestGiftFactory;
-import com.dokev.gold_dduck.factory.TestGiftItemFactory;
 import com.dokev.gold_dduck.factory.TestMemberFactory;
 import com.dokev.gold_dduck.gift.domain.Gift;
 import com.dokev.gold_dduck.gift.domain.GiftItem;
