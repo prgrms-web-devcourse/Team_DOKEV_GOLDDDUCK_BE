@@ -17,7 +17,9 @@ public enum ErrorCode {
     METHOD_NOT_ALLOWED("C005", "Method not allowed"),
     GIFT_NOT_EMPTY("C006", "Gift or GiftItem is must not be empty"),
 
-    FILE_UPLOAD_FAILURE("F001", "파일 업로드에 실패하였습니다.");
+    FILE_UPLOAD_FAILURE("F001", "파일 업로드에 실패하였습니다."),
+
+    MEMBER_GIFT_NOT_MATCHED("M001", "멤버 id : %d가 선물 id :%d을 가지고 있지 않습니다.");
 
     private final String code;
 

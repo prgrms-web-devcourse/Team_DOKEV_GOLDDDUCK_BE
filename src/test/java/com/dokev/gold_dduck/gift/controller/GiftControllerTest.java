@@ -1,10 +1,12 @@
 package com.dokev.gold_dduck.gift.controller;
 
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.nullValue;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.handler;
@@ -21,6 +23,7 @@ import com.dokev.gold_dduck.factory.TestMemberFactory;
 import com.dokev.gold_dduck.gift.domain.Gift;
 import com.dokev.gold_dduck.gift.domain.GiftItem;
 import com.dokev.gold_dduck.gift.dto.GiftFifoChoiceDto;
+import com.dokev.gold_dduck.gift.dto.GiftItemUpdateDto;
 import com.dokev.gold_dduck.gift.service.GiftService;
 import com.dokev.gold_dduck.member.domain.Member;
 import com.dokev.gold_dduck.security.WithMockJwtAuthentication;
@@ -362,6 +365,92 @@ class GiftControllerTest {
                 jsonPath("$.success", is(false)),
                 jsonPath("$.error.code", is(ErrorCode.ENTITY_NOT_FOUND.getCode())),
                 jsonPath("$.error.message", containsString(Member.class.getName()))
+            );
+    }
+
+    @Test
+    @DisplayName("GiftItem 수정 성공 테스트")
+    void updateGiftItemSuccessTest() throws Exception {
+        //given
+        Event givenEvent = givenCompleteEvent();
+        Member givenMember = givenEvent.getMember();
+        Gift givenGift = givenEvent.getGifts().get(0);
+        GiftItem targetGiftItem = givenGift.getGiftItems().get(0);
+        targetGiftItem.allocateMember(givenMember);
+        GiftItemUpdateDto giftItemUpdateDto = new GiftItemUpdateDto(true);
+        //when
+        ResultActions result = mockMvc.perform(
+            patch("/api/v1/members/{memberId}/giftItems/{giftItemId}", givenMember.getId(), targetGiftItem.getId())
+                .accept(MediaType.APPLICATION_JSON)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(giftItemUpdateDto))
+        );
+        //then
+        result.andDo(print())
+            .andExpectAll(
+                status().isOk(),
+                handler().handlerType(GiftController.class),
+                handler().methodName("updateGiftItem"),
+                jsonPath("$.success", is(true)),
+                jsonPath("$.error", is(nullValue())),
+                jsonPath("$.data", is(nullValue()))
+            );
+        GiftItem findGiftItem = entityManager.find(GiftItem.class, targetGiftItem.getId());
+        assertThat(findGiftItem.isUsed(), is(true));
+    }
+
+    @Test
+    @DisplayName("GiftItem 수정 실패 테스트 - (멤버가 할당되지 않은 선물)")
+    void updateGiftItemFailureTest() throws Exception {
+        //given
+        Event givenEvent = givenCompleteEvent();
+        Member givenMember = givenEvent.getMember();
+        Gift givenGift = givenEvent.getGifts().get(0);
+        GiftItem targetGiftItem = givenGift.getGiftItems().get(0);
+        GiftItemUpdateDto giftItemUpdateDto = new GiftItemUpdateDto(true);
+        //when
+        ResultActions result = mockMvc.perform(
+            patch("/api/v1/members/{memberId}/giftItems/{giftItemId}", givenMember.getId(), targetGiftItem.getId())
+                .accept(MediaType.APPLICATION_JSON)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(giftItemUpdateDto))
+        );
+        //then
+        result.andDo(print())
+            .andExpectAll(
+                status().is4xxClientError(),
+                handler().handlerType(GiftController.class),
+                handler().methodName("updateGiftItem"),
+                jsonPath("$.success", is(false)),
+                jsonPath("$.error.code", is(ErrorCode.MEMBER_GIFT_NOT_MATCHED.getCode()))
+            );
+    }
+
+    @Test
+    @DisplayName("GiftItem 수정 실패 테스트 - (요청 멤버와 선물에 할당된 멤버가 다른 경우)")
+    void updateGiftItemFailureTest2() throws Exception {
+        //given
+        Event givenEvent = givenCompleteEvent();
+        Member givenMember = givenEvent.getMember();
+        Gift givenGift = givenEvent.getGifts().get(0);
+        GiftItem targetGiftItem = givenGift.getGiftItems().get(0);
+        targetGiftItem.allocateMember(TestMemberFactory.getAdminMember(entityManager));
+        GiftItemUpdateDto giftItemUpdateDto = new GiftItemUpdateDto(false);
+        //when
+        ResultActions result = mockMvc.perform(
+            patch("/api/v1/members/{memberId}/giftItems/{giftItemId}", givenMember.getId(), targetGiftItem.getId())
+                .accept(MediaType.APPLICATION_JSON)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(giftItemUpdateDto))
+        );
+        //then
+        result.andDo(print())
+            .andExpectAll(
+                status().is4xxClientError(),
+                handler().handlerType(GiftController.class),
+                handler().methodName("updateGiftItem"),
+                jsonPath("$.success", is(false)),
+                jsonPath("$.error.code", is(ErrorCode.MEMBER_GIFT_NOT_MATCHED.getCode()))
             );
     }
 
