@@ -41,7 +41,8 @@ public class EventDto {
 
     private List<GiftDto> gifts;
 
-    public EventDto(Long eventId, String title, GiftChoiceType giftChoiceType, LocalDateTime startAt, LocalDateTime endAt,
+    public EventDto(Long eventId, String title, GiftChoiceType giftChoiceType, LocalDateTime startAt,
+        LocalDateTime endAt,
         UUID code, EventProgressStatus eventProgressStatus, String mainTemplate, Integer maxParticipantCount,
         MemberDto member, List<GiftDto> gifts) {
         this.eventId = eventId;

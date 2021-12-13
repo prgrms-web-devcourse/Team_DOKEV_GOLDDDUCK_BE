@@ -22,7 +22,8 @@ public class EventRepositoryCustomImpl implements EventRepositoryCustom {
     }
 
     @Override
-    public Page<Event> searchSimpleDescByMember(Long memberId, EventSearchCondition eventSearchCondition, Pageable pageable) {
+    public Page<Event> searchSimpleDescByMember(Long memberId, EventSearchCondition eventSearchCondition,
+        Pageable pageable) {
         QueryResults<Event> eventQueryResults = queryFactory
             .selectFrom(event)
             .where(memberEq(memberId), eventProgressStatusEq(eventSearchCondition.getEventProgressStatus()))

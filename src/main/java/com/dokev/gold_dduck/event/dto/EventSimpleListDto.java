@@ -8,9 +8,9 @@ import org.springframework.data.domain.Page;
 @Getter
 public class EventSimpleListDto {
 
-    private List<EventSimpleDto> simpleEventList;
+    private final List<EventSimpleDto> simpleEventList;
 
-    private PaginationDto pagination;
+    private final PaginationDto pagination;
 
     public EventSimpleListDto(Page<EventSimpleDto> page) {
         this.simpleEventList = page.getContent();

@@ -9,7 +9,6 @@ import com.dokev.gold_dduck.member.repository.GroupRepository;
 import com.dokev.gold_dduck.member.repository.MemberRepository;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Service;

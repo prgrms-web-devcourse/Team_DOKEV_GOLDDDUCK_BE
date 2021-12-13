@@ -6,15 +6,15 @@ import org.springframework.data.domain.Page;
 @Getter
 public class PaginationDto {
 
-    private int totalPages;
+    private final int totalPages;
 
-    private long totalElements;
+    private final long totalElements;
 
-    private int currentPage;
+    private final int currentPage;
 
-    private long offset;
+    private final long offset;
 
-    private int size;
+    private final int size;
 
     public PaginationDto(Page page) {
         this.totalPages = page.getTotalPages();
