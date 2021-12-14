@@ -16,7 +16,7 @@ public interface EventRepository extends JpaRepository<Event, Long>, EventReposi
 
     @Query("select distinct e from Event e"
         + " join fetch e.gifts"
-        + " where e.code = :eventCode")
+        + " where e.code = :eventCode AND e.deletedAt IS null")
     Optional<Event> findEventByCodeWithGift(@Param("eventCode") UUID eventCode);
 
     @Lock(LockModeType.PESSIMISTIC_WRITE)

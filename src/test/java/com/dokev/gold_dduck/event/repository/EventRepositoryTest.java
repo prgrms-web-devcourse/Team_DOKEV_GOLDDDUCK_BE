@@ -8,7 +8,6 @@ import com.dokev.gold_dduck.gift.domain.Gift;
 import com.dokev.gold_dduck.gift.domain.GiftItem;
 import com.dokev.gold_dduck.gift.domain.GiftType;
 import com.dokev.gold_dduck.member.domain.Member;
-import com.dokev.gold_dduck.member.repository.MemberRepository;
 import java.util.Optional;
 import java.util.UUID;
 import javax.persistence.EntityManager;
@@ -18,7 +17,6 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
-import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
 import org.springframework.context.annotation.Import;
 
 @Import(JpaAuditingConfiguration.class)
@@ -40,8 +38,12 @@ class EventRepositoryTest {
         Member member = TestMemberFactory.getUserMember(entityManager);
 
         Event event = TestEventFactory.builder(member)
-                .code(eventCode)
-                .build();
+            .code(eventCode)
+            .build();
+        entityManager.persist(event);
+
+        Event deletedEvent = TestEventFactory.createEvent(member);
+        deletedEvent.deleteEvent();
         entityManager.persist(event);
 
         Gift gift1 = new Gift("coffee", 2);
@@ -67,9 +69,12 @@ class EventRepositoryTest {
 
         entityManager.clear();
         Optional<Event> findByCodeEvent = eventRepository.findEventByCodeWithGift(eventCode);
+        Optional<Event> foundDeletedEvent = eventRepository.findEventByCodeWithGift(deletedEvent.getCode());
 
         Assertions.assertThat(findByCodeEvent.get().getId()).isEqualTo(event.getId());
         Assertions.assertThat(findByCodeEvent.get().getGifts().size()).isEqualTo(2);
         Assertions.assertThat(findByCodeEvent.get().getGifts().get(0).getGiftItems().size()).isEqualTo(2);
+
+        Assertions.assertThat(foundDeletedEvent.isPresent()).isFalse();
     }
 }
