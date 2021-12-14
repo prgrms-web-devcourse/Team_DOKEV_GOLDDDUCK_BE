@@ -2,10 +2,12 @@ package com.dokev.gold_dduck.gift.controller;
 
 import com.dokev.gold_dduck.common.ApiResponse;
 import com.dokev.gold_dduck.gift.dto.GiftFifoChoiceDto;
+import com.dokev.gold_dduck.gift.dto.GiftItemDetailDto;
 import com.dokev.gold_dduck.gift.dto.GiftItemDto;
 import com.dokev.gold_dduck.gift.dto.GiftItemListDto;
 import com.dokev.gold_dduck.gift.dto.GiftItemSearchCondition;
 import com.dokev.gold_dduck.gift.dto.GiftItemUpdateDto;
+import com.dokev.gold_dduck.gift.dto.GiftRandomChoiceDto;
 import com.dokev.gold_dduck.gift.service.GiftService;
 import javax.validation.Valid;
 import org.springframework.data.domain.Pageable;
@@ -34,6 +36,15 @@ public class GiftController {
     public ApiResponse<GiftItemDto> chooseGiftItemByFIFO(@RequestBody @Validated GiftFifoChoiceDto giftFifoChoiceDto) {
         GiftItemDto giftItemDto = giftService.chooseGiftItemByFIFO(giftFifoChoiceDto.getEventId(),
             giftFifoChoiceDto.getMemberId(), giftFifoChoiceDto.getGiftId());
+        return ApiResponse.success(giftItemDto);
+    }
+
+    @PostMapping("/v1/gifts/random")
+    public ApiResponse<GiftItemDetailDto> chooseGiftItemByRandom(
+        @RequestBody @Validated GiftRandomChoiceDto giftRandomChoiceDto
+    ) {
+        GiftItemDetailDto giftItemDto = giftService.chooseGiftItemByRandom(giftRandomChoiceDto.getEventId(),
+            giftRandomChoiceDto.getMemberId());
         return ApiResponse.success(giftItemDto);
     }
 
