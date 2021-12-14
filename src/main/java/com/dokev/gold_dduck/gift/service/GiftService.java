@@ -21,6 +21,7 @@ import com.dokev.gold_dduck.gift.repository.GiftItemQueryRepository;
 import com.dokev.gold_dduck.gift.repository.GiftItemRepository;
 import com.dokev.gold_dduck.gift.repository.GiftRepository;
 import com.dokev.gold_dduck.member.domain.Member;
+import com.dokev.gold_dduck.member.domain.RoleGroupType;
 import com.dokev.gold_dduck.member.repository.MemberRepository;
 import java.util.List;
 import java.util.Optional;
@@ -72,9 +73,9 @@ public class GiftService {
         Event event = eventRepository.findById(eventId)
             .orElseThrow(() -> new EntityNotFoundException(Event.class, eventId));
         event.validateEndTime();
-        Member member = memberRepository.findById(memberId)
+        Member member = memberRepository.findByIdWithGroup(memberId)
             .orElseThrow(() -> new EntityNotFoundException(Member.class, memberId));
-        checkAlreadyParticipatedMember(eventId, memberId);
+        checkAlreadyParticipatedMember(event, member);
         Gift gift = giftRepository.findById(giftId)
             .orElseThrow(() -> new EntityNotFoundException(Gift.class, giftId));
 
@@ -93,9 +94,9 @@ public class GiftService {
         Event event = eventRepository.findByIdForUpdate(eventId)
             .orElseThrow(() -> new EntityNotFoundException(Event.class, eventId));
         event.validateEndTime();
-        Member member = memberRepository.findById(memberId)
+        Member member = memberRepository.findByIdWithGroup(memberId)
             .orElseThrow(() -> new EntityNotFoundException(Member.class, memberId));
-        checkAlreadyParticipatedMember(eventId, memberId);
+        checkAlreadyParticipatedMember(event, member);
 
         Integer leftBlankCount = event.getLeftBlankCount();
         List<GiftItem> giftItems = giftRepository.findByEventId(eventId).stream()
@@ -110,7 +111,7 @@ public class GiftService {
         int nextInt = new Random().nextInt(leftBlankCount + giftItems.size());
         if (giftItems.size() > nextInt) {
             GiftItem chosenGiftItem = giftItems.get(nextInt);
-            chosenGiftItem.allocateMember(memberRepository.getById(1L));
+            chosenGiftItem.allocateMember(member);
             eventLogRepository.save(new EventLog(event, member, chosenGiftItem.getGift(), chosenGiftItem));
             return giftConverter.convertToGiftItemDetailDto(chosenGiftItem, chosenGiftItem.getGift().getCategory(),
                 event.getMainTemplate());
@@ -147,8 +148,11 @@ public class GiftService {
         giftItem.changeUsed(giftItemUpdateDto.getUsed());
     }
 
-    private void checkAlreadyParticipatedMember(Long eventId, Long memberId) {
-        boolean alreadyParticipated = eventLogRepository.existsByEventIdAndMemberId(eventId, memberId);
+    private void checkAlreadyParticipatedMember(Event event, Member member) {
+        if (RoleGroupType.of(member.getGroup().getName()) == RoleGroupType.ADMIN) {
+            return;
+        }
+        boolean alreadyParticipated = eventLogRepository.existsByEventIdAndMemberId(event.getId(), member.getId());
         if (alreadyParticipated) {
             throw new EventAlreadyParticipatedException();
         }

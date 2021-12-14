@@ -12,6 +12,11 @@ public interface MemberRepository extends JpaRepository<Member, Long> {
 
     @Query("select m from Member m"
         + " join fetch m.group g"
+        + " where m.id = :id")
+    Optional<Member> findByIdWithGroup(Long id);
+
+    @Query("select m from Member m"
+        + " join fetch m.group g"
         + " left join fetch g.groupPermissions gp"
         + " left join fetch gp.permission p"
         + " where m.provider = :provider and m.socialId = :socialId")
