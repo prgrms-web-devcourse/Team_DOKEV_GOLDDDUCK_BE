@@ -141,14 +141,22 @@ public class Event extends BaseEntity {
     }
 
     public void validateEndTime() {
-        if (this.eventProgressStatus == EventProgressStatus.CLOSED) {
-            return;
-        }
         boolean eventEndTimeOver = this.endAt.isBefore(LocalDateTime.now());
         if (eventEndTimeOver) {
             closeEvent();
             throw new EventClosedException();
         }
+    }
+
+    public void validateCloseStatus() {
+        if (this.eventProgressStatus == EventProgressStatus.CLOSED) {
+            throw new EventClosedException();
+        }
+    }
+
+    public void validateEventRunning() {
+        validateCloseStatus();
+        validateEndTime();
     }
 
     public void deleteEvent() {

@@ -72,7 +72,7 @@ public class GiftService {
     public GiftItemDto chooseGiftItemByFIFO(Long eventId, Long memberId, Long giftId) {
         Event event = eventRepository.findById(eventId)
             .orElseThrow(() -> new EntityNotFoundException(Event.class, eventId));
-        event.validateEndTime();
+        event.validateEventRunning();
         Member member = memberRepository.findByIdWithGroup(memberId)
             .orElseThrow(() -> new EntityNotFoundException(Member.class, memberId));
         checkAlreadyParticipatedMember(event, member);
@@ -93,7 +93,7 @@ public class GiftService {
     public GiftItemDetailDto chooseGiftItemByRandom(Long eventId, Long memberId) {
         Event event = eventRepository.findByIdForUpdate(eventId)
             .orElseThrow(() -> new EntityNotFoundException(Event.class, eventId));
-        event.validateEndTime();
+        event.validateEventRunning();
         Member member = memberRepository.findByIdWithGroup(memberId)
             .orElseThrow(() -> new EntityNotFoundException(Member.class, memberId));
         checkAlreadyParticipatedMember(event, member);
