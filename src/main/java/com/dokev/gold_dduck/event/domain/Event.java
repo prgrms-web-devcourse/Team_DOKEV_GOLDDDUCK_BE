@@ -123,6 +123,5 @@ public class Event extends BaseEntity {
 
     public void deleteEvent() {
         this.deletedAt = LocalDateTime.now();
-        this.member = null;
     }
 }

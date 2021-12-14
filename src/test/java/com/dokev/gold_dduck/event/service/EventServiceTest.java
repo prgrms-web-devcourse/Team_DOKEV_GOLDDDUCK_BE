@@ -10,7 +10,6 @@ import static org.mockito.Mockito.mock;
 import com.dokev.gold_dduck.event.converter.EventFindConverter;
 import com.dokev.gold_dduck.event.converter.EventSaveConverter;
 import com.dokev.gold_dduck.event.domain.Event;
-import com.dokev.gold_dduck.event.domain.EventProgressStatus;
 import com.dokev.gold_dduck.event.dto.EventDto;
 import com.dokev.gold_dduck.event.dto.EventSaveDto;
 import com.dokev.gold_dduck.event.repository.EventRepository;
@@ -104,6 +103,5 @@ class EventServiceTest {
 
         Assertions.assertThat(deletedEventId).isEqualTo(event.getId());
         Assertions.assertThat(event.getDeletedAt()).isNotNull();
-        Assertions.assertThat(event.getMember()).isNull();
     }
 }
