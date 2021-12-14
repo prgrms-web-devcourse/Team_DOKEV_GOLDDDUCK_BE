@@ -77,6 +77,7 @@ public class EventService {
         }
     }
 
+    @Transactional
     public EventDto findDetailEventByCode(UUID eventCode) throws EntityNotFoundException {
         Event event = eventRepository.findEventByCodeWithGift(eventCode)
             .orElseThrow(() -> new EntityNotFoundException(Event.class, eventCode));

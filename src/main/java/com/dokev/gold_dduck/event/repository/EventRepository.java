@@ -10,7 +10,6 @@ import org.springframework.data.repository.query.Param;
 
 public interface EventRepository extends JpaRepository<Event, Long>, EventRepositoryCustom {
 
-    @Transactional
     @Query("select distinct e from Event e"
         + " join fetch e.gifts"
         + " join fetch e.member"
