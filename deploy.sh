@@ -18,4 +18,4 @@ DEPLOY_PATH=/home/ec2-user/apps/gold-dduck/
 DEPLOY_JAR=$DEPLOY_PATH$JAR_NAME
 echo "> DEPLOY_JAR 배포"    >> /home/ec2-user/apps/gold-dduck/deploy.log
 sudo chmod +x $DEPLOY_JAR
-nohup java -jar $DEPLOY_JAR -Dspring.profiles.active=prod >> /home/ec2-user/apps/gold-dduck/deploy.log 2>/home/ec2-user/apps/gold-dduck/deploy_err.log &
+nohup java -jar -Dspring.profiles.active=dev $DEPLOY_JAR >> /home/ec2-user/apps/gold-dduck/deploy.log 2>/home/ec2-user/apps/gold-dduck/deploy_err.log &
