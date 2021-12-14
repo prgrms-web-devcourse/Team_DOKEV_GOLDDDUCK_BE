@@ -137,7 +137,6 @@ public class EventService {
             throw new MemberEventNotMatchedException(memberId, eventId);
         }
 
-        member.getEvents().remove(event);
         event.deleteEvent();
 
         return eventId;

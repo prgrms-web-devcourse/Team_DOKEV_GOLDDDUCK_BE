@@ -104,5 +104,6 @@ class EventServiceTest {
 
         Assertions.assertThat(deletedEventId).isEqualTo(event.getId());
         Assertions.assertThat(event.getDeletedAt()).isNotNull();
+        Assertions.assertThat(event.getMember()).isNull();
     }
 }
