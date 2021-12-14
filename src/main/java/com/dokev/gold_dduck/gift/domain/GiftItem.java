@@ -19,7 +19,9 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
+import org.hibernate.annotations.DynamicUpdate;
 
+@DynamicUpdate
 @ToString(of = {"id", "giftType", "content", "used"})
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
@@ -70,7 +72,7 @@ public class GiftItem extends BaseEntity {
     public void allocateMember(Member member) {
         Objects.requireNonNull(member, "member는 notnull이어야 합니다.");
         if (Objects.nonNull(this.member)) {
-            throw new GiftAlreadyAllocatedException();
+            throw new GiftAlreadyAllocatedException(this.id, this.member.getId());
         }
         this.member = member;
     }
