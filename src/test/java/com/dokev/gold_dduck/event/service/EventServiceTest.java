@@ -102,6 +102,6 @@ class EventServiceTest {
         Long deletedEventId = eventService.deleteEvent(member.getId(), event.getId());
 
         Assertions.assertThat(deletedEventId).isEqualTo(event.getId());
-        Assertions.assertThat(event.getEventProgressStatus()).isEqualTo(EventProgressStatus.CLOSED);
+        Assertions.assertThat(event.getDeletedAt()).isNotNull();
     }
 }

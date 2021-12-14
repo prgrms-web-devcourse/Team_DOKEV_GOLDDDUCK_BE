@@ -4,6 +4,7 @@ import com.dokev.gold_dduck.aws.service.AwsS3Service;
 import com.dokev.gold_dduck.common.exception.EntityNotFoundException;
 import com.dokev.gold_dduck.common.exception.FileUploadException;
 import com.dokev.gold_dduck.common.exception.GiftEmptyException;
+import com.dokev.gold_dduck.common.exception.MemberEventNotMatchedException;
 import com.dokev.gold_dduck.event.converter.EventFindConverter;
 import com.dokev.gold_dduck.event.converter.EventSaveConverter;
 import com.dokev.gold_dduck.event.domain.Event;
@@ -124,20 +125,16 @@ public class EventService {
         return new EventSimpleListDto(page);
     }
 
-    private void updateEventProgressStatusToEnd(Event event) {
-        event.changeEventStatus(EventProgressStatus.CLOSED);
-    }
-
     @Transactional
     public Long deleteEvent(Long memberId, Long eventId) {
         Event event = eventRepository.findById(eventId)
             .orElseThrow(() -> new EntityNotFoundException(Event.class, eventId));
 
         if (!event.getMember().getId().equals(memberId)) {
-            throw new EntityNotFoundException(Event.class, eventId);
+            throw new MemberEventNotMatchedException(memberId, eventId);
         }
 
-        updateEventProgressStatusToEnd(event);
+        event.deleteEvent();
 
         return eventId;
     }
