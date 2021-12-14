@@ -50,6 +50,9 @@ public class Event extends BaseEntity {
     @Column(name = "end_at", columnDefinition = "TIMESTAMP", nullable = false)
     private LocalDateTime endAt;
 
+    @Column(name = "deleted_at", columnDefinition = "TIMESTAMP")
+    private LocalDateTime deletedAt;
+
     @Column(name = "code", nullable = false)
     private UUID code;
 
@@ -116,5 +119,9 @@ public class Event extends BaseEntity {
         }
         this.member = member;
         member.getEvents().add(this);
+    }
+
+    public void deleteEvent() {
+        this.deletedAt = LocalDateTime.now();
     }
 }

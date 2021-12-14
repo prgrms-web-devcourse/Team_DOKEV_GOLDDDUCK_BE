@@ -6,6 +6,7 @@ import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.matchesPattern;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.Matchers.nullValue;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.multipart;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -446,4 +447,18 @@ class EventControllerTest {
             .andExpect(jsonPath("$.error", is(nullValue())));
     }
 
+    @Test
+    @DisplayName("이벤트 삭제 테스트 - 성공")
+    void deleteEvent() throws Exception {
+        Member member = TestMemberFactory.createTestMember(entityManager);
+        entityManager.persist(member);
+        Event event = TestEventFactory.createEvent(member);
+        entityManager.persist(event);
+
+        mockMvc.perform(delete("/api/v1/members/{memberId}/events/{eventId}", member.getId(), event.getId()))
+            .andDo(print())
+            .andExpect(jsonPath("$.success", is(true)))
+            .andExpect(jsonPath("$.data", is(event.getId().intValue())))
+            .andExpect(jsonPath("$.error", is(nullValue())));
+    }
 }

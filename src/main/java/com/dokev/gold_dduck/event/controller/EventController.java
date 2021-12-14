@@ -17,6 +17,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.MediaType;
 import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -60,6 +61,11 @@ public class EventController {
     ) {
         EventSearchCondition eventSearchCondition = new EventSearchCondition(eventProgressStatus);
         return ApiResponse.success(eventService.searchSimpleDescByMember(memberId, eventSearchCondition, pageable));
+    }
+
+    @DeleteMapping(value = "/v1/members/{memberId}/events/{eventId}")
+    public ApiResponse<Long> deleteEvent(@PathVariable Long memberId, @PathVariable Long eventId) {
+        return ApiResponse.success(eventService.deleteEvent(memberId, eventId));
     }
 
     @GetMapping(value = "/v1/members/{memberId}/{eventId}/winners")
