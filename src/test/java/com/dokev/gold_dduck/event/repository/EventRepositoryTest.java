@@ -11,6 +11,7 @@ import com.dokev.gold_dduck.member.domain.Member;
 import com.dokev.gold_dduck.member.repository.MemberRepository;
 import java.util.Optional;
 import java.util.UUID;
+import javassist.NotFoundException;
 import javax.persistence.EntityManager;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
@@ -44,6 +45,10 @@ class EventRepositoryTest {
                 .build();
         entityManager.persist(event);
 
+        Event deletedEvent = TestEventFactory.createEvent(member);
+        deletedEvent.deleteEvent();
+        entityManager.persist(event);
+
         Gift gift1 = new Gift("coffee", 2);
         gift1.changeEvent(event);
         entityManager.persist(gift1);
@@ -67,9 +72,12 @@ class EventRepositoryTest {
 
         entityManager.clear();
         Optional<Event> findByCodeEvent = eventRepository.findEventByCodeWithGift(eventCode);
+        Optional<Event> foundDeletedEvent = eventRepository.findEventByCodeWithGift(deletedEvent.getCode());
 
         Assertions.assertThat(findByCodeEvent.get().getId()).isEqualTo(event.getId());
         Assertions.assertThat(findByCodeEvent.get().getGifts().size()).isEqualTo(2);
         Assertions.assertThat(findByCodeEvent.get().getGifts().get(0).getGiftItems().size()).isEqualTo(2);
+
+        Assertions.assertThat(foundDeletedEvent.isPresent()).isFalse();
     }
 }
