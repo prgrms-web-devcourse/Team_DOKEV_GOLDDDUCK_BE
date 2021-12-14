@@ -16,6 +16,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import com.dokev.gold_dduck.common.error.ErrorCode;
 import com.dokev.gold_dduck.event.domain.Event;
 import com.dokev.gold_dduck.event.domain.EventLog;
+import com.dokev.gold_dduck.event.domain.EventProgressStatus;
 import com.dokev.gold_dduck.factory.TestEventFactory;
 import com.dokev.gold_dduck.factory.TestGiftFactory;
 import com.dokev.gold_dduck.factory.TestGiftItemFactory;
@@ -24,10 +25,12 @@ import com.dokev.gold_dduck.gift.domain.Gift;
 import com.dokev.gold_dduck.gift.domain.GiftItem;
 import com.dokev.gold_dduck.gift.dto.GiftFifoChoiceDto;
 import com.dokev.gold_dduck.gift.dto.GiftItemUpdateDto;
+import com.dokev.gold_dduck.gift.dto.GiftRandomChoiceDto;
 import com.dokev.gold_dduck.gift.service.GiftService;
 import com.dokev.gold_dduck.member.domain.Member;
 import com.dokev.gold_dduck.security.WithMockJwtAuthentication;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import java.time.LocalDateTime;
 import javax.persistence.EntityManager;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -194,12 +197,11 @@ class GiftControllerTest {
     }
 
     @Test
-    @DisplayName("선착순으로 선물 받기 실패 테스트 (선물 재고 부족)")
+    @DisplayName("선착순으로 선물 받기 실패 테스트 (선물 재고 소진에 의한 이벤트 종료)")
     void chooseGiftItemByFIFOFailureTest5() throws Exception {
         //given
         Event givenEvent = givenEvent();
         Gift gift = givenGift(givenEvent);
-        GiftItem giftItem = givenGiftItem(gift, givenEvent.getMember());
         GiftFifoChoiceDto giftFifoChoiceDto = new GiftFifoChoiceDto(givenEvent.getId(), givenEvent.getMember().getId(),
             gift.getId());
         //when
@@ -216,13 +218,41 @@ class GiftControllerTest {
                 handler().handlerType(GiftController.class),
                 handler().methodName("chooseGiftItemByFIFO"),
                 jsonPath("$.success", is(false)),
-                jsonPath("$.error.code", is(ErrorCode.GIFT_STOCK_OUT.getCode())),
-                jsonPath("$.error.message", containsString(ErrorCode.GIFT_STOCK_OUT.getMessage()))
+                jsonPath("$.error.code", is(ErrorCode.EVENT_CLOSED.getCode())),
+                jsonPath("$.error.message", containsString(ErrorCode.EVENT_CLOSED.getMessage()))
             );
     }
 
     @Test
-    @Transactional
+    @DisplayName("랜덤으로 선물 받기 실패 테스트 - (이벤트 종료 시간 넘어서 이벤트 종료됨)")
+    void chooseGiftItemByRandomSuccessTest() throws Exception {
+        //given
+        Member givenMember = givenMember();
+        Event endEvent = TestEventFactory.builder(givenMember).endAt(LocalDateTime.now().minusMinutes(1)).build();
+        entityManager.persist(endEvent);
+        GiftRandomChoiceDto giftRandomChoiceDto = new GiftRandomChoiceDto(endEvent.getId(),
+            givenMember.getId());
+        //when
+        ResultActions result = mockMvc.perform(
+            post("/api/v1/gifts/random")
+                .accept(MediaType.APPLICATION_JSON)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(giftRandomChoiceDto))
+        );
+        //then
+        result.andDo(print())
+            .andExpectAll(
+                status().is4xxClientError(),
+                handler().handlerType(GiftController.class),
+                handler().methodName("chooseGiftItemByRandom"),
+                jsonPath("$.success", is(false)),
+                jsonPath("$.error.code", is(ErrorCode.EVENT_CLOSED.getCode()))
+            );
+        Event findEvent = entityManager.find(Event.class, endEvent.getId());
+        assertThat(findEvent.getEventProgressStatus(), is(EventProgressStatus.CLOSED));
+    }
+
+    @Test
     @DisplayName("Member가 받은 GiftItem 수령일 최신순으로 페이징 조회 성공 테스트 - (page = null, size = null, 사용여부 = null)")
     void searchDescByMemberSuccessTest() throws Exception {
         //given
@@ -262,7 +292,6 @@ class GiftControllerTest {
     }
 
     @Test
-    @Transactional
     @DisplayName("Member가 받은 GiftItem 수령일 최신순으로 페이징 조회 성공 테스트 - (page = 1, size = 2, 사용여부 = 사용)")
     void searchDescByMemberSuccessTest2() throws Exception {
         //given
@@ -314,7 +343,6 @@ class GiftControllerTest {
     }
 
     @Test
-    @Transactional
     @DisplayName("Member가 받은 GiftItem 수령일 최신순으로 페이징 조회 성공 테스트 - (dto 값 검증)")
     void searchDescByMemberSuccessTest3() throws Exception {
         //given
