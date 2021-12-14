@@ -1,12 +1,9 @@
 package com.dokev.gold_dduck.event.repository;
 
 import com.dokev.gold_dduck.event.domain.Event;
-import com.dokev.gold_dduck.gift.domain.GiftItem;
-import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import javax.persistence.LockModeType;
-import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Lock;
 import org.springframework.data.jpa.repository.Query;
@@ -16,6 +13,7 @@ public interface EventRepository extends JpaRepository<Event, Long>, EventReposi
 
     @Query("select distinct e from Event e"
         + " join fetch e.gifts"
+        + " join fetch e.member"
         + " where e.code = :eventCode AND e.deletedAt IS null")
     Optional<Event> findEventByCodeWithGift(@Param("eventCode") UUID eventCode);
 

@@ -8,7 +8,6 @@ import com.dokev.gold_dduck.common.exception.MemberEventNotMatchedException;
 import com.dokev.gold_dduck.event.converter.EventFindConverter;
 import com.dokev.gold_dduck.event.converter.EventSaveConverter;
 import com.dokev.gold_dduck.event.domain.Event;
-import com.dokev.gold_dduck.event.domain.EventProgressStatus;
 import com.dokev.gold_dduck.event.dto.EventDto;
 import com.dokev.gold_dduck.event.dto.EventSaveDto;
 import com.dokev.gold_dduck.event.dto.EventSearchCondition;
@@ -77,6 +76,7 @@ public class EventService {
         }
     }
 
+    @Transactional
     public EventDto findDetailEventByCode(UUID eventCode) throws EntityNotFoundException {
         Event event = eventRepository.findEventByCodeWithGift(eventCode)
             .orElseThrow(() -> new EntityNotFoundException(Event.class, eventCode));
