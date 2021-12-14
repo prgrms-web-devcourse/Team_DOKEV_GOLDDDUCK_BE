@@ -8,10 +8,8 @@ import com.dokev.gold_dduck.gift.domain.Gift;
 import com.dokev.gold_dduck.gift.domain.GiftItem;
 import com.dokev.gold_dduck.gift.domain.GiftType;
 import com.dokev.gold_dduck.member.domain.Member;
-import com.dokev.gold_dduck.member.repository.MemberRepository;
 import java.util.Optional;
 import java.util.UUID;
-import javassist.NotFoundException;
 import javax.persistence.EntityManager;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
@@ -19,7 +17,6 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
-import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
 import org.springframework.context.annotation.Import;
 
 @Import(JpaAuditingConfiguration.class)
@@ -41,8 +38,8 @@ class EventRepositoryTest {
         Member member = TestMemberFactory.getUserMember(entityManager);
 
         Event event = TestEventFactory.builder(member)
-                .code(eventCode)
-                .build();
+            .code(eventCode)
+            .build();
         entityManager.persist(event);
 
         Event deletedEvent = TestEventFactory.createEvent(member);
