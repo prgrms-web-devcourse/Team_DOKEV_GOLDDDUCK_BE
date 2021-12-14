@@ -2,7 +2,8 @@ package com.dokev.gold_dduck.gift.service;
 
 import com.dokev.gold_dduck.common.exception.EntityNotFoundException;
 import com.dokev.gold_dduck.common.exception.EventAlreadyParticipatedException;
-import com.dokev.gold_dduck.common.exception.GiftStockOutException;
+import com.dokev.gold_dduck.common.exception.EventClosedException;
+import com.dokev.gold_dduck.common.exception.GiftBlankDrawnException;
 import com.dokev.gold_dduck.common.exception.MemberGiftNotMatchedException;
 import com.dokev.gold_dduck.event.domain.Event;
 import com.dokev.gold_dduck.event.domain.EventLog;
@@ -23,6 +24,8 @@ import com.dokev.gold_dduck.member.domain.Member;
 import com.dokev.gold_dduck.member.repository.MemberRepository;
 import java.util.List;
 import java.util.Optional;
+import java.util.Random;
+import java.util.stream.Collectors;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -64,16 +67,14 @@ public class GiftService {
         this.giftConverter = giftConverter;
     }
 
-    @Transactional
+    @Transactional(noRollbackFor = {EventClosedException.class})
     public GiftItemDto chooseGiftItemByFIFO(Long eventId, Long memberId, Long giftId) {
         Event event = eventRepository.findById(eventId)
             .orElseThrow(() -> new EntityNotFoundException(Event.class, eventId));
+        event.validateEndTime();
         Member member = memberRepository.findById(memberId)
             .orElseThrow(() -> new EntityNotFoundException(Member.class, memberId));
-        boolean alreadyParticipated = eventLogRepository.existsByEventIdAndMemberId(eventId, memberId);
-        if (alreadyParticipated) {
-            throw new EventAlreadyParticipatedException();
-        }
+        checkAlreadyParticipatedMember(eventId, memberId);
         Gift gift = giftRepository.findById(giftId)
             .orElseThrow(() -> new EntityNotFoundException(Gift.class, giftId));
 
@@ -83,7 +84,41 @@ public class GiftService {
             chosenGiftItem.get().allocateMember(member);
             return giftConverter.convertToGiftItemDto(chosenGiftItem.get());
         }
-        throw new GiftStockOutException();
+        event.closeEvent();
+        throw new EventClosedException();
+    }
+
+    @Transactional(noRollbackFor = {EventClosedException.class, GiftBlankDrawnException.class})
+    public GiftItemDetailDto chooseGiftItemByRandom(Long eventId, Long memberId) {
+        Event event = eventRepository.findByIdForUpdate(eventId)
+            .orElseThrow(() -> new EntityNotFoundException(Event.class, eventId));
+        event.validateEndTime();
+        Member member = memberRepository.findById(memberId)
+            .orElseThrow(() -> new EntityNotFoundException(Member.class, memberId));
+        checkAlreadyParticipatedMember(eventId, memberId);
+
+        Integer leftBlankCount = event.getLeftBlankCount();
+        List<GiftItem> giftItems = giftRepository.findByEventId(eventId).stream()
+            .flatMap(gift -> gift.getGiftItems().stream())
+            .collect(Collectors.toList());
+
+        if (giftItems.size() + leftBlankCount <= 0) {
+            event.closeEvent();
+            throw new EventClosedException();
+        }
+
+        int nextInt = new Random().nextInt(leftBlankCount + giftItems.size());
+        if (giftItems.size() > nextInt) {
+            GiftItem chosenGiftItem = giftItems.get(nextInt);
+            chosenGiftItem.allocateMember(memberRepository.getById(1L));
+            eventLogRepository.save(new EventLog(event, member, chosenGiftItem.getGift(), chosenGiftItem));
+            return giftConverter.convertToGiftItemDetailDto(chosenGiftItem, chosenGiftItem.getGift().getCategory(),
+                event.getMainTemplate());
+        } else {
+            event.decreaseLeftBlankCount();
+            eventLogRepository.save(new EventLog(event, member, null, null));
+            throw new GiftBlankDrawnException();
+        }
     }
 
     public GiftItemListDto searchDescByMember(
@@ -110,6 +145,13 @@ public class GiftService {
             .filter(member -> member.getId().equals(memberId))
             .orElseThrow(() -> new MemberGiftNotMatchedException(memberId, giftItemId));
         giftItem.changeUsed(giftItemUpdateDto.getUsed());
+    }
+
+    private void checkAlreadyParticipatedMember(Long eventId, Long memberId) {
+        boolean alreadyParticipated = eventLogRepository.existsByEventIdAndMemberId(eventId, memberId);
+        if (alreadyParticipated) {
+            throw new EventAlreadyParticipatedException();
+        }
     }
 
     private Optional<GiftItem> findGiftItemByFIFO(Long giftId) {

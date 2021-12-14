@@ -1,6 +1,7 @@
 package com.dokev.gold_dduck.event.domain;
 
 import com.dokev.gold_dduck.common.BaseEntity;
+import com.dokev.gold_dduck.common.exception.EventClosedException;
 import com.dokev.gold_dduck.gift.domain.Gift;
 import com.dokev.gold_dduck.member.domain.Member;
 import java.time.LocalDateTime;
@@ -63,6 +64,9 @@ public class Event extends BaseEntity {
     @Column(name = "max_participant_count", nullable = false)
     private Integer maxParticipantCount;
 
+    @Column(name = "left_lose_count", nullable = false)
+    private Integer leftBlankCount;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "member_id")
     private Member member;
@@ -73,7 +77,8 @@ public class Event extends BaseEntity {
     @Builder(builderMethodName = "eventInternalBuilder")
     private Event(
         String title, GiftChoiceType giftChoiceType, LocalDateTime startAt, LocalDateTime endAt, UUID code,
-        EventProgressStatus eventProgressStatus, String mainTemplate, Integer maxParticipantCount, Member member
+        EventProgressStatus eventProgressStatus, String mainTemplate, Integer maxParticipantCount,
+        Integer leftBlankCount, Member member
     ) {
         this.title = title;
         this.giftChoiceType = giftChoiceType;
@@ -83,7 +88,8 @@ public class Event extends BaseEntity {
         this.eventProgressStatus = eventProgressStatus;
         this.mainTemplate = mainTemplate;
         this.maxParticipantCount = maxParticipantCount;
-        changeMember(member);
+        this.leftBlankCount = leftBlankCount;
+        this.member = member;
     }
 
     public static EventBuilder builder(
@@ -116,5 +122,24 @@ public class Event extends BaseEntity {
         }
         this.member = member;
         member.getEvents().add(this);
+    }
+
+    public void decreaseLeftBlankCount() {
+        this.leftBlankCount--;
+    }
+
+    public void closeEvent() {
+        this.eventProgressStatus = EventProgressStatus.CLOSED;
+    }
+
+    public void validateEndTime() {
+        if (this.eventProgressStatus == EventProgressStatus.CLOSED) {
+            return;
+        }
+        boolean eventEndTimeOver = this.endAt.isBefore(LocalDateTime.now());
+        if (eventEndTimeOver) {
+            closeEvent();
+            throw new EventClosedException();
+        }
     }
 }
