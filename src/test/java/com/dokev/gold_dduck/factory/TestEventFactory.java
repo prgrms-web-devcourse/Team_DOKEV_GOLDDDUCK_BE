@@ -86,8 +86,7 @@ public class TestEventFactory {
         MockMultipartFile image = new MockMultipartFile("images", "test.png", null,
             Files.readAllBytes(imageFile.toPath()));
 
-        GiftItemSaveDto giftItemSaveDto1 = new GiftItemSaveDto(GiftType.IMAGE, image.getOriginalFilename(),
-            image.getBytes());
+        GiftItemSaveDto giftItemSaveDto1 = new GiftItemSaveDto(GiftType.IMAGE, image);
         GiftItemSaveDto giftItemSaveDto2 = new GiftItemSaveDto(GiftType.TEXT, "text1");
         GiftItemSaveDto giftItemSaveDto3 = new GiftItemSaveDto(GiftType.TEXT, "text2");
 

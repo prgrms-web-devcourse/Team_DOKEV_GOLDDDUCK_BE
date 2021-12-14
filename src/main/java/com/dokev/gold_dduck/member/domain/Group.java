@@ -32,7 +32,7 @@ public class Group {
     private String name;
 
     @OneToMany(mappedBy = "group")
-    private List<GroupPermission> groupPermissions = new ArrayList<>();
+    private final List<GroupPermission> groupPermissions = new ArrayList<>();
 
     public List<GrantedAuthority> getAuthorities() {
         return groupPermissions.stream()

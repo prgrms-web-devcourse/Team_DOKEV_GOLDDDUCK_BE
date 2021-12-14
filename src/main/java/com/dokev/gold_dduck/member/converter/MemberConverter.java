@@ -9,6 +9,6 @@ public class MemberConverter {
 
     public MemberDto convertToMemberDto(Member member) {
         return new MemberDto(member.getId(), member.getName(), member.getEmail(),
-                member.getSocialId(), member.getProfileImage().orElse(null));
+            member.getSocialId(), member.getProfileImage().orElse(null));
     }
 }

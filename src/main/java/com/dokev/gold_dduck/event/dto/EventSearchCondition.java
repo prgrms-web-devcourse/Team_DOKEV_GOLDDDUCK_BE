@@ -6,7 +6,7 @@ import lombok.Getter;
 @Getter
 public class EventSearchCondition {
 
-    private EventProgressStatus eventProgressStatus;
+    private final EventProgressStatus eventProgressStatus;
 
     public EventSearchCondition(EventProgressStatus eventProgressStatus) {
         this.eventProgressStatus = eventProgressStatus;

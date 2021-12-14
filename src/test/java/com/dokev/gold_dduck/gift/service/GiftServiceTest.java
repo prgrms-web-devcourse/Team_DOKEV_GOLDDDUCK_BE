@@ -62,7 +62,7 @@ class GiftServiceTest {
         gift.changeEvent(savedEvent);
         Gift savedGift = giftRepository.save(gift);
         GiftItem giftItem1 = new GiftItem(GiftType.TEXT, "coffee1", false);
-        GiftItem giftItem2 = new GiftItem(GiftType.URL, "coffee2", false);
+        GiftItem giftItem2 = new GiftItem(GiftType.TEXT, "coffee2", false);
         GiftItem giftItem3 = new GiftItem(GiftType.IMAGE, "coffee3", false);
         giftItem1.changeGift(savedGift);
         giftItem2.changeGift(savedGift);

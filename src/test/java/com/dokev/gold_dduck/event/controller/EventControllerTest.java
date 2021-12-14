@@ -6,6 +6,7 @@ import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.matchesPattern;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.Matchers.nullValue;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.multipart;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -30,7 +31,6 @@ import com.dokev.gold_dduck.factory.TestMemberFactory;
 import com.dokev.gold_dduck.gift.domain.Gift;
 import com.dokev.gold_dduck.gift.domain.GiftItem;
 import com.dokev.gold_dduck.gift.domain.GiftType;
-import com.dokev.gold_dduck.member.converter.MemberConverter;
 import com.dokev.gold_dduck.member.domain.Member;
 import com.dokev.gold_dduck.security.WithMockJwtAuthentication;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -48,6 +48,7 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 @Slf4j
 @WithMockJwtAuthentication
@@ -74,9 +75,6 @@ class EventControllerTest {
     @Autowired
     private EventLogConverter eventLogConverter;
 
-    @Autowired
-    private MemberConverter memberConverter;
-
     @Test
     @DisplayName("이벤트 생성 테스트 - 성공")
     void saveEventTest() throws Exception {
@@ -88,9 +86,8 @@ class EventControllerTest {
         // WHEN
         ResultActions resultActions = mockMvc.perform(
             multipart("/api/v1/events")
-                .accept(MediaType.APPLICATION_JSON)
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(eventSaveDto))
+                .contentType(MediaType.MULTIPART_FORM_DATA_VALUE)
+                .flashAttr("eventSaveDto", eventSaveDto)
         );
 
         // THEN
@@ -155,9 +152,8 @@ class EventControllerTest {
         // WHEN
         ResultActions resultActions = mockMvc.perform(
             post("/api/v1/events")
-                .accept(MediaType.APPLICATION_JSON)
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(eventSaveDto))
+                .contentType(MediaType.MULTIPART_FORM_DATA_VALUE)
+                .flashAttr("eventSaveDto", eventSaveDto)
         );
 
         // THEN
@@ -171,22 +167,21 @@ class EventControllerTest {
     }
 
     @Test
-    @DisplayName("이벤트 생성 실패 (Invalid Input Value - 선물이 비어 있는 경우)")
+    @DisplayName("이벤트 생성 실패 (선물이 비어 있는 경우)")
     void saveEventFailureTest2() throws Exception {
         // GIVEN
         Member testMember = TestMemberFactory.getUserMember(entityManager);
 
-        Event newEvent = TestEventFactory.builder(testMember).build();
-
-        EventSaveDto eventSaveDto = eventSaveConverter.convertToEventSaveDto(newEvent);
-        eventSaveDto.changedMemberId(eventSaveDto.getMemberId());
+        EventSaveDto eventSaveDto = TestEventFactory.createEventSaveDto(testMember);
+        MultipartFile multipartFile = null;
+        GiftItemSaveDto giftItemSaveDto = new GiftItemSaveDto(GiftType.IMAGE, multipartFile);
+        eventSaveDto.getGifts().get(0).getGiftItems().add(giftItemSaveDto);
 
         // WHEN
         ResultActions resultActions = mockMvc.perform(
             post("/api/v1/events")
-                .accept(MediaType.APPLICATION_JSON)
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(eventSaveDto))
+                .contentType(MediaType.MULTIPART_FORM_DATA_VALUE)
+                .flashAttr("eventSaveDto", eventSaveDto)
         );
 
         // THEN
@@ -194,35 +189,6 @@ class EventControllerTest {
             .andExpectAll(
                 jsonPath("$.success", is(false)),
                 jsonPath("$.data", is(nullValue())),
-                jsonPath("$.error.code", is(ErrorCode.INVALID_INPUT_VALUE.getCode())),
-                jsonPath("$.error.message", containsString(ErrorCode.INVALID_INPUT_VALUE.getMessage()))
-            );
-    }
-
-    @Test
-    @DisplayName("선착순 이벤트 생성 테스트 - 실패(선물 아이템에 텍스트, 파일 아무것도 없는 경우)")
-    void saveEventFailureTest3() throws Exception {
-        // GIVEN
-        Member testMember = TestMemberFactory.createTestMember(entityManager);
-        entityManager.persist(testMember);
-
-        EventSaveDto eventSaveDto = TestEventFactory.createEventSaveDto(testMember);
-
-        GiftItemSaveDto giftItemSaveDto = new GiftItemSaveDto(GiftType.IMAGE, null, null);
-        eventSaveDto.getGifts().get(0).getGiftItems().add(giftItemSaveDto);
-
-        // WHEN
-        ResultActions resultActions = mockMvc.perform(
-            multipart("/api/v1/events")
-                .accept(MediaType.APPLICATION_JSON)
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(eventSaveDto))
-        );
-
-        // THEN
-        resultActions.andDo(print())
-            .andExpectAll(status().isBadRequest(),
-                jsonPath("$.success", is(false)),
                 jsonPath("$.error.code", is(ErrorCode.GIFT_NOT_EMPTY.getCode())),
                 jsonPath("$.error.message", containsString(ErrorCode.GIFT_NOT_EMPTY.getMessage()))
             );
@@ -481,4 +447,18 @@ class EventControllerTest {
             .andExpect(jsonPath("$.error", is(nullValue())));
     }
 
+    @Test
+    @DisplayName("이벤트 삭제 테스트 - 성공")
+    void deleteEvent() throws Exception {
+        Member member = TestMemberFactory.createTestMember(entityManager);
+        entityManager.persist(member);
+        Event event = TestEventFactory.createEvent(member);
+        entityManager.persist(event);
+
+        mockMvc.perform(delete("/api/v1/members/{memberId}/events/{eventId}", member.getId(), event.getId()))
+            .andDo(print())
+            .andExpect(jsonPath("$.success", is(true)))
+            .andExpect(jsonPath("$.data", is(event.getId().intValue())))
+            .andExpect(jsonPath("$.error", is(nullValue())));
+    }
 }

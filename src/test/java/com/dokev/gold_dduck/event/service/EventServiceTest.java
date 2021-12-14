@@ -89,4 +89,19 @@ class EventServiceTest {
         Assertions.assertThat(foundEventDto.getGifts().size()).isEqualTo(3);
         Assertions.assertThat(foundEventDto.getGifts().get(0).getGiftItems().size()).isEqualTo(3);
     }
+
+    @Test
+    @DisplayName("멤버 아이디와 이벤트 아이디를 통해 삭제 테스트 - 성공")
+    void deleteEvent() {
+        Member member = mock(Member.class);
+        Event event = TestEventFactory.createEvent(member);
+
+        given(memberRepository.findById(member.getId())).willReturn(Optional.of(member));
+        given(eventRepository.findById(event.getId())).willReturn(Optional.of(event));
+
+        Long deletedEventId = eventService.deleteEvent(member.getId(), event.getId());
+
+        Assertions.assertThat(deletedEventId).isEqualTo(event.getId());
+        Assertions.assertThat(event.getDeletedAt()).isNotNull();
+    }
 }

@@ -45,7 +45,7 @@ public class Gift extends BaseEntity {
 
     @BatchSize(size = 50)
     @OneToMany(mappedBy = "gift", cascade = CascadeType.PERSIST)
-    private List<GiftItem> giftItems = new ArrayList<>();
+    private final List<GiftItem> giftItems = new ArrayList<>();
 
     public Gift(String category, Integer itemCount) {
         Objects.requireNonNull(category, "선물 카테고리는 notnull이어야 합니다.");

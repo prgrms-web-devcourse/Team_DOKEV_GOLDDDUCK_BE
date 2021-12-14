@@ -5,7 +5,7 @@ import lombok.Getter;
 @Getter
 public class GiftItemSearchCondition {
 
-    private Boolean used;
+    private final Boolean used;
 
     public GiftItemSearchCondition(Boolean used) {
         this.used = used;
