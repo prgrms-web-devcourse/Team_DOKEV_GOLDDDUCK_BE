@@ -64,7 +64,7 @@ public class Event extends BaseEntity {
     @Column(name = "max_participant_count", nullable = false)
     private Integer maxParticipantCount;
 
-    @Column(name = "left_lose_count", nullable = false)
+    @Column(name = "left_blank_count", nullable = false)
     private Integer leftBlankCount;
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -94,7 +94,8 @@ public class Event extends BaseEntity {
 
     public static EventBuilder builder(
         String title, GiftChoiceType giftChoiceType, LocalDateTime startAt, LocalDateTime endAt,
-        EventProgressStatus eventProgressStatus, String mainTemplate, Integer maxParticipantCount, Member member
+        EventProgressStatus eventProgressStatus, String mainTemplate, Integer maxParticipantCount,
+        Integer leftBlankCount, Member member
     ) {
         Objects.requireNonNull(giftChoiceType, "이벤트에서 선물 받을 방법을 선택해야 합니다.");
         Objects.requireNonNull(startAt, "이벤트 시작 시간은 notnull이어야 합니다.");
@@ -102,6 +103,7 @@ public class Event extends BaseEntity {
         Objects.requireNonNull(eventProgressStatus, "이벤트 상태는 notnull이어야 합니다.");
         Objects.requireNonNull(mainTemplate, "이벤트 대표 이미지 타입은 notnull이어야 합니다.");
         Objects.requireNonNull(maxParticipantCount, "이벤트 최대 참가자 수는 notnull이어야 합니다.");
+        Objects.requireNonNull(leftBlankCount, "남은 꽝 개수는 notnull이어야 합니다.");
         Objects.requireNonNull(member, "이벤트 생성자는 notnull이어야 합니다.");
 
         return eventInternalBuilder()
@@ -113,6 +115,7 @@ public class Event extends BaseEntity {
             .eventProgressStatus(eventProgressStatus)
             .mainTemplate(mainTemplate)
             .maxParticipantCount(maxParticipantCount)
+            .leftBlankCount(leftBlankCount)
             .member(member);
     }
 

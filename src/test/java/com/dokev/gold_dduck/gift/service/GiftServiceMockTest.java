@@ -11,7 +11,7 @@ import static org.mockito.Mockito.mock;
 
 import com.dokev.gold_dduck.common.exception.EntityNotFoundException;
 import com.dokev.gold_dduck.common.exception.EventAlreadyParticipatedException;
-import com.dokev.gold_dduck.common.exception.GiftStockOutException;
+import com.dokev.gold_dduck.common.exception.EventClosedException;
 import com.dokev.gold_dduck.event.domain.Event;
 import com.dokev.gold_dduck.event.domain.EventLog;
 import com.dokev.gold_dduck.event.repository.EventLogRepository;
@@ -170,6 +170,6 @@ class GiftServiceMockTest {
         //when then
         assertThatThrownBy(
             () -> sut.chooseGiftItemByFIFO(1L, 1L, 1L))
-            .isInstanceOf(GiftStockOutException.class);
+            .isInstanceOf(EventClosedException.class);
     }
 }

@@ -216,8 +216,8 @@ class GiftControllerTest {
                 handler().handlerType(GiftController.class),
                 handler().methodName("chooseGiftItemByFIFO"),
                 jsonPath("$.success", is(false)),
-                jsonPath("$.error.code", is(ErrorCode.GIFT_STOCK_OUT.getCode())),
-                jsonPath("$.error.message", containsString(ErrorCode.GIFT_STOCK_OUT.getMessage()))
+                jsonPath("$.error.code", is(ErrorCode.EVENT_CLOSED.getCode())),
+                jsonPath("$.error.message", containsString(ErrorCode.EVENT_CLOSED.getMessage()))
             );
     }
 
