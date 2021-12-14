@@ -8,9 +8,9 @@ import org.springframework.data.domain.Page;
 @Getter
 public class GiftItemListDto {
 
-    private List<GiftItemDetailDto> giftItemList;
+    private final List<GiftItemDetailDto> giftItemList;
 
-    private PaginationDto pagination;
+    private final PaginationDto pagination;
 
     public GiftItemListDto(Page<GiftItemDetailDto> page) {
         this.giftItemList = page.getContent();

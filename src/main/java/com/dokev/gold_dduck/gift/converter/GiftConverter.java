@@ -15,8 +15,8 @@ public class GiftConverter {
     public GiftDto convertToGiftDto(Gift gift) {
         List<GiftItem> giftItems = gift.getGiftItems();
         List<GiftItemDto> giftItemDtos = giftItems.stream()
-                .map(this::convertToGiftItemDto)
-                .collect(Collectors.toList());
+            .map(this::convertToGiftItemDto)
+            .collect(Collectors.toList());
 
         return new GiftDto(gift.getId(), gift.getCategory(), giftItemDtos.size(), giftItemDtos);
     }

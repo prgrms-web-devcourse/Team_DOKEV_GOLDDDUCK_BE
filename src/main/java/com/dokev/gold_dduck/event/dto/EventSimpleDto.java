@@ -11,28 +11,28 @@ import lombok.Getter;
 @Getter
 public class EventSimpleDto {
 
-    private Long eventId;
+    private final Long eventId;
 
-    private String title;
+    private final String title;
 
-    private GiftChoiceType giftChoiceType;
-
-    @JsonFormat(shape = Shape.STRING, timezone = "Asia/Seoul")
-    private LocalDateTime startAt;
+    private final GiftChoiceType giftChoiceType;
 
     @JsonFormat(shape = Shape.STRING, timezone = "Asia/Seoul")
-    private LocalDateTime endAt;
-
-    private UUID code;
-
-    private EventProgressStatus eventProgressStatus;
-
-    private String mainTemplate;
-
-    private Integer maxParticipantCount;
+    private final LocalDateTime startAt;
 
     @JsonFormat(shape = Shape.STRING, timezone = "Asia/Seoul")
-    private LocalDateTime createdAt;
+    private final LocalDateTime endAt;
+
+    private final UUID code;
+
+    private final EventProgressStatus eventProgressStatus;
+
+    private final String mainTemplate;
+
+    private final Integer maxParticipantCount;
+
+    @JsonFormat(shape = Shape.STRING, timezone = "Asia/Seoul")
+    private final LocalDateTime createdAt;
 
     public EventSimpleDto(Long eventId, String title, GiftChoiceType giftChoiceType, LocalDateTime startAt,
         LocalDateTime endAt, UUID code, EventProgressStatus eventProgressStatus, String mainTemplate,

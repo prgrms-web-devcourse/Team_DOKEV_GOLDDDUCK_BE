@@ -11,10 +11,12 @@ import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.format.annotation.DateTimeFormat.ISO;
 
+@Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
-@Getter
 public class EventSaveDto {
 
     @NotNull
@@ -35,10 +37,12 @@ public class EventSaveDto {
 
     @NotNull
     @FutureOrPresent
+    @DateTimeFormat(iso = ISO.DATE_TIME)
     private LocalDateTime startAt;
 
     @NotNull
     @Future
+    @DateTimeFormat(iso = ISO.DATE_TIME)
     private LocalDateTime endAt;
 
     @NotNull

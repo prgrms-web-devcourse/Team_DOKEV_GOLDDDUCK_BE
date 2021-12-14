@@ -8,6 +8,7 @@ import com.dokev.gold_dduck.jwt.Jwt.Claims;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.regex.Pattern;
 import javax.servlet.FilterChain;
@@ -77,16 +78,12 @@ public class JwtAuthenticationFilter extends GenericFilterBean {
         String token = request.getHeader(headerKey);
         if (token != null && !token.isEmpty()) {
             log.debug("Jwt token detected : {}", token);
-            try {
-                String decodeToken = URLDecoder.decode(token, "UTF-8");
-                String[] parts = decodeToken.split(" ");
-                if (parts.length == 2) {
-                    String scheme = parts[0];
-                    String credentials = parts[1];
-                    return BEARER.matcher(scheme).matches() ? credentials : null;
-                }
-            } catch (UnsupportedEncodingException e) {
-                logger.error(e.getMessage(), e);
+            String decodeToken = URLDecoder.decode(token, StandardCharsets.UTF_8);
+            String[] parts = decodeToken.split(" ");
+            if (parts.length == 2) {
+                String scheme = parts[0];
+                String credentials = parts[1];
+                return BEARER.matcher(scheme).matches() ? credentials : null;
             }
         }
         return null;
