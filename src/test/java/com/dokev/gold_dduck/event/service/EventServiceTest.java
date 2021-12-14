@@ -97,6 +97,7 @@ class EventServiceTest {
         Member member = mock(Member.class);
         Event event = TestEventFactory.createEvent(member);
 
+        given(memberRepository.findById(member.getId())).willReturn(Optional.of(member));
         given(eventRepository.findById(event.getId())).willReturn(Optional.of(event));
 
         Long deletedEventId = eventService.deleteEvent(member.getId(), event.getId());

@@ -130,10 +130,14 @@ public class EventService {
         Event event = eventRepository.findById(eventId)
             .orElseThrow(() -> new EntityNotFoundException(Event.class, eventId));
 
+        Member member = memberRepository.findById(memberId)
+            .orElseThrow(() -> new EntityNotFoundException(Member.class, memberId));
+
         if (!event.getMember().getId().equals(memberId)) {
             throw new MemberEventNotMatchedException(memberId, eventId);
         }
 
+        member.getEvents().remove(event);
         event.deleteEvent();
 
         return eventId;
