@@ -62,7 +62,7 @@ public class EventController {
         return ApiResponse.success(eventService.searchSimpleDescByMember(memberId, eventSearchCondition, pageable));
     }
 
-    @DeleteMapping(value = "/v1/members/{memberId}/{eventId}")
+    @DeleteMapping(value = "/v1/members/{memberId}/events/{eventId}")
     public ApiResponse<Long> deleteEvent(@PathVariable Long memberId, @PathVariable Long eventId) {
         return ApiResponse.success(eventService.deleteEvent(memberId, eventId));
     }

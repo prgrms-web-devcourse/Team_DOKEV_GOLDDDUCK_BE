@@ -492,7 +492,7 @@ class EventControllerTest {
 
         entityManager.clear();
 
-        mockMvc.perform(delete("/api/v1/members/{memberId}/{eventId}", member.getId(), event.getId()))
+        mockMvc.perform(delete("/v1/members/{memberId}/events/{eventId}", member.getId(), event.getId()))
             .andDo(print())
             .andExpect(jsonPath("$.success", is(true)))
             .andExpect(jsonPath("$.data", is(event.getId().intValue())))
