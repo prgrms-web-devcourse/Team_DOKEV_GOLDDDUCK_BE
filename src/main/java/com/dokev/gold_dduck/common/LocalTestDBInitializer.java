@@ -9,6 +9,8 @@ import com.dokev.gold_dduck.gift.domain.GiftItem;
 import com.dokev.gold_dduck.gift.domain.GiftType;
 import com.dokev.gold_dduck.member.domain.Member;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 import javax.persistence.EntityManager;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
@@ -50,7 +52,7 @@ public class LocalTestDBInitializer implements ApplicationRunner {
                 "데브코스 1기 수료를 축하합니다",
                 GiftChoiceType.FIFO,
                 LocalDateTime.now().plusMinutes(1),
-                LocalDateTime.now().plusMinutes(10),
+                LocalDateTime.now().plusYears(1),
                 EventProgressStatus.RUNNING,
                 "template1",
                 5,
@@ -59,20 +61,25 @@ public class LocalTestDBInitializer implements ApplicationRunner {
             ).build();
             Gift gift = new Gift("커피", 3);
             gift.changeEvent(fifoEvent);
-            GiftItem giftItem1 = new GiftItem(GiftType.TEXT,
-                "선물코드를 등록하여 선물을 받아보세요. (마르코 타운) ∙ 선물코드 : 3TLVAY2538 ∙ 선물명 : 카페아메리카노 ICED ∙ 코드등록 유효기간 : 2021.11.02 ∙ 코드등록 방법 : 카카오톡 > 선물하기 > 선물함 > 선물코드 등록 ∙ 등록 URL : http://kko.to/Aikttag4o",
-                false);
-            GiftItem giftItem2 = new GiftItem(GiftType.TEXT, "http://kko.to/Aikttag4o", false);
-            GiftItem giftItem3 = new GiftItem(GiftType.IMAGE,
-                "https://dokev-gold-dduck.s3.ap-northeast-2.amazonaws.com/giftItemTest.jfif", false);
-            giftItem1.changeGift(gift);
-            giftItem2.changeGift(gift);
-            giftItem3.changeGift(gift);
+
+            List<GiftItem> giftItems = new ArrayList<>();
+            for (int i = 0; i < 100; i++) {
+
+                GiftItem giftItemText = new GiftItem(GiftType.TEXT,
+                    "선물코드를 등록하여 선물을 받아보세요. (마르코 타운) ∙ 선물코드 : 3TLVAY2538 ∙ 선물명 : 카페아메리카노 ICED ∙ 코드등록 유효기간 : 2021.11.02 ∙ 코드등록 방법 : 카카오톡 > 선물하기 > 선물함 > 선물코드 등록 ∙ 등록 URL : http://kko.to/Aikttag4o",
+                    false);
+                GiftItem giftItemImage = new GiftItem(GiftType.IMAGE,
+                    "https://dokev-gold-dduck.s3.ap-northeast-2.amazonaws.com/giftItemTest.jfif", false);
+
+                giftItems.add(giftItemText);
+                giftItems.add(giftItemImage);
+            }
+
+            giftItems.forEach(giftItem -> {
+                giftItem.changeGift(gift);
+            });
+
             entityManager.persist(fifoEvent);
-            entityManager.persist(gift);
-            entityManager.persist(giftItem1);
-            entityManager.persist(giftItem2);
-            entityManager.persist(giftItem3);
         }
 
         public void init2() {
