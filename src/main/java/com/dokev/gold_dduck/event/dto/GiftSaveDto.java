@@ -1,6 +1,7 @@
 package com.dokev.gold_dduck.event.dto;
 
 import java.util.List;
+import java.util.UUID;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import lombok.AccessLevel;
@@ -19,4 +20,6 @@ public class GiftSaveDto {
     @NotNull
     @NotEmpty
     private List<GiftItemSaveDto> giftItems;
+
+    private UUID giftCheckId;
 }
