@@ -94,7 +94,7 @@ public class TestEventFactory {
         giftItemSaveDtos.add(giftItemSaveDto2);
         giftItemSaveDtos.add(giftItemSaveDto3);
 
-        GiftSaveDto giftSaveDto = new GiftSaveDto("gift1", giftItemSaveDtos);
+        GiftSaveDto giftSaveDto = new GiftSaveDto("gift1", giftItemSaveDtos, UUID.randomUUID());
 
         giftSaveDtos.add(giftSaveDto);
 
