@@ -26,7 +26,7 @@ public class EventSaveConverter {
                 eventSaveRequest.getGiftChoiceType(),
                 eventSaveRequest.getStartAt(),
                 eventSaveRequest.getEndAt(),
-                EventProgressStatus.RUNNING,
+                EventProgressStatus.READY,
                 eventSaveRequest.getMainTemplate(),
                 eventSaveRequest.getMaxParticipantCount(),
                 eventSaveRequest.getMaxParticipantCount() - giftItemCount,

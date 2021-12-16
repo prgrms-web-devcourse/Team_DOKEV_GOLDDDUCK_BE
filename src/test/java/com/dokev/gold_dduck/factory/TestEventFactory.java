@@ -30,7 +30,7 @@ public class TestEventFactory {
             GiftChoiceType.FIFO,
             LocalDateTime.now().plusMinutes(1),
             LocalDateTime.now().plusMinutes(10),
-            EventProgressStatus.RUNNING,
+            EventProgressStatus.READY,
             "template1",
             60,
             60,
