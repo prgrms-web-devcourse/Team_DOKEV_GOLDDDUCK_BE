@@ -56,7 +56,7 @@ public class Event extends BaseEntity {
     @Column(name = "deleted_at", columnDefinition = "TIMESTAMP")
     private LocalDateTime deletedAt;
 
-    @Column(name = "code", nullable = false)
+    @Column(name = "code", nullable = false, length = 16)
     private UUID code;
 
     @Enumerated(value = EnumType.STRING)
