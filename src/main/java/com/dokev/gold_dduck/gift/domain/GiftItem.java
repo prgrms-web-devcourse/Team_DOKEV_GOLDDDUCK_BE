@@ -2,6 +2,7 @@ package com.dokev.gold_dduck.gift.domain;
 
 import com.dokev.gold_dduck.common.BaseEntity;
 import com.dokev.gold_dduck.common.exception.GiftAlreadyAllocatedException;
+import com.dokev.gold_dduck.event.domain.EventLog;
 import com.dokev.gold_dduck.member.domain.Member;
 import java.util.Objects;
 import javax.persistence.Column;
@@ -14,6 +15,7 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.OneToOne;
 import javax.persistence.Table;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -51,6 +53,9 @@ public class GiftItem extends BaseEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "member_id")
     private Member member;
+
+    @OneToOne(mappedBy = "giftItem")
+    private EventLog eventLog;
 
     public GiftItem(GiftType giftType, String content, boolean used) {
         Objects.requireNonNull(giftType, "선물 유형은 notnull이어야 합니다.");

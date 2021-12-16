@@ -490,8 +490,14 @@ class GiftControllerTest {
 
         Event event = TestEventFactory.createEvent(admin);
         entityManager.persist(event);
+
         Gift gift = givenGift(event);
         GiftItem giftItem = givenGiftItem(gift, user);
+
+        EventLog eventLog = new EventLog(event, user, gift, giftItem);
+        entityManager.persist(eventLog);
+
+        entityManager.clear();
 
         mockMvc.perform(get("/api/v1/members/{memberId}/giftItems/{giftItemId}"
                 , user.getId(), giftItem.getId()))
@@ -502,7 +508,7 @@ class GiftControllerTest {
             .andExpect(jsonPath("$.data.category", is(gift.getCategory())))
             .andExpect(jsonPath("$.data.mainTemplate", is(event.getMainTemplate())))
             .andExpect(jsonPath("$.data.sender", is(event.getMember().getName())))
-            .andExpect(jsonPath("$.data.receivedDate", is(giftItem.getLastModifiedAt().toString())))
+            .andExpect(jsonPath("$.data.receivedDate", is(eventLog.getLastModifiedAt().toString())))
             .andExpect(jsonPath("$.error", is(nullValue())));
     }
 

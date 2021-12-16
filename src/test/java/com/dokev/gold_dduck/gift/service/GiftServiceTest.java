@@ -7,6 +7,7 @@ import static org.hamcrest.Matchers.is;
 
 import com.dokev.gold_dduck.common.exception.GiftBlankDrawnException;
 import com.dokev.gold_dduck.event.domain.Event;
+import com.dokev.gold_dduck.event.domain.EventLog;
 import com.dokev.gold_dduck.event.repository.EventLogRepository;
 import com.dokev.gold_dduck.event.repository.EventRepository;
 import com.dokev.gold_dduck.factory.TestEventFactory;
@@ -134,12 +135,15 @@ class GiftServiceTest {
         giftItem.allocateMember(user);
         giftItemRepository.save(giftItem);
 
+        EventLog eventLog = new EventLog(event, user, gift, giftItem);
+        eventLogRepository.save(eventLog);
+
         GiftItemSearchDto giftItemSearchDto = sut.searchGiftItem(giftItem.getId(), user.getId());
 
         Assertions.assertThat(giftItemSearchDto.getSender()).isEqualTo(event.getMember().getName());
         Assertions.assertThat(giftItemSearchDto.getMainTemplate()).isEqualTo(event.getMainTemplate());
         Assertions.assertThat(giftItemSearchDto.getCategory()).isEqualTo(gift.getCategory());
-        Assertions.assertThat(giftItemSearchDto.getReceivedDate()).isEqualTo(String.valueOf(giftItem.getLastModifiedAt()));
+        Assertions.assertThat(giftItemSearchDto.getReceivedDate()).isEqualTo(String.valueOf(eventLog.getLastModifiedAt()));
 
     }
 }
