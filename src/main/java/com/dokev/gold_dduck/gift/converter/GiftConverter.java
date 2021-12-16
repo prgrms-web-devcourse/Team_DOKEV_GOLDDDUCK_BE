@@ -26,8 +26,9 @@ public class GiftConverter {
             giftItem.isUsed());
     }
 
-    public GiftItemDetailDto convertToGiftItemDetailDto(GiftItem giftItem, String category, String mainTemplate) {
+    public GiftItemDetailDto convertToGiftItemDetailDto(GiftItem giftItem, Long giftId, String category,
+        String mainTemplate, String sender) {
         return new GiftItemDetailDto(giftItem.getId(), giftItem.getGiftType(), giftItem.getContent(),
-            giftItem.isUsed(), category, mainTemplate);
+            giftItem.isUsed(), giftId, category, mainTemplate, sender);
     }
 }

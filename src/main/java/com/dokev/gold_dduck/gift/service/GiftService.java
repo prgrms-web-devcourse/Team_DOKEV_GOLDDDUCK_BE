@@ -113,8 +113,44 @@ public class GiftService {
             GiftItem chosenGiftItem = giftItems.get(nextInt);
             chosenGiftItem.allocateMember(member);
             eventLogRepository.save(new EventLog(event, member, chosenGiftItem.getGift(), chosenGiftItem));
-            return giftConverter.convertToGiftItemDetailDto(chosenGiftItem, chosenGiftItem.getGift().getCategory(),
-                event.getMainTemplate());
+            return giftConverter.convertToGiftItemDetailDto(
+                chosenGiftItem,
+                chosenGiftItem.getGift().getId(),
+                chosenGiftItem.getGift().getCategory(),
+                event.getMainTemplate(),
+                null
+            );
+        } else {
+            event.decreaseLeftBlankCount();
+            eventLogRepository.save(new EventLog(event, member, null, null));
+            throw new GiftBlankDrawnException();
+        }
+    }
+
+    //랜덤으로 선물받기 성능 개선 버전 (선물 총 개수 반정규화, 선물아이템 DTO 조회, 쿼리 수 감소)
+    @Transactional(noRollbackFor = {EventClosedException.class, GiftBlankDrawnException.class})
+    public GiftItemDetailDto chooseGiftItemByRandom2(Long eventId, Long memberId) {
+        Event event = eventRepository.findByIdForUpdate(eventId)
+            .orElseThrow(() -> new EntityNotFoundException(Event.class, eventId));
+        event.validateEventRunning();
+        Member member = memberRepository.findByIdWithGroup(memberId)
+            .orElseThrow(() -> new EntityNotFoundException(Member.class, memberId));
+        checkAlreadyParticipatedMember(event, member);
+
+        int candidateCount = event.getLeftGiftCount() + event.getLeftBlankCount();
+        if (candidateCount <= 0) {
+            event.closeEvent();
+            throw new EventClosedException();
+        }
+        int offset = new Random().nextInt(candidateCount);
+        Optional<GiftItemDetailDto> maybeGiftItem = giftItemQueryRepository.findDetailGiftItemByRandom(eventId,
+            offset);
+        if (maybeGiftItem.isPresent()) {
+            GiftItemDetailDto chosenGiftItem = maybeGiftItem.get();
+            eventLogRepository.save(
+                new EventLog(event, member, giftRepository.getById(chosenGiftItem.getGiftId()),
+                    giftItemRepository.getById(chosenGiftItem.getGiftItemId())));
+            return chosenGiftItem;
         } else {
             event.decreaseLeftBlankCount();
             eventLogRepository.save(new EventLog(event, member, null, null));

@@ -4,13 +4,17 @@ import static com.dokev.gold_dduck.event.domain.QEvent.event;
 import static com.dokev.gold_dduck.event.domain.QEventLog.eventLog;
 import static com.dokev.gold_dduck.gift.domain.QGift.gift;
 import static com.dokev.gold_dduck.gift.domain.QGiftItem.giftItem;
+import static com.dokev.gold_dduck.member.domain.QMember.*;
 
 import com.dokev.gold_dduck.gift.dto.GiftItemDetailDto;
 import com.dokev.gold_dduck.gift.dto.GiftItemSearchCondition;
+import com.dokev.gold_dduck.gift.dto.GiftItemSimpleDto;
+import com.dokev.gold_dduck.member.domain.QMember;
 import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import java.util.List;
+import java.util.Optional;
 import javax.persistence.EntityManager;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -60,6 +64,54 @@ public class GiftItemQueryRepository {
             .fetchCount();
 
         return new PageImpl<>(content, pageable, total);
+    }
+
+    public Optional<GiftItemDetailDto> findDetailGiftItemByRandom(
+        Long eventId,
+        int offset
+    ) {
+        List<GiftItemDetailDto> content = queryFactory
+            .select(Projections.fields(GiftItemDetailDto.class,
+                giftItem.id.as("giftItemId"),
+                giftItem.giftType,
+                giftItem.content,
+                giftItem.used,
+                gift.id.as("giftId"),
+                gift.category,
+                event.mainTemplate,
+                event.member.name.as("sender")
+            ))
+            .from(gift)
+            .leftJoin(gift.giftItems, giftItem)
+            .on(gift.event.id.eq(eventId))
+            .join(gift.event, event)
+            .join(event.member, member)
+            .where(giftItem.member.isNull())
+            .offset(offset)
+            .limit(1)
+            .fetch();
+
+        return content.isEmpty() ? Optional.empty() : Optional.of(content.get(0));
+    }
+
+    public Optional<GiftItemSimpleDto> findSimpleGiftItemByRandom(
+        Long eventId,
+        int offset
+    ) {
+        List<GiftItemSimpleDto> content = queryFactory
+            .select(Projections.fields(GiftItemSimpleDto.class,
+                giftItem.id.as("giftItemId")
+            ))
+            .from(gift)
+            .leftJoin(gift.giftItems, giftItem)
+            .on(gift.event.id.eq(eventId))
+            .leftJoin(eventLog)
+            .on(eventLog.giftItem.isNull())
+            .offset(offset)
+            .limit(1)
+            .fetch();
+
+        return content.isEmpty() ? Optional.empty() : Optional.of(content.get(0));
     }
 
     private BooleanExpression usedEq(Boolean used) {
