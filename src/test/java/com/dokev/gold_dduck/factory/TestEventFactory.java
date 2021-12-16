@@ -33,6 +33,7 @@ public class TestEventFactory {
             EventProgressStatus.RUNNING,
             "template1",
             60,
+            0,
             60,
             member);
     }
