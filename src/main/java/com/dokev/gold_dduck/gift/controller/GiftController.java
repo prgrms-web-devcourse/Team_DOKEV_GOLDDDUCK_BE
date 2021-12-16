@@ -6,6 +6,7 @@ import com.dokev.gold_dduck.gift.dto.GiftItemDetailDto;
 import com.dokev.gold_dduck.gift.dto.GiftItemDto;
 import com.dokev.gold_dduck.gift.dto.GiftItemListDto;
 import com.dokev.gold_dduck.gift.dto.GiftItemSearchCondition;
+import com.dokev.gold_dduck.gift.dto.GiftItemSearchDto;
 import com.dokev.gold_dduck.gift.dto.GiftItemUpdateDto;
 import com.dokev.gold_dduck.gift.dto.GiftRandomChoiceDto;
 import com.dokev.gold_dduck.gift.service.GiftService;
@@ -66,5 +67,12 @@ public class GiftController {
     ) {
         giftService.updateGiftItem(memberId, giftItemId, giftItemUpdateDto);
         return ApiResponse.success();
+    }
+
+    @GetMapping("/v1/members/{memberId}/giftItems/{giftItemId}")
+    public ApiResponse<GiftItemSearchDto> searchGiftItemById
+        (@PathVariable Long memberId, @PathVariable Long giftItemId) {
+        GiftItemSearchDto giftItemSearchDto = giftService.searchGiftItem(giftItemId, memberId);
+        return ApiResponse.success(giftItemSearchDto);
     }
 }

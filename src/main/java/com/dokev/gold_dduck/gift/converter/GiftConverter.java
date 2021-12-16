@@ -1,10 +1,14 @@
 package com.dokev.gold_dduck.gift.converter;
 
+import com.dokev.gold_dduck.event.domain.Event;
+import com.dokev.gold_dduck.event.domain.EventLog;
 import com.dokev.gold_dduck.gift.domain.Gift;
 import com.dokev.gold_dduck.gift.domain.GiftItem;
 import com.dokev.gold_dduck.gift.dto.GiftDto;
 import com.dokev.gold_dduck.gift.dto.GiftItemDetailDto;
 import com.dokev.gold_dduck.gift.dto.GiftItemDto;
+import com.dokev.gold_dduck.gift.dto.GiftItemSearchDto;
+import com.dokev.gold_dduck.member.domain.Member;
 import java.util.List;
 import java.util.stream.Collectors;
 import org.springframework.stereotype.Component;
@@ -29,5 +33,15 @@ public class GiftConverter {
     public GiftItemDetailDto convertToGiftItemDetailDto(GiftItem giftItem, String category, String mainTemplate) {
         return new GiftItemDetailDto(giftItem.getId(), giftItem.getGiftType(), giftItem.getContent(),
             giftItem.isUsed(), category, mainTemplate);
+    }
+
+    public GiftItemSearchDto convertToGiftItemSearchDto(GiftItem giftItem) {
+        Gift gift = giftItem.getGift();
+        Event event = giftItem.getGift().getEvent();
+        EventLog eventLog = giftItem.getEventLog();
+
+        return new GiftItemSearchDto(giftItem.getId(), giftItem.getGiftType(), giftItem.getContent(), giftItem.isUsed(),
+            gift.getCategory(), event.getMainTemplate(), event.getMember().getName()
+            , String.valueOf(eventLog.getLastModifiedAt()));
     }
 }
