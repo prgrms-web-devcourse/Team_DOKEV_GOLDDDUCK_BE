@@ -19,13 +19,17 @@ public class EventSaveConverter {
 
     public Event convertToEvent(EventSaveDto eventSaveRequest, Member member)
         throws IllegalArgumentException {
+        int giftItemCount = eventSaveRequest.getGifts().stream()
+            .mapToInt(giftSaveDto -> giftSaveDto.getGiftItems().size())
+            .sum();
         Event newEvent = Event.builder(eventSaveRequest.getTitle(),
                 eventSaveRequest.getGiftChoiceType(),
                 eventSaveRequest.getStartAt(),
                 eventSaveRequest.getEndAt(),
-                EventProgressStatus.RUNNING,
+                EventProgressStatus.READY,
                 eventSaveRequest.getMainTemplate(),
                 eventSaveRequest.getMaxParticipantCount(),
+                eventSaveRequest.getMaxParticipantCount() - giftItemCount,
                 member)
             .code(UUID.randomUUID())
             .build();

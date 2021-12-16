@@ -1,6 +1,7 @@
 package com.dokev.gold_dduck.event.domain;
 
 import com.dokev.gold_dduck.common.BaseEntity;
+import com.dokev.gold_dduck.common.exception.EventClosedException;
 import com.dokev.gold_dduck.gift.domain.Gift;
 import com.dokev.gold_dduck.member.domain.Member;
 import java.time.LocalDateTime;
@@ -25,7 +26,9 @@ import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.DynamicUpdate;
 
+@DynamicUpdate
 @Getter
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -53,7 +56,7 @@ public class Event extends BaseEntity {
     @Column(name = "deleted_at", columnDefinition = "TIMESTAMP")
     private LocalDateTime deletedAt;
 
-    @Column(name = "code", nullable = false)
+    @Column(name = "code", nullable = false, length = 16)
     private UUID code;
 
     @Enumerated(value = EnumType.STRING)
@@ -66,6 +69,9 @@ public class Event extends BaseEntity {
     @Column(name = "max_participant_count", nullable = false)
     private Integer maxParticipantCount;
 
+    @Column(name = "left_blank_count", nullable = false)
+    private Integer leftBlankCount;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "member_id")
     private Member member;
@@ -76,7 +82,8 @@ public class Event extends BaseEntity {
     @Builder(builderMethodName = "eventInternalBuilder")
     private Event(
         String title, GiftChoiceType giftChoiceType, LocalDateTime startAt, LocalDateTime endAt, UUID code,
-        EventProgressStatus eventProgressStatus, String mainTemplate, Integer maxParticipantCount, Member member
+        EventProgressStatus eventProgressStatus, String mainTemplate, Integer maxParticipantCount,
+        Integer leftBlankCount, Member member
     ) {
         this.title = title;
         this.giftChoiceType = giftChoiceType;
@@ -86,12 +93,14 @@ public class Event extends BaseEntity {
         this.eventProgressStatus = eventProgressStatus;
         this.mainTemplate = mainTemplate;
         this.maxParticipantCount = maxParticipantCount;
-        changeMember(member);
+        this.leftBlankCount = leftBlankCount;
+        this.member = member;
     }
 
     public static EventBuilder builder(
         String title, GiftChoiceType giftChoiceType, LocalDateTime startAt, LocalDateTime endAt,
-        EventProgressStatus eventProgressStatus, String mainTemplate, Integer maxParticipantCount, Member member
+        EventProgressStatus eventProgressStatus, String mainTemplate, Integer maxParticipantCount,
+        Integer leftBlankCount, Member member
     ) {
         Objects.requireNonNull(giftChoiceType, "이벤트에서 선물 받을 방법을 선택해야 합니다.");
         Objects.requireNonNull(startAt, "이벤트 시작 시간은 notnull이어야 합니다.");
@@ -99,6 +108,7 @@ public class Event extends BaseEntity {
         Objects.requireNonNull(eventProgressStatus, "이벤트 상태는 notnull이어야 합니다.");
         Objects.requireNonNull(mainTemplate, "이벤트 대표 이미지 타입은 notnull이어야 합니다.");
         Objects.requireNonNull(maxParticipantCount, "이벤트 최대 참가자 수는 notnull이어야 합니다.");
+        Objects.requireNonNull(leftBlankCount, "남은 꽝 개수는 notnull이어야 합니다.");
         Objects.requireNonNull(member, "이벤트 생성자는 notnull이어야 합니다.");
 
         return eventInternalBuilder()
@@ -110,6 +120,7 @@ public class Event extends BaseEntity {
             .eventProgressStatus(eventProgressStatus)
             .mainTemplate(mainTemplate)
             .maxParticipantCount(maxParticipantCount)
+            .leftBlankCount(leftBlankCount)
             .member(member);
     }
 
@@ -119,6 +130,48 @@ public class Event extends BaseEntity {
         }
         this.member = member;
         member.getEvents().add(this);
+    }
+
+    public void decreaseLeftBlankCount() {
+        this.leftBlankCount--;
+    }
+
+    public void closeEvent() {
+        this.eventProgressStatus = EventProgressStatus.CLOSED;
+    }
+
+    public void validateEndTime() {
+        boolean eventEndTimeOver = this.endAt.isBefore(LocalDateTime.now());
+        if (eventEndTimeOver) {
+            closeEvent();
+            throw new EventClosedException();
+        }
+    }
+
+    public void validateCloseStatus() {
+        if (this.eventProgressStatus == EventProgressStatus.CLOSED) {
+            throw new EventClosedException();
+        }
+    }
+
+    public void validateEventRunning() {
+        validateCloseStatus();
+        validateEndTime();
+    }
+
+    public void renewStatus() {
+        if (startAt.isAfter(LocalDateTime.now())) {
+            eventProgressStatus = EventProgressStatus.READY;
+            return;
+        }
+        if (startAt.isEqual(LocalDateTime.now()) || (startAt.isBefore(LocalDateTime.now()) && endAt.isAfter(
+            LocalDateTime.now()))) {
+            eventProgressStatus = EventProgressStatus.RUNNING;
+            return;
+        }
+        if (endAt.isEqual(LocalDateTime.now()) || endAt.isBefore(LocalDateTime.now())){
+            eventProgressStatus = EventProgressStatus.CLOSED;
+        }
     }
 
     public void deleteEvent() {

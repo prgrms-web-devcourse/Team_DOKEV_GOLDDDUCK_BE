@@ -44,8 +44,8 @@ dependencies {
     implementation 'io.springfox:springfox-boot-starter:3.0.0'
     testImplementation 'org.springframework.security:spring-security-test'
     implementation 'com.querydsl:querydsl-jpa'
-    implementation group: 'org.apache.logging.log4j', name: 'log4j-api', version: '2.15.0'
-    implementation group: 'org.apache.logging.log4j', name: 'log4j-to-slf4j', version: '2.15.0'
+    implementation group: 'org.apache.logging.log4j', name: 'log4j-api', version: '2.16.0'
+    implementation group: 'org.apache.logging.log4j', name: 'log4j-to-slf4j', version: '2.16.0'
 }
 
 test {
