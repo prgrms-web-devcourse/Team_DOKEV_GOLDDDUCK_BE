@@ -80,7 +80,7 @@ public class EventSaveConverter {
     }
 
     public GiftSaveDto convertToGiftSaveDto(Gift gift) {
-        return new GiftSaveDto(gift.getCategory(), convertToGiftItemDtos(gift.getGiftItems()));
+        return new GiftSaveDto(gift.getCategory(), convertToGiftItemDtos(gift.getGiftItems()), UUID.randomUUID());
     }
 
     public List<GiftItemSaveDto> convertToGiftItemDtos(List<GiftItem> giftItems) {
