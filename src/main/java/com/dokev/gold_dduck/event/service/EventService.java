@@ -81,6 +81,8 @@ public class EventService {
         Event event = eventRepository.findEventByCodeWithGift(eventCode)
             .orElseThrow(() -> new EntityNotFoundException(Event.class, eventCode));
 
+        event.renewStatus();
+
         return eventFindConverter.convertToEventDto(event);
     }
 
