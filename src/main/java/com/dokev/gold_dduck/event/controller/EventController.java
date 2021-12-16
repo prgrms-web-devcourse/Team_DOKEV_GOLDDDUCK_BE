@@ -41,7 +41,7 @@ public class EventController {
         this.eventLogService = eventLogService;
     }
 
-    @PostMapping(value = "/v1/events", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PostMapping(value = "/v1/events")
     public ApiResponse<UUID> saveEvent(@ModelAttribute(value = "eventSaveDto") @Validated EventSaveDto eventSaveDto) {
         UUID eventCode = eventService.saveEvent(eventSaveDto);
         return ApiResponse.success(eventCode);
