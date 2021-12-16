@@ -16,6 +16,7 @@ import com.dokev.gold_dduck.gift.dto.GiftItemDetailDto;
 import com.dokev.gold_dduck.gift.dto.GiftItemDto;
 import com.dokev.gold_dduck.gift.dto.GiftItemListDto;
 import com.dokev.gold_dduck.gift.dto.GiftItemSearchCondition;
+import com.dokev.gold_dduck.gift.dto.GiftItemSearchDto;
 import com.dokev.gold_dduck.gift.dto.GiftItemUpdateDto;
 import com.dokev.gold_dduck.gift.repository.GiftItemQueryRepository;
 import com.dokev.gold_dduck.gift.repository.GiftItemRepository;
@@ -24,6 +25,7 @@ import com.dokev.gold_dduck.member.domain.Member;
 import com.dokev.gold_dduck.member.domain.RoleGroupType;
 import com.dokev.gold_dduck.member.repository.MemberRepository;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Random;
 import java.util.stream.Collectors;
@@ -161,5 +163,16 @@ public class GiftService {
     private Optional<GiftItem> findGiftItemByFIFO(Long giftId) {
         List<GiftItem> chosenGiftItems = giftItemRepository.findByGiftIdWithPageForUpdate(giftId, Pageable.ofSize(1));
         return chosenGiftItems.isEmpty() ? Optional.empty() : Optional.of(chosenGiftItems.get(0));
+    }
+
+    public GiftItemSearchDto searchGiftItem(Long giftItemId, Long memberId) {
+        GiftItem giftItem = giftItemRepository.findByGiftIdWithMemberAndGift(giftItemId)
+            .orElseThrow(() -> new EntityNotFoundException(GiftItem.class, giftItemId));
+
+        if (!Objects.equals(giftItem.getMember().getId(), memberId)) {
+            throw new MemberGiftNotMatchedException(memberId, giftItemId);
+        }
+
+        return giftConverter.convertToGiftItemSearchDto(giftItem);
     }
 }

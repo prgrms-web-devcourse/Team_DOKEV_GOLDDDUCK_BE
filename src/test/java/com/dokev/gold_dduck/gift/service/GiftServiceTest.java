@@ -16,6 +16,7 @@ import com.dokev.gold_dduck.gift.domain.GiftItem;
 import com.dokev.gold_dduck.gift.domain.GiftType;
 import com.dokev.gold_dduck.gift.dto.GiftItemDetailDto;
 import com.dokev.gold_dduck.gift.dto.GiftItemDto;
+import com.dokev.gold_dduck.gift.dto.GiftItemSearchDto;
 import com.dokev.gold_dduck.gift.repository.GiftItemRepository;
 import com.dokev.gold_dduck.gift.repository.GiftRepository;
 import com.dokev.gold_dduck.member.domain.Member;
@@ -23,6 +24,7 @@ import com.dokev.gold_dduck.member.repository.MemberRepository;
 import java.util.ArrayList;
 import java.util.List;
 import javax.persistence.EntityManager;
+import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -114,5 +116,28 @@ class GiftServiceTest {
         boolean alreadyParticipated = eventLogRepository.existsByEventIdAndMemberId(savedEvent.getId(),
             savedMember.getId());
         assertThat(alreadyParticipated, is(true));
+    }
+
+    @Test
+    @DisplayName("giftItem의 id를 통해 giftItem 검색 테스트 - 성공")
+    void searchGiftItemById() {
+        Member admin = TestMemberFactory.getAdminMember(entityManager);
+        Member user = TestMemberFactory.getUserMember(entityManager);
+        Event event = eventRepository.save(TestEventFactory.createEvent(admin));
+
+        Gift gift = new Gift("커피", 3);
+        gift.changeEvent(event);
+        Gift savedGift = giftRepository.save(gift);
+
+        GiftItem giftItem = new GiftItem(GiftType.TEXT, "coffee1", false);
+        giftItem.changeGift(savedGift);
+        giftItem.allocateMember(user);
+        giftItemRepository.save(giftItem);
+
+        GiftItemSearchDto giftItemSearchDto = sut.searchGiftItem(giftItem.getId(), user.getId());
+
+        Assertions.assertThat(giftItemSearchDto.getSender()).isEqualTo(user.getName());
+        Assertions.assertThat(giftItemSearchDto.getMainTemplate()).isEqualTo(event.getMainTemplate());
+        Assertions.assertThat(giftItemSearchDto.getCategory()).isEqualTo(gift.getCategory());
     }
 }
