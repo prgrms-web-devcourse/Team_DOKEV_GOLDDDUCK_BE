@@ -36,10 +36,10 @@ public class GiftConverter {
 
     public GiftItemSearchDto convertToGiftItemSearchDto(GiftItem giftItem) {
         Gift gift = giftItem.getGift();
-        Member member = giftItem.getMember();
         Event event = giftItem.getGift().getEvent();
 
         return new GiftItemSearchDto(giftItem.getId(), giftItem.getGiftType(), giftItem.getContent(), giftItem.isUsed(),
-            gift.getCategory(), event.getMainTemplate(), member.getName());
+            gift.getCategory(), event.getMainTemplate(), event.getMember().getName()
+            , String.valueOf(giftItem.getLastModifiedAt()));
     }
 }

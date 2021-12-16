@@ -136,8 +136,10 @@ class GiftServiceTest {
 
         GiftItemSearchDto giftItemSearchDto = sut.searchGiftItem(giftItem.getId(), user.getId());
 
-        Assertions.assertThat(giftItemSearchDto.getSender()).isEqualTo(user.getName());
+        Assertions.assertThat(giftItemSearchDto.getSender()).isEqualTo(event.getMember().getName());
         Assertions.assertThat(giftItemSearchDto.getMainTemplate()).isEqualTo(event.getMainTemplate());
         Assertions.assertThat(giftItemSearchDto.getCategory()).isEqualTo(gift.getCategory());
+        Assertions.assertThat(giftItemSearchDto.getReceivedDate()).isEqualTo(String.valueOf(giftItem.getLastModifiedAt()));
+
     }
 }

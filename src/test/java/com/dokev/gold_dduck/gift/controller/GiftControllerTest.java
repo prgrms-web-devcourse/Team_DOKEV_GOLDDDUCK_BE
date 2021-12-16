@@ -501,7 +501,8 @@ class GiftControllerTest {
             .andExpect(jsonPath("$.data.content", is(giftItem.getContent())))
             .andExpect(jsonPath("$.data.category", is(gift.getCategory())))
             .andExpect(jsonPath("$.data.mainTemplate", is(event.getMainTemplate())))
-            .andExpect(jsonPath("$.data.sender", is(user.getName())))
+            .andExpect(jsonPath("$.data.sender", is(event.getMember().getName())))
+            .andExpect(jsonPath("$.data.receivedDate", is(giftItem.getLastModifiedAt().toString())))
             .andExpect(jsonPath("$.error", is(nullValue())));
     }
 

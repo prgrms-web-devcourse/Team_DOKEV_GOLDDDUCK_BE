@@ -23,8 +23,10 @@ public class GiftItemSearchDto {
 
     private String sender;
 
+    private String receivedDate;
+
     public GiftItemSearchDto(Long id, GiftType giftType, String content, boolean used, String category,
-        String mainTemplate, String sender) {
+        String mainTemplate, String sender, String receivedDate) {
         this.id = id;
         this.giftType = giftType;
         this.content = content;
@@ -32,5 +34,6 @@ public class GiftItemSearchDto {
         this.category = category;
         this.mainTemplate = mainTemplate;
         this.sender = sender;
+        this.receivedDate = receivedDate;
     }
 }
