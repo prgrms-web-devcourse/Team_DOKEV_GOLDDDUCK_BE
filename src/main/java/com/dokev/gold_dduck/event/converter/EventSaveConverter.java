@@ -26,7 +26,7 @@ public class EventSaveConverter {
                 eventSaveRequest.getGiftChoiceType(),
                 eventSaveRequest.getStartAt(),
                 eventSaveRequest.getEndAt(),
-                EventProgressStatus.RUNNING,
+                EventProgressStatus.READY,
                 eventSaveRequest.getMainTemplate(),
                 eventSaveRequest.getMaxParticipantCount(),
                 giftItemCount,
@@ -81,7 +81,7 @@ public class EventSaveConverter {
     }
 
     public GiftSaveDto convertToGiftSaveDto(Gift gift) {
-        return new GiftSaveDto(gift.getCategory(), convertToGiftItemDtos(gift.getGiftItems()), UUID.randomUUID());
+        return new GiftSaveDto(gift.getCategory(), convertToGiftItemDtos(gift.getGiftItems()));
     }
 
     public List<GiftItemSaveDto> convertToGiftItemDtos(List<GiftItem> giftItems) {

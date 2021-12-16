@@ -165,6 +165,21 @@ public class Event extends BaseEntity {
         validateEndTime();
     }
 
+    public void renewStatus() {
+        if (startAt.isAfter(LocalDateTime.now())) {
+            eventProgressStatus = EventProgressStatus.READY;
+            return;
+        }
+        if (startAt.isEqual(LocalDateTime.now()) || (startAt.isBefore(LocalDateTime.now()) && endAt.isAfter(
+            LocalDateTime.now()))) {
+            eventProgressStatus = EventProgressStatus.RUNNING;
+            return;
+        }
+        if (endAt.isEqual(LocalDateTime.now()) || endAt.isBefore(LocalDateTime.now())){
+            eventProgressStatus = EventProgressStatus.CLOSED;
+        }
+    }
+
     public void deleteEvent() {
         this.deletedAt = LocalDateTime.now();
     }
