@@ -124,6 +124,9 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter {
             .authenticationEntryPoint(authenticationEntryPoint())
             .accessDeniedHandler(accessDeniedHandler())
             .and()
+            .requiresChannel()
+            .anyRequest().requiresSecure()
+            .and()
             .addFilterAfter(jwtAuthenticationFilter(), SecurityContextPersistenceFilter.class);
 
     }
