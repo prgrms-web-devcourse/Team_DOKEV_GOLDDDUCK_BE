@@ -7,15 +7,15 @@ import java.time.ZonedDateTime;
 public class TimeUtil {
 
     public static LocalDateTime seoulTimeToUtc(LocalDateTime localDateTime) {
-        ZonedDateTime zonedDateTime1 = localDateTime.atZone(ZoneId.of("Asia/Seoul"));
-        ZonedDateTime utc = zonedDateTime1.withZoneSameInstant(ZoneId.of("UTC"));
-        return utc.toLocalDateTime();
+        ZonedDateTime seoulTime = localDateTime.atZone(ZoneId.of("Asia/Seoul"));
+        ZonedDateTime utcTime = seoulTime.withZoneSameInstant(ZoneId.of("UTC"));
+        return utcTime.toLocalDateTime();
     }
 
     public static LocalDateTime utcToSeoul(LocalDateTime localDateTime) {
-        ZonedDateTime zonedDateTime1 = localDateTime.atZone(ZoneId.of("UTC"));
-        ZonedDateTime utc = zonedDateTime1.withZoneSameInstant(ZoneId.of("Asia/Seoul"));
-        return utc.toLocalDateTime();
+        ZonedDateTime utcTime = localDateTime.atZone(ZoneId.of("UTC"));
+        ZonedDateTime seoulTime = utcTime.withZoneSameInstant(ZoneId.of("Asia/Seoul"));
+        return seoulTime.toLocalDateTime();
     }
 
 }
