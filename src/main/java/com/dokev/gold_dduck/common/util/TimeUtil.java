@@ -12,4 +12,10 @@ public class TimeUtil {
         return utc.toLocalDateTime();
     }
 
+    public static LocalDateTime utcToSeoul(LocalDateTime localDateTime){
+        ZonedDateTime zonedDateTime1 = localDateTime.atZone(ZoneId.of("UTC"));
+        ZonedDateTime utc = zonedDateTime1.withZoneSameInstant(ZoneId.of("Asia/Seoul"));
+        return utc.toLocalDateTime();
+    }
+
 }
