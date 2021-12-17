@@ -1,5 +1,6 @@
 package com.dokev.gold_dduck.event.converter;
 
+import com.dokev.gold_dduck.common.util.TimeUtil;
 import com.dokev.gold_dduck.event.domain.Event;
 import com.dokev.gold_dduck.event.domain.EventProgressStatus;
 import com.dokev.gold_dduck.event.dto.EventSaveDto;
@@ -8,6 +9,7 @@ import com.dokev.gold_dduck.event.dto.GiftSaveDto;
 import com.dokev.gold_dduck.gift.domain.Gift;
 import com.dokev.gold_dduck.gift.domain.GiftItem;
 import com.dokev.gold_dduck.member.domain.Member;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -22,10 +24,14 @@ public class EventSaveConverter {
         int giftItemCount = eventSaveRequest.getGifts().stream()
             .mapToInt(giftSaveDto -> giftSaveDto.getGiftItems().size())
             .sum();
+
+        LocalDateTime startAt = TimeUtil.seoulTimeToUtc(eventSaveRequest.getStartAt());
+        LocalDateTime endAt = TimeUtil.seoulTimeToUtc(eventSaveRequest.getEndAt());
+
         Event newEvent = Event.builder(eventSaveRequest.getTitle(),
                 eventSaveRequest.getGiftChoiceType(),
-                eventSaveRequest.getStartAt(),
-                eventSaveRequest.getEndAt(),
+                startAt,
+                endAt,
                 EventProgressStatus.READY,
                 eventSaveRequest.getMainTemplate(),
                 eventSaveRequest.getMaxParticipantCount(),
