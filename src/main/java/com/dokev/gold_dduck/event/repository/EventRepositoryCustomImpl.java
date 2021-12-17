@@ -26,7 +26,8 @@ public class EventRepositoryCustomImpl implements EventRepositoryCustom {
         Pageable pageable) {
         QueryResults<Event> eventQueryResults = queryFactory
             .selectFrom(event)
-            .where(memberEq(memberId), eventProgressStatusEq(eventSearchCondition.getEventProgressStatus()))
+            .where(memberEq(memberId), eventProgressStatusEq(eventSearchCondition.getEventProgressStatus()),
+                event.deletedAt.isNull())
             .orderBy(event.createdAt.desc())
             .offset(pageable.getOffset())
             .limit(pageable.getPageSize())
