@@ -6,7 +6,6 @@ import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
 
 import com.dokev.gold_dduck.common.exception.GiftBlankDrawnException;
-import com.dokev.gold_dduck.common.util.TimeUtil;
 import com.dokev.gold_dduck.event.domain.Event;
 import com.dokev.gold_dduck.event.domain.EventLog;
 import com.dokev.gold_dduck.event.repository.EventLogRepository;
@@ -23,7 +22,6 @@ import com.dokev.gold_dduck.gift.repository.GiftItemRepository;
 import com.dokev.gold_dduck.gift.repository.GiftRepository;
 import com.dokev.gold_dduck.member.domain.Member;
 import com.dokev.gold_dduck.member.repository.MemberRepository;
-import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
 import javax.persistence.EntityManager;
@@ -145,8 +143,5 @@ class GiftServiceTest {
         Assertions.assertThat(giftItemSearchDto.getSender()).isEqualTo(event.getMember().getName());
         Assertions.assertThat(giftItemSearchDto.getMainTemplate()).isEqualTo(event.getMainTemplate());
         Assertions.assertThat(giftItemSearchDto.getCategory()).isEqualTo(gift.getCategory());
-        Assertions.assertThat(giftItemSearchDto.getReceivedDate()).isEqualTo(TimeUtil.utcToSeoul(eventLog.getLastModifiedAt()).truncatedTo(
-            ChronoUnit.MILLIS).toString());
-
     }
 }
