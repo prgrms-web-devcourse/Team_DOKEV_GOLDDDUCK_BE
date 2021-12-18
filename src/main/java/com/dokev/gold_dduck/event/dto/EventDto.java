@@ -1,5 +1,6 @@
 package com.dokev.gold_dduck.event.dto;
 
+import com.dokev.gold_dduck.common.util.TimeUtil;
 import com.dokev.gold_dduck.event.domain.EventProgressStatus;
 import com.dokev.gold_dduck.event.domain.GiftChoiceType;
 import com.dokev.gold_dduck.gift.dto.GiftDto;
@@ -23,10 +24,10 @@ public class EventDto {
 
     private GiftChoiceType giftChoiceType;
 
-    @JsonFormat(shape = Shape.STRING, timezone = "Asia/Seoul")
+    @JsonFormat(shape = Shape.STRING)
     private LocalDateTime startAt;
 
-    @JsonFormat(shape = Shape.STRING, timezone = "Asia/Seoul")
+    @JsonFormat(shape = Shape.STRING)
     private LocalDateTime endAt;
 
     private UUID code;
@@ -48,8 +49,8 @@ public class EventDto {
         this.eventId = eventId;
         this.title = title;
         this.giftChoiceType = giftChoiceType;
-        this.startAt = startAt;
-        this.endAt = endAt;
+        this.startAt = TimeUtil.utcToSeoul(startAt);
+        this.endAt = TimeUtil.utcToSeoul(endAt);
         this.code = code;
         this.eventProgressStatus = eventProgressStatus;
         this.mainTemplate = mainTemplate;
