@@ -1,5 +1,6 @@
 package com.dokev.gold_dduck.event.dto;
 
+import com.dokev.gold_dduck.common.util.TimeUtil;
 import com.dokev.gold_dduck.event.domain.EventProgressStatus;
 import com.dokev.gold_dduck.event.domain.GiftChoiceType;
 import com.fasterxml.jackson.annotation.JsonFormat;
@@ -17,10 +18,10 @@ public class EventSimpleDto {
 
     private final GiftChoiceType giftChoiceType;
 
-    @JsonFormat(shape = Shape.STRING, timezone = "Asia/Seoul")
+    @JsonFormat(shape = Shape.STRING)
     private final LocalDateTime startAt;
 
-    @JsonFormat(shape = Shape.STRING, timezone = "Asia/Seoul")
+    @JsonFormat(shape = Shape.STRING)
     private final LocalDateTime endAt;
 
     private final UUID code;
@@ -31,7 +32,7 @@ public class EventSimpleDto {
 
     private final Integer maxParticipantCount;
 
-    @JsonFormat(shape = Shape.STRING, timezone = "Asia/Seoul")
+    @JsonFormat(shape = Shape.STRING)
     private final LocalDateTime createdAt;
 
     public EventSimpleDto(Long eventId, String title, GiftChoiceType giftChoiceType, LocalDateTime startAt,
@@ -40,12 +41,12 @@ public class EventSimpleDto {
         this.eventId = eventId;
         this.title = title;
         this.giftChoiceType = giftChoiceType;
-        this.startAt = startAt;
-        this.endAt = endAt;
+        this.startAt = TimeUtil.utcToSeoul(startAt);
+        this.endAt = TimeUtil.utcToSeoul(endAt);
         this.code = code;
         this.eventProgressStatus = eventProgressStatus;
         this.mainTemplate = mainTemplate;
         this.maxParticipantCount = maxParticipantCount;
-        this.createdAt = createdAt;
+        this.createdAt = TimeUtil.utcToSeoul(createdAt);
     }
 }

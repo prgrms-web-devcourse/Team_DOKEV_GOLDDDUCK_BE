@@ -1,6 +1,8 @@
 package com.dokev.gold_dduck.gift.dto;
 
+import com.dokev.gold_dduck.common.util.TimeUtil;
 import com.dokev.gold_dduck.gift.domain.GiftType;
+import java.time.LocalDateTime;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -23,10 +25,10 @@ public class GiftItemSearchDto {
 
     private String sender;
 
-    private String receivedDate;
+    private LocalDateTime receivedDate;
 
     public GiftItemSearchDto(Long id, GiftType giftType, String content, boolean used, String category,
-        String mainTemplate, String sender, String receivedDate) {
+        String mainTemplate, String sender, LocalDateTime receivedDate) {
         this.id = id;
         this.giftType = giftType;
         this.content = content;
@@ -34,6 +36,6 @@ public class GiftItemSearchDto {
         this.category = category;
         this.mainTemplate = mainTemplate;
         this.sender = sender;
-        this.receivedDate = receivedDate;
+        this.receivedDate = TimeUtil.utcToSeoul(receivedDate);
     }
 }

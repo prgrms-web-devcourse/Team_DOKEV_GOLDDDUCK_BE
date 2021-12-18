@@ -28,7 +28,6 @@ public class AwsS3Service {
         String fileName = directoryName + "/" + UUID.randomUUID() + "-" + file.getOriginalFilename();
 
         ObjectMetadata objectMetadata = new ObjectMetadata();
-        objectMetadata.setContentType(file.getContentType());
         objectMetadata.setContentLength(file.getBytes().length);
 
         amazonS3Client.putObject(new PutObjectRequest(bucket, fileName, file.getInputStream(), objectMetadata)

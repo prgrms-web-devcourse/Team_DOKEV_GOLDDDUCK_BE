@@ -43,6 +43,6 @@ public class GiftConverter {
 
         return new GiftItemSearchDto(giftItem.getId(), giftItem.getGiftType(), giftItem.getContent(), giftItem.isUsed(),
             gift.getCategory(), event.getMainTemplate(), event.getMember().getName()
-            , String.valueOf(eventLog.getLastModifiedAt()));
+            , eventLog.getCreatedAt());
     }
 }

@@ -20,7 +20,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Component
-@Profile("dev|local")
+@Profile("local")
 public class LocalTestDBInitializer implements ApplicationRunner {
 
     private final InitDBService initDBService;
