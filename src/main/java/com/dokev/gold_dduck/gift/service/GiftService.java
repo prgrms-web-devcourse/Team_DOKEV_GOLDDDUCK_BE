@@ -115,13 +115,9 @@ public class GiftService {
             GiftItem chosenGiftItem = giftItems.get(nextInt);
             chosenGiftItem.allocateMember(member);
             eventLogRepository.save(new EventLog(event, member, chosenGiftItem.getGift(), chosenGiftItem));
-            return giftConverter.convertToGiftItemDetailDto(
-                chosenGiftItem,
-                chosenGiftItem.getGift().getId(),
+            return giftConverter.convertToGiftItemDetailDto(chosenGiftItem, chosenGiftItem.getGift().getId(),
                 chosenGiftItem.getGift().getCategory(),
-                event.getMainTemplate(),
-                null
-            );
+                event.getMainTemplate(), null);
         } else {
             event.decreaseLeftBlankCount();
             eventLogRepository.save(new EventLog(event, member, null, null));
@@ -151,7 +147,7 @@ public class GiftService {
             GiftItemDetailDto chosenGiftItem = maybeGiftItem.get();
             eventLogRepository.save(
                 new EventLog(event, member, giftRepository.getById(chosenGiftItem.getGiftId()),
-                    giftItemRepository.getById(chosenGiftItem.getGiftItemId())));
+                    giftItemRepository.getById(chosenGiftItem.getId())));
             return chosenGiftItem;
         } else {
             event.decreaseLeftBlankCount();

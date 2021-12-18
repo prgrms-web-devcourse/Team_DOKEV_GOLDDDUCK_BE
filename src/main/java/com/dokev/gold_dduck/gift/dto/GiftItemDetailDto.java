@@ -9,7 +9,7 @@ import lombok.NoArgsConstructor;
 @Getter
 public class GiftItemDetailDto {
 
-    private Long giftItemId;
+    private Long id;
 
     private GiftType giftType;
 
@@ -25,16 +25,10 @@ public class GiftItemDetailDto {
 
     private String sender;
 
-    public GiftItemDetailDto(
-        Long giftItemId,
-        GiftType giftType,
-        String content,
-        boolean used,
-        Long giftId,
+    public GiftItemDetailDto(Long id, GiftType giftType, String content, boolean used, Long giftId,
         String category,
-        String mainTemplate, String sender
-    ) {
-        this.giftItemId = giftItemId;
+        String mainTemplate, String sender) {
+        this.id = id;
         this.giftType = giftType;
         this.content = content;
         this.used = used;
