@@ -8,7 +8,6 @@ import com.dokev.gold_dduck.gift.dto.GiftDto;
 import com.dokev.gold_dduck.gift.dto.GiftItemDetailDto;
 import com.dokev.gold_dduck.gift.dto.GiftItemDto;
 import com.dokev.gold_dduck.gift.dto.GiftItemSearchDto;
-import com.dokev.gold_dduck.member.domain.Member;
 import java.util.List;
 import java.util.stream.Collectors;
 import org.springframework.stereotype.Component;
@@ -30,9 +29,10 @@ public class GiftConverter {
             giftItem.isUsed());
     }
 
-    public GiftItemDetailDto convertToGiftItemDetailDto(GiftItem giftItem, String category, String mainTemplate) {
+    public GiftItemDetailDto convertToGiftItemDetailDto(GiftItem giftItem, String category, String mainTemplate,
+        String sender) {
         return new GiftItemDetailDto(giftItem.getId(), giftItem.getGiftType(), giftItem.getContent(),
-            giftItem.isUsed(), category, mainTemplate);
+            giftItem.isUsed(), category, mainTemplate, sender);
     }
 
     public GiftItemSearchDto convertToGiftItemSearchDto(GiftItem giftItem) {

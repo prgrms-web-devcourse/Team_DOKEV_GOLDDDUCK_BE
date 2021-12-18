@@ -116,7 +116,7 @@ public class GiftService {
             chosenGiftItem.allocateMember(member);
             eventLogRepository.save(new EventLog(event, member, chosenGiftItem.getGift(), chosenGiftItem));
             return giftConverter.convertToGiftItemDetailDto(chosenGiftItem, chosenGiftItem.getGift().getCategory(),
-                event.getMainTemplate());
+                event.getMainTemplate(), null);
         } else {
             event.decreaseLeftBlankCount();
             eventLogRepository.save(new EventLog(event, member, null, null));

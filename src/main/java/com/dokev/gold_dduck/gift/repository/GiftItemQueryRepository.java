@@ -4,6 +4,7 @@ import static com.dokev.gold_dduck.event.domain.QEvent.event;
 import static com.dokev.gold_dduck.event.domain.QEventLog.eventLog;
 import static com.dokev.gold_dduck.gift.domain.QGift.gift;
 import static com.dokev.gold_dduck.gift.domain.QGiftItem.giftItem;
+import static com.dokev.gold_dduck.member.domain.QMember.member;
 
 import com.dokev.gold_dduck.gift.dto.GiftItemDetailDto;
 import com.dokev.gold_dduck.gift.dto.GiftItemSearchCondition;
@@ -38,13 +39,15 @@ public class GiftItemQueryRepository {
                 giftItem.content,
                 giftItem.used,
                 gift.category,
-                event.mainTemplate
+                event.mainTemplate,
+                member.name.as("sender")
             ))
             .from(eventLog)
             .join(eventLog.giftItem, giftItem)
             .on(eventLog.member.id.eq(memberId))
             .join(giftItem.gift, gift)
             .join(eventLog.event, event)
+            .join(event.member, member)
             .where(usedEq(giftItemSearchCondition.getUsed()))
             .orderBy(eventLog.createdAt.desc())
             .offset(pageable.getOffset())
