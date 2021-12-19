@@ -1,5 +1,6 @@
 package com.dokev.gold_dduck.gift.dto;
 
+import com.dokev.gold_dduck.gift.domain.GiftItemRedis;
 import com.dokev.gold_dduck.gift.domain.GiftType;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -32,6 +33,18 @@ public class GiftItemDetailDto {
         this.giftType = giftType;
         this.content = content;
         this.used = used;
+        this.giftId = giftId;
+        this.category = category;
+        this.mainTemplate = mainTemplate;
+        this.sender = sender;
+    }
+
+    public GiftItemDetailDto(GiftItemRedis giftItemRedis, Long giftId, String category, String mainTemplate,
+        String sender) {
+        this.id = giftItemRedis.getGiftItemId();
+        this.giftType = giftItemRedis.getGiftType();
+        this.content = giftItemRedis.getContent();
+        this.used = giftItemRedis.isUsed();
         this.giftId = giftId;
         this.category = category;
         this.mainTemplate = mainTemplate;
