@@ -12,7 +12,7 @@ public enum ErrorCode {
     EVENT_CLOSED("E003", "종료된 이벤트 입니다."),
 
     GIFT_ALREADY_ALLOCATED("G001", "GiftItem(id=%d)은 이미 Member(id=%d)에게 할당된 선물입니다."),
-    GIFT_STOCK_OUT("G002", "선물의 재고가 전부 소진되었습니다."),
+    GIFT_STOCK_OUT("G002", "Gift(id=%d)의 GiftItem 재고가 전부 소진되었습니다."),
     GIFT_BLANK_DRAWN("G004", "꽝을 뽑았습니다."),
 
     INVALID_INPUT_VALUE("C004", "Invalid Input Value"),

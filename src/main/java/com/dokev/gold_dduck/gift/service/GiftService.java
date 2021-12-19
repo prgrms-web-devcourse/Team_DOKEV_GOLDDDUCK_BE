@@ -4,6 +4,7 @@ import com.dokev.gold_dduck.common.exception.EntityNotFoundException;
 import com.dokev.gold_dduck.common.exception.EventAlreadyParticipatedException;
 import com.dokev.gold_dduck.common.exception.EventClosedException;
 import com.dokev.gold_dduck.common.exception.GiftBlankDrawnException;
+import com.dokev.gold_dduck.common.exception.GiftStockOutException;
 import com.dokev.gold_dduck.common.exception.MemberGiftNotMatchedException;
 import com.dokev.gold_dduck.event.domain.Event;
 import com.dokev.gold_dduck.event.domain.EventLog;
@@ -97,7 +98,7 @@ public class GiftService {
         this.eventLogRedisRepository = eventLogRedisRepository;
     }
 
-    @Transactional(noRollbackFor = {EventClosedException.class})
+    @Transactional(noRollbackFor = {EventClosedException.class, GiftStockOutException.class})
     public GiftItemDto chooseGiftItemByFIFO(Long eventId, Long memberId, Long giftId) {
         Event event = eventRepository.findById(eventId)
             .orElseThrow(() -> new EntityNotFoundException(Event.class, eventId));
@@ -114,8 +115,7 @@ public class GiftService {
             chosenGiftItem.get().allocateMember(member);
             return giftConverter.convertToGiftItemDto(chosenGiftItem.get());
         }
-        event.closeEvent();
-        throw new EventClosedException();
+        throw new GiftStockOutException(giftId);
     }
 
     @Transactional(noRollbackFor = {EventClosedException.class, GiftBlankDrawnException.class})
