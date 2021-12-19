@@ -138,6 +138,10 @@ public class Event extends BaseEntity {
         member.getEvents().add(this);
     }
 
+    public void decreaseLeftGiftCount() {
+        this.leftGiftCount--;
+    }
+
     public void decreaseLeftBlankCount() {
         this.leftBlankCount--;
     }

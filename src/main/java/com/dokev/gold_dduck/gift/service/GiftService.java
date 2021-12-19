@@ -109,9 +109,14 @@ public class GiftService {
         Gift gift = giftRepository.findById(giftId)
             .orElseThrow(() -> new EntityNotFoundException(Gift.class, giftId));
 
+        if (event.getLeftGiftCount() <= 1) {
+            event.closeEvent();
+        }
+
         Optional<GiftItem> chosenGiftItem = findGiftItemByFIFO(giftId);
         eventLogRepository.save(new EventLog(event, member, gift, chosenGiftItem.orElse(null)));
         if (chosenGiftItem.isPresent()) {
+            event.decreaseLeftGiftCount();
             chosenGiftItem.get().allocateMember(member);
             return giftConverter.convertToGiftItemDto(chosenGiftItem.get());
         }
@@ -132,9 +137,8 @@ public class GiftService {
             .flatMap(gift -> gift.getGiftItems().stream())
             .collect(Collectors.toList());
 
-        if (giftItems.size() + leftBlankCount <= 0) {
+        if (giftItems.size() + leftBlankCount <= 1) {
             event.closeEvent();
-            throw new EventClosedException();
         }
 
         int nextInt = new Random().nextInt(leftBlankCount + giftItems.size());
