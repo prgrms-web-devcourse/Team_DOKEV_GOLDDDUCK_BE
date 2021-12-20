@@ -17,9 +17,9 @@ public class TestGiftFactory {
 
     public static List<GiftDto> createTestGiftDtos(List<GiftItemDto> giftItemDtos) {
         ArrayList<GiftDto> giftDtos = new ArrayList<>();
-        giftDtos.add(new GiftDto(1L, "category gift0", 3, giftItemDtos));
-        giftDtos.add(new GiftDto(2L, "category gift1", 3, giftItemDtos));
-        giftDtos.add(new GiftDto(3L, "category gift2", 3, giftItemDtos));
+        giftDtos.add(new GiftDto(1L, "category gift0", 3, false, giftItemDtos));
+        giftDtos.add(new GiftDto(2L, "category gift1", 3, false, giftItemDtos));
+        giftDtos.add(new GiftDto(3L, "category gift2", 3, false, giftItemDtos));
 
         return giftDtos;
     }

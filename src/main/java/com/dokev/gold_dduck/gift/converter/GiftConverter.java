@@ -20,8 +20,8 @@ public class GiftConverter {
         List<GiftItemDto> giftItemDtos = giftItems.stream()
             .map(this::convertToGiftItemDto)
             .collect(Collectors.toList());
-
-        return new GiftDto(gift.getId(), gift.getCategory(), giftItemDtos.size(), giftItemDtos);
+        boolean soldout = giftItems.stream().allMatch(giftItem -> giftItem.getMember() != null);
+        return new GiftDto(gift.getId(), gift.getCategory(), giftItemDtos.size(), soldout, giftItemDtos);
     }
 
     public GiftItemDto convertToGiftItemDto(GiftItem giftItem) {

@@ -15,12 +15,15 @@ public class GiftDto {
 
     private Integer itemCount;
 
+    private boolean soldOut;
+
     private List<GiftItemDto> giftItems;
 
-    public GiftDto(Long id, String category, Integer itemCount, List<GiftItemDto> giftItems) {
+    public GiftDto(Long id, String category, Integer itemCount, boolean soldOut, List<GiftItemDto> giftItems) {
         this.id = id;
         this.category = category;
         this.itemCount = itemCount;
+        this.soldOut = soldOut;
         this.giftItems = giftItems;
     }
 }
