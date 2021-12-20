@@ -170,8 +170,15 @@ public class Event extends BaseEntity {
     }
 
     public void renewStatus() {
-        if (startAt.isAfter(LocalDateTime.now())) {
-            eventProgressStatus = EventProgressStatus.READY;
+        if (this.eventProgressStatus == EventProgressStatus.CLOSED) {
+            return;
+        }
+        if (this.giftChoiceType == GiftChoiceType.FIFO && this.leftGiftCount <= 0) {
+            closeEvent();
+            return;
+        }
+        if (this.giftChoiceType == GiftChoiceType.RANDOM && this.leftGiftCount + this.leftBlankCount <= 0) {
+            closeEvent();
             return;
         }
         if (startAt.isEqual(LocalDateTime.now()) || (startAt.isBefore(LocalDateTime.now()) && endAt.isAfter(
