@@ -43,28 +43,31 @@ public class GiftController {
 
     @PostMapping("/v1/gifts/random")
     public ApiResponse<GiftItemDetailDto> chooseGiftItemByRandom(
-        @RequestBody @Validated GiftRandomChoiceDto giftRandomChoiceDto
+        @RequestBody @Valid GiftRandomChoiceDto giftRandomChoiceDto
     ) {
-        GiftItemDetailDto giftItemDto = giftService.chooseGiftItemByRandom(giftRandomChoiceDto.getEventId(),
+        GiftItemDetailDto giftItemDto = giftService.chooseGiftItemByRandom(
+            giftRandomChoiceDto.getEventId(),
             giftRandomChoiceDto.getMemberId());
         return ApiResponse.success(giftItemDto);
     }
 
     @PostMapping("/v2/gifts/random")
     public ApiResponse<GiftItemDetailDto> chooseGiftItemByRandomV2(
-        @RequestParam Long eventId,
-        @RequestParam Long memberId
+        @RequestBody @Valid GiftRandomChoiceDto giftRandomChoiceDto
     ) {
-        GiftItemDetailDto giftItemDto = giftService.chooseGiftItemByRandom2(eventId, memberId);
+        GiftItemDetailDto giftItemDto = giftService.chooseGiftItemByRandom2(
+            giftRandomChoiceDto.getEventId(),
+            giftRandomChoiceDto.getMemberId());
         return ApiResponse.success(giftItemDto);
     }
 
     @PostMapping("/v3/gifts/random")
     public ApiResponse<GiftItemSimpleDto> chooseGiftItemByRandomV3(
-        @RequestParam Long eventId,
-        @RequestParam Long memberId
+        @RequestBody @Valid GiftRandomChoiceDto giftRandomChoiceDto
     ) {
-        GiftItemSimpleDto giftItemDto = giftService.chooseGiftItemByRandom3(eventId, memberId);
+        GiftItemSimpleDto giftItemDto = giftService.chooseGiftItemByRandom3(
+            giftRandomChoiceDto.getEventId(),
+            giftRandomChoiceDto.getMemberId());
         return ApiResponse.success(giftItemDto);
     }
 
@@ -88,10 +91,17 @@ public class GiftController {
         return ApiResponse.success();
     }
 
+    @Deprecated
     @GetMapping("/v1/members/{memberId}/giftItems/{giftItemId}")
     public ApiResponse<GiftItemSearchDto> searchGiftItemById
         (@PathVariable Long memberId, @PathVariable Long giftItemId) {
-        GiftItemSearchDto giftItemSearchDto = giftService.searchGiftItem(giftItemId, memberId);
+        GiftItemSearchDto giftItemSearchDto = giftService.searchGiftItem(giftItemId);
+        return ApiResponse.success(giftItemSearchDto);
+    }
+
+    @GetMapping("/v2/giftItems/{giftItemId}")
+    public ApiResponse<GiftItemSearchDto> searchGiftItemByIdV2(@PathVariable Long giftItemId) {
+        GiftItemSearchDto giftItemSearchDto = giftService.searchGiftItem(giftItemId);
         return ApiResponse.success(giftItemSearchDto);
     }
 }
