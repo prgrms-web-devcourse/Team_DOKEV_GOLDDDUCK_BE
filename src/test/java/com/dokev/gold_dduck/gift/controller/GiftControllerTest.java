@@ -94,7 +94,7 @@ class GiftControllerTest {
     @DisplayName("선착순으로 선물 받기 실패 테스트 (잘못된 eventId)")
     void chooseGiftItemByFIFOFailureTest() throws Exception {
         //given
-        Long invalidEventId = 1L;
+        Long invalidEventId = -1L;
         GiftFifoChoiceDto giftFifoChoiceDto = new GiftFifoChoiceDto(invalidEventId, 1L, 1L);
         //when
         ResultActions result = mockMvc.perform(
@@ -218,8 +218,7 @@ class GiftControllerTest {
                 handler().handlerType(GiftController.class),
                 handler().methodName("chooseGiftItemByFIFO"),
                 jsonPath("$.success", is(false)),
-                jsonPath("$.error.code", is(ErrorCode.EVENT_CLOSED.getCode())),
-                jsonPath("$.error.message", containsString(ErrorCode.EVENT_CLOSED.getMessage()))
+                jsonPath("$.error.code", is(ErrorCode.GIFT_STOCK_OUT.getCode()))
             );
     }
 
