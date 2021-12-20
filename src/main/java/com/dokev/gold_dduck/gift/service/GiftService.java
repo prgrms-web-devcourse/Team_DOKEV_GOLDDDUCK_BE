@@ -8,14 +8,11 @@ import com.dokev.gold_dduck.common.exception.GiftStockOutException;
 import com.dokev.gold_dduck.common.exception.MemberGiftNotMatchedException;
 import com.dokev.gold_dduck.event.domain.Event;
 import com.dokev.gold_dduck.event.domain.EventLog;
-import com.dokev.gold_dduck.event.domain.EventLogRedis;
-import com.dokev.gold_dduck.event.repository.EventLogRedisRepository;
 import com.dokev.gold_dduck.event.repository.EventLogRepository;
 import com.dokev.gold_dduck.event.repository.EventRepository;
 import com.dokev.gold_dduck.gift.converter.GiftConverter;
 import com.dokev.gold_dduck.gift.domain.Gift;
 import com.dokev.gold_dduck.gift.domain.GiftItem;
-import com.dokev.gold_dduck.gift.domain.GiftItemRedis;
 import com.dokev.gold_dduck.gift.dto.GiftItemDetailDto;
 import com.dokev.gold_dduck.gift.dto.GiftItemDto;
 import com.dokev.gold_dduck.gift.dto.GiftItemListDto;
@@ -23,7 +20,6 @@ import com.dokev.gold_dduck.gift.dto.GiftItemSearchCondition;
 import com.dokev.gold_dduck.gift.dto.GiftItemSearchDto;
 import com.dokev.gold_dduck.gift.dto.GiftItemUpdateDto;
 import com.dokev.gold_dduck.gift.repository.GiftItemQueryRepository;
-import com.dokev.gold_dduck.gift.repository.GiftItemRedisRepository;
 import com.dokev.gold_dduck.gift.repository.GiftItemRepository;
 import com.dokev.gold_dduck.gift.repository.GiftRepository;
 import com.dokev.gold_dduck.member.domain.Member;
@@ -33,17 +29,10 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Random;
-import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
-import java.util.stream.StreamSupport;
 import lombok.extern.slf4j.Slf4j;
-import org.redisson.api.RLock;
-import org.redisson.api.RMap;
-import org.redisson.api.RReadWriteLock;
-import org.redisson.api.RedissonClient;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -66,14 +55,6 @@ public class GiftService {
 
     private final GiftConverter giftConverter;
 
-    private final RedisTemplate<String, Integer> redisTemplate;
-
-    private final RedissonClient redissonClient;
-
-    private final GiftItemRedisRepository giftItemRedisRepository;
-
-    private final EventLogRedisRepository eventLogRedisRepository;
-
     public GiftService(
         EventRepository eventRepository,
         GiftRepository giftRepository,
@@ -81,10 +62,8 @@ public class GiftService {
         MemberRepository memberRepository,
         EventLogRepository eventLogRepository,
         GiftItemQueryRepository giftItemQueryRepository,
-        GiftConverter giftConverter,
-        RedisTemplate redisTemplate, RedissonClient redissonClient,
-        GiftItemRedisRepository giftItemRedisRepository,
-        EventLogRedisRepository eventLogRedisRepository) {
+        GiftConverter giftConverter
+    ) {
         this.eventRepository = eventRepository;
         this.giftRepository = giftRepository;
         this.giftItemRepository = giftItemRepository;
@@ -92,10 +71,6 @@ public class GiftService {
         this.eventLogRepository = eventLogRepository;
         this.giftItemQueryRepository = giftItemQueryRepository;
         this.giftConverter = giftConverter;
-        this.redisTemplate = redisTemplate;
-        this.redissonClient = redissonClient;
-        this.giftItemRedisRepository = giftItemRedisRepository;
-        this.eventLogRedisRepository = eventLogRedisRepository;
     }
 
     @Transactional(noRollbackFor = {EventClosedException.class, GiftStockOutException.class})
@@ -109,13 +84,12 @@ public class GiftService {
         Gift gift = giftRepository.findById(giftId)
             .orElseThrow(() -> new EntityNotFoundException(Gift.class, giftId));
 
-        if (event.getLeftGiftCount() <= 1) {
-            event.closeEvent();
-        }
-
         Optional<GiftItem> chosenGiftItem = findGiftItemByFIFO(giftId);
         eventLogRepository.save(new EventLog(event, member, gift, chosenGiftItem.orElse(null)));
         if (chosenGiftItem.isPresent()) {
+            if (event.getLeftGiftCount() <= 1) {
+                event.closeEvent();
+            }
             event.decreaseLeftGiftCount();
             chosenGiftItem.get().allocateMember(member);
             return giftConverter.convertToGiftItemDto(chosenGiftItem.get());
@@ -156,7 +130,6 @@ public class GiftService {
         }
     }
 
-    //랜덤으로 선물받기 성능 개선 버전 (선물 총 개수 반정규화, 선물아이템 DTO 조회, 쿼리 수 감소)
     @Transactional(noRollbackFor = {EventClosedException.class, GiftBlankDrawnException.class})
     public GiftItemDetailDto chooseGiftItemByRandom2(Long eventId, Long memberId) {
         Event event = eventRepository.findByIdForUpdate(eventId)
@@ -184,90 +157,6 @@ public class GiftService {
             event.decreaseLeftBlankCount();
             eventLogRepository.save(new EventLog(event, member, null, null));
             throw new GiftBlankDrawnException();
-        }
-    }
-
-    @Transactional(noRollbackFor = {EventClosedException.class, GiftBlankDrawnException.class})
-    public GiftItemDetailDto chooseGiftItemByRandomWithRedis(Long eventId, Long memberId) {
-
-        Event event = eventRepository.findById(eventId)
-            .orElseThrow(() -> new EntityNotFoundException(Event.class, eventId));
-        event.validateEventRunning();
-        Member member = memberRepository.findByIdWithGroup(memberId)
-            .orElseThrow(() -> new EntityNotFoundException(Member.class, memberId));
-        checkAlreadyParticipatedMemberWithRedis(event, member);
-
-        RReadWriteLock eventLock = redissonClient.getReadWriteLock("eventLock:" + eventId);
-        RLock writeLock = eventLock.writeLock();
-        try {
-            boolean isLocked = writeLock.tryLock(2, 2, TimeUnit.SECONDS);
-
-            if (!isLocked) {
-                throw new IllegalStateException("락이 안걸렸음");
-            }
-            String eventMap = "map:" + event.getId();
-            String leftGiftCountKey = "leftGiftCount:" + event.getId();
-            String leftBlankCountKey = "leftBlankCount:" + event.getId();
-            String initializeGiftItemKey = "initializeGiftItem:" + event.getId();
-
-            RMap<String, Integer> map = redissonClient.getMap(eventMap);
-            map.fastPutIfAbsent(leftGiftCountKey, event.getLeftGiftCount());
-            map.fastPutIfAbsent(leftBlankCountKey, event.getLeftBlankCount());
-
-            Integer leftGiftCount = map.get(leftGiftCountKey);
-            Integer leftBlankCount = map.get(leftBlankCountKey);
-
-            int candidateCount = leftGiftCount + leftBlankCount;
-            if (candidateCount <= 0) {
-                event.closeEvent();
-                List<EventLogRedis> eventlogRedises = eventLogRedisRepository.findAllByEventId(eventId);
-                List<EventLog> eventLogs = eventlogRedises.stream()
-                    .map(er -> new EventLog(
-                        eventRepository.getById(er.getEventId()),
-                        memberRepository.getById(er.getMemberId()),
-                        er.getGiftId() == null ? null : giftRepository.getById(er.getGiftId()),
-                        er.getGiftItemId() == null ? null : giftItemRepository.getById(er.getGiftItemId())
-                    ))
-                    .collect(Collectors.toList());
-                eventLogRepository.saveAll(eventLogs);
-                eventLogRedisRepository.deleteAll(eventlogRedises);
-                map.remove(leftGiftCountKey);
-                map.remove(leftBlankCountKey);
-                map.remove(initializeGiftItemKey);
-                throw new EventClosedException();
-            }
-
-            map.fastPutIfAbsent(initializeGiftItemKey, 0);
-            if (map.get(initializeGiftItemKey) == 0) {
-                List<GiftItemRedis> giftItems = giftRepository.findByEventId(eventId).stream()
-                    .flatMap(gift -> gift.getGiftItems().stream())
-                    .map(GiftItemRedis::new)
-                    .collect(Collectors.toList());
-                giftItemRedisRepository.saveAll(giftItems);
-                map.put(initializeGiftItemKey, 1);
-            }
-
-            int offset = new Random().nextInt(candidateCount);
-            if (leftGiftCount > offset) {
-                GiftItemRedis chosenGiftItem = StreamSupport.stream(giftItemRedisRepository.findAll().spliterator(),
-                        false)
-                    .collect(Collectors.toList()).get(offset);
-                map.put(leftGiftCountKey, map.get(leftGiftCountKey) - 1);
-                giftItemRedisRepository.delete(chosenGiftItem);
-                eventLogRedisRepository.save(
-                    new EventLogRedis(eventId, memberId, chosenGiftItem.getGiftId(), chosenGiftItem.getGiftItemId()));
-                return new GiftItemDetailDto(chosenGiftItem, chosenGiftItem.getGiftId(), chosenGiftItem.getCategory(),
-                    event.getMainTemplate(), null);
-            } else {
-                map.put(leftBlankCountKey, map.get(leftBlankCountKey) - 1);
-                eventLogRedisRepository.save(
-                    new EventLogRedis(eventId, memberId, null, null));
-                throw new GiftBlankDrawnException();
-            }
-        } catch (InterruptedException e) {
-            throw new IllegalStateException();
-        } finally {
-            writeLock.unlock();
         }
     }
 
@@ -307,16 +196,6 @@ public class GiftService {
         }
     }
 
-    private void checkAlreadyParticipatedMemberWithRedis(Event event, Member member) {
-        if (RoleGroupType.of(member.getGroup().getName()) == RoleGroupType.ADMIN) {
-            return;
-        }
-        boolean alreadyParticipated = eventLogRedisRepository.existsByEventIdAndMemberId(event.getId(), member.getId());
-        if (alreadyParticipated) {
-            throw new EventAlreadyParticipatedException();
-        }
-    }
-
     private Optional<GiftItem> findGiftItemByFIFO(Long giftId) {
         List<GiftItem> chosenGiftItems = giftItemRepository.findByGiftIdWithPageForUpdate(giftId, Pageable.ofSize(1));
         return chosenGiftItems.isEmpty() ? Optional.empty() : Optional.of(chosenGiftItems.get(0));
@@ -331,17 +210,5 @@ public class GiftService {
         }
 
         return giftConverter.convertToGiftItemSearchDto(giftItem);
-    }
-
-    private void tryLock(Runnable runnable) {
-        RLock lock = redissonClient.getLock("gg");
-        try {
-            boolean isLocked = lock.tryLock(2, 2, TimeUnit.SECONDS);
-            runnable.run();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        } finally {
-            lock.unlock();
-        }
     }
 }
