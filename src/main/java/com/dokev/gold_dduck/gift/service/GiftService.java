@@ -235,14 +235,8 @@ public class GiftService {
         return chosenGiftItems.isEmpty() ? Optional.empty() : Optional.of(chosenGiftItems.get(0));
     }
 
-    public GiftItemSearchDto searchGiftItem(Long giftItemId, Long memberId) {
-        GiftItem giftItem = giftItemRepository.findByGiftIdWithMemberAndGift(giftItemId)
+    public GiftItemSearchDto searchGiftItem(Long giftItemId) {
+        return giftItemQueryRepository.findGiftItemDetailById(giftItemId)
             .orElseThrow(() -> new EntityNotFoundException(GiftItem.class, giftItemId));
-
-        if (!Objects.equals(giftItem.getMember().getId(), memberId)) {
-            throw new MemberGiftNotMatchedException(memberId, giftItemId);
-        }
-
-        return giftConverter.convertToGiftItemSearchDto(giftItem);
     }
 }

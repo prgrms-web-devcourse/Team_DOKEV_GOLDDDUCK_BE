@@ -18,12 +18,6 @@ public interface GiftItemRepository extends JpaRepository<GiftItem, Long> {
         + " where gl.gift.id = :giftId and gl.member is null")
     List<GiftItem> findByGiftIdWithPageForUpdate(@Param("giftId") Long giftId, Pageable pageable);
 
-    @Query("select distinct gi  from GiftItem gi"
-        + "  join fetch gi.gift"
-        + " join fetch gi.eventLog"
-        + " where gi.id = :giftItemId")
-    Optional<GiftItem> findByGiftIdWithMemberAndGift(@Param("giftItemId") Long giftItemId);
-
     @Modifying
     @Query("update GiftItem gi"
         + " set gi.member.id = :memberId"

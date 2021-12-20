@@ -4,13 +4,12 @@ import static com.dokev.gold_dduck.event.domain.QEvent.event;
 import static com.dokev.gold_dduck.event.domain.QEventLog.eventLog;
 import static com.dokev.gold_dduck.gift.domain.QGift.gift;
 import static com.dokev.gold_dduck.gift.domain.QGiftItem.giftItem;
-import static com.dokev.gold_dduck.member.domain.QMember.*;
 import static com.dokev.gold_dduck.member.domain.QMember.member;
 
 import com.dokev.gold_dduck.gift.dto.GiftItemDetailDto;
 import com.dokev.gold_dduck.gift.dto.GiftItemSearchCondition;
+import com.dokev.gold_dduck.gift.dto.GiftItemSearchDto;
 import com.dokev.gold_dduck.gift.dto.GiftItemSimpleDto;
-import com.dokev.gold_dduck.member.domain.QMember;
 import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQueryFactory;
@@ -69,6 +68,28 @@ public class GiftItemQueryRepository {
         return new PageImpl<>(content, pageable, total);
     }
 
+    public Optional<GiftItemSearchDto> findGiftItemDetailById(Long giftItemId) {
+        GiftItemSearchDto giftItemSearchDto = queryFactory
+            .select(Projections.fields(GiftItemSearchDto.class,
+                giftItem.id,
+                giftItem.giftType,
+                giftItem.content,
+                giftItem.used,
+                gift.category,
+                event.mainTemplate,
+                member.name.as("sender"),
+                eventLog.createdAt.as("receivedDate")
+            ))
+            .from(giftItem)
+            .join(giftItem.gift, gift)
+            .join(gift.event, event)
+            .join(event.member, member)
+            .leftJoin(eventLog).on(giftItem.id.eq(eventLog.giftItem.id))
+            .where(giftItem.id.eq(giftItemId))
+            .fetchOne();
+        return Optional.ofNullable(giftItemSearchDto);
+    }
+
     public Optional<GiftItemDetailDto> findDetailGiftItemByRandom(
         Long eventId,
         int offset
@@ -85,7 +106,7 @@ public class GiftItemQueryRepository {
                 event.member.name.as("sender")
             ))
             .from(gift)
-            .leftJoin(gift.giftItems, giftItem)
+            .join(gift.giftItems, giftItem)
             .on(gift.event.id.eq(eventId))
             .join(gift.event, event)
             .join(event.member, member)
