@@ -4,7 +4,7 @@ import com.dokev.gold_dduck.common.error.ErrorCode;
 
 public class GiftStockOutException extends BusinessException {
 
-    public GiftStockOutException() {
-        super(ErrorCode.GIFT_STOCK_OUT);
+    public GiftStockOutException(Long giftId) {
+        super(ErrorCode.GIFT_STOCK_OUT, giftId);
     }
 }

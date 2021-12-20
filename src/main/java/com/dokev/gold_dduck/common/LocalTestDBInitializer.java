@@ -56,6 +56,7 @@ public class LocalTestDBInitializer implements ApplicationRunner {
                 EventProgressStatus.RUNNING,
                 "template1",
                 5,
+                3,
                 2,
                 userMember
             ).build();
@@ -116,6 +117,7 @@ public class LocalTestDBInitializer implements ApplicationRunner {
                 EventProgressStatus.RUNNING,
                 "template2",
                 60,
+                6,
                 54,
                 adminMember
             ).build();
@@ -169,6 +171,7 @@ public class LocalTestDBInitializer implements ApplicationRunner {
                 EventProgressStatus.RUNNING,
                 "template1",
                 5,
+                3,
                 2,
                 createMember
             ).build();

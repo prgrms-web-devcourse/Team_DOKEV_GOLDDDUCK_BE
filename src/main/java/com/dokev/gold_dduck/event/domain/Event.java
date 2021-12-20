@@ -69,6 +69,9 @@ public class Event extends BaseEntity {
     @Column(name = "max_participant_count", nullable = false)
     private Integer maxParticipantCount;
 
+    @Column(name = "left_gift_count", nullable = false)
+    private Integer leftGiftCount;
+
     @Column(name = "left_blank_count", nullable = false)
     private Integer leftBlankCount;
 
@@ -83,7 +86,7 @@ public class Event extends BaseEntity {
     private Event(
         String title, GiftChoiceType giftChoiceType, LocalDateTime startAt, LocalDateTime endAt, UUID code,
         EventProgressStatus eventProgressStatus, String mainTemplate, Integer maxParticipantCount,
-        Integer leftBlankCount, Member member
+        Integer leftGiftCount, Integer leftBlankCount, Member member
     ) {
         this.title = title;
         this.giftChoiceType = giftChoiceType;
@@ -93,6 +96,7 @@ public class Event extends BaseEntity {
         this.eventProgressStatus = eventProgressStatus;
         this.mainTemplate = mainTemplate;
         this.maxParticipantCount = maxParticipantCount;
+        this.leftGiftCount = leftGiftCount;
         this.leftBlankCount = leftBlankCount;
         this.member = member;
     }
@@ -100,7 +104,7 @@ public class Event extends BaseEntity {
     public static EventBuilder builder(
         String title, GiftChoiceType giftChoiceType, LocalDateTime startAt, LocalDateTime endAt,
         EventProgressStatus eventProgressStatus, String mainTemplate, Integer maxParticipantCount,
-        Integer leftBlankCount, Member member
+        Integer leftGiftCount, Integer leftBlankCount, Member member
     ) {
         Objects.requireNonNull(giftChoiceType, "이벤트에서 선물 받을 방법을 선택해야 합니다.");
         Objects.requireNonNull(startAt, "이벤트 시작 시간은 notnull이어야 합니다.");
@@ -109,6 +113,7 @@ public class Event extends BaseEntity {
         Objects.requireNonNull(mainTemplate, "이벤트 대표 이미지 타입은 notnull이어야 합니다.");
         Objects.requireNonNull(maxParticipantCount, "이벤트 최대 참가자 수는 notnull이어야 합니다.");
         Objects.requireNonNull(leftBlankCount, "남은 꽝 개수는 notnull이어야 합니다.");
+        Objects.requireNonNull(leftBlankCount, "남은 선물 개수는 notnull이어야 합니다.");
         Objects.requireNonNull(member, "이벤트 생성자는 notnull이어야 합니다.");
 
         return eventInternalBuilder()
@@ -120,6 +125,7 @@ public class Event extends BaseEntity {
             .eventProgressStatus(eventProgressStatus)
             .mainTemplate(mainTemplate)
             .maxParticipantCount(maxParticipantCount)
+            .leftGiftCount(leftGiftCount)
             .leftBlankCount(leftBlankCount)
             .member(member);
     }
@@ -130,6 +136,10 @@ public class Event extends BaseEntity {
         }
         this.member = member;
         member.getEvents().add(this);
+    }
+
+    public void decreaseLeftGiftCount() {
+        this.leftGiftCount--;
     }
 
     public void decreaseLeftBlankCount() {

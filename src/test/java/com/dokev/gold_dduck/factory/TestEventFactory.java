@@ -33,7 +33,8 @@ public class TestEventFactory {
             EventProgressStatus.READY,
             "template1",
             60,
-            60,
+            9,
+            51,
             member);
     }
 

@@ -20,8 +20,8 @@ public class GiftConverter {
         List<GiftItemDto> giftItemDtos = giftItems.stream()
             .map(this::convertToGiftItemDto)
             .collect(Collectors.toList());
-
-        return new GiftDto(gift.getId(), gift.getCategory(), giftItemDtos.size(), giftItemDtos);
+        boolean soldout = giftItems.stream().allMatch(giftItem -> giftItem.getMember() != null);
+        return new GiftDto(gift.getId(), gift.getCategory(), giftItemDtos.size(), soldout, giftItemDtos);
     }
 
     public GiftItemDto convertToGiftItemDto(GiftItem giftItem) {
@@ -29,10 +29,10 @@ public class GiftConverter {
             giftItem.isUsed());
     }
 
-    public GiftItemDetailDto convertToGiftItemDetailDto(GiftItem giftItem, String category, String mainTemplate,
+    public GiftItemDetailDto convertToGiftItemDetailDto(GiftItem giftItem, Long giftId, String category, String mainTemplate,
         String sender) {
         return new GiftItemDetailDto(giftItem.getId(), giftItem.getGiftType(), giftItem.getContent(),
-            giftItem.isUsed(), category, mainTemplate, sender);
+            giftItem.isUsed(), giftId, category, mainTemplate, sender);
     }
 
     public GiftItemSearchDto convertToGiftItemSearchDto(GiftItem giftItem) {

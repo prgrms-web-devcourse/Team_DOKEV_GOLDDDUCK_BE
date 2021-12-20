@@ -54,7 +54,7 @@ public class GiftItem extends BaseEntity {
     @JoinColumn(name = "member_id")
     private Member member;
 
-    @OneToOne(mappedBy = "giftItem")
+    @OneToOne(mappedBy = "giftItem", fetch = FetchType.LAZY)
     private EventLog eventLog;
 
     public GiftItem(GiftType giftType, String content, boolean used) {

@@ -35,6 +35,7 @@ public class EventSaveConverter {
                 EventProgressStatus.READY,
                 eventSaveRequest.getMainTemplate(),
                 eventSaveRequest.getMaxParticipantCount(),
+                giftItemCount,
                 eventSaveRequest.getMaxParticipantCount() - giftItemCount,
                 member)
             .code(UUID.randomUUID())

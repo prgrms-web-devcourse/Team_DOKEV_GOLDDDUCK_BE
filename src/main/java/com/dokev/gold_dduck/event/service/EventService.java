@@ -94,6 +94,7 @@ public class EventService {
         }
     }
 
+    @Transactional
     public EventSimpleListDto searchSimpleDescByMember(
         Long memberId,
         EventSearchCondition eventSearchCondition,
@@ -102,7 +103,9 @@ public class EventService {
         if (!memberRepository.existsById(memberId)) {
             throw new EntityNotFoundException(Member.class, memberId);
         }
-        Page<EventSimpleDto> page = eventRepository.searchSimpleDescByMember(memberId, eventSearchCondition, pageable)
+        Page<Event> events = eventRepository.searchSimpleDescByMember(memberId, eventSearchCondition, pageable);
+        events.forEach(Event::renewStatus);
+        Page<EventSimpleDto> page = events
             .map(eventFindConverter::convertToEventSimpleDto);
         return new EventSimpleListDto(page);
     }
