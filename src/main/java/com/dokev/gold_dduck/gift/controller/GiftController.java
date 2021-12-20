@@ -7,6 +7,7 @@ import com.dokev.gold_dduck.gift.dto.GiftItemDto;
 import com.dokev.gold_dduck.gift.dto.GiftItemListDto;
 import com.dokev.gold_dduck.gift.dto.GiftItemSearchCondition;
 import com.dokev.gold_dduck.gift.dto.GiftItemSearchDto;
+import com.dokev.gold_dduck.gift.dto.GiftItemSimpleDto;
 import com.dokev.gold_dduck.gift.dto.GiftItemUpdateDto;
 import com.dokev.gold_dduck.gift.dto.GiftRandomChoiceDto;
 import com.dokev.gold_dduck.gift.service.GiftService;
@@ -46,6 +47,24 @@ public class GiftController {
     ) {
         GiftItemDetailDto giftItemDto = giftService.chooseGiftItemByRandom(giftRandomChoiceDto.getEventId(),
             giftRandomChoiceDto.getMemberId());
+        return ApiResponse.success(giftItemDto);
+    }
+
+    @PostMapping("/v2/gifts/random")
+    public ApiResponse<GiftItemDetailDto> chooseGiftItemByRandomV2(
+        @RequestParam Long eventId,
+        @RequestParam Long memberId
+    ) {
+        GiftItemDetailDto giftItemDto = giftService.chooseGiftItemByRandom2(eventId, memberId);
+        return ApiResponse.success(giftItemDto);
+    }
+
+    @PostMapping("/v3/gifts/random")
+    public ApiResponse<GiftItemSimpleDto> chooseGiftItemByRandomV3(
+        @RequestParam Long eventId,
+        @RequestParam Long memberId
+    ) {
+        GiftItemSimpleDto giftItemDto = giftService.chooseGiftItemByRandom3(eventId, memberId);
         return ApiResponse.success(giftItemDto);
     }
 

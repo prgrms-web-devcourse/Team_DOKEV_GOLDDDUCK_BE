@@ -103,13 +103,13 @@ public class GiftItemQueryRepository {
     ) {
         List<GiftItemSimpleDto> content = queryFactory
             .select(Projections.fields(GiftItemSimpleDto.class,
-                giftItem.id.as("giftItemId")
+                giftItem.id.as("giftItemId"),
+                gift.id.as("giftId")
             ))
             .from(gift)
-            .leftJoin(gift.giftItems, giftItem)
+            .join(gift.giftItems, giftItem)
             .on(gift.event.id.eq(eventId))
-            .leftJoin(eventLog)
-            .on(eventLog.giftItem.isNull())
+            .where(giftItem.member.isNull())
             .offset(offset)
             .limit(1)
             .fetch();

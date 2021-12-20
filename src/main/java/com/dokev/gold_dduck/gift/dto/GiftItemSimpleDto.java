@@ -1,6 +1,5 @@
 package com.dokev.gold_dduck.gift.dto;
 
-import com.dokev.gold_dduck.gift.domain.GiftType;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -11,7 +10,10 @@ public class GiftItemSimpleDto {
 
     private Long giftItemId;
 
-    public GiftItemSimpleDto(Long giftItemId) {
+    private Long giftId;
+
+    public GiftItemSimpleDto(Long giftItemId, Long giftId) {
         this.giftItemId = giftItemId;
+        this.giftId = giftId;
     }
 }
