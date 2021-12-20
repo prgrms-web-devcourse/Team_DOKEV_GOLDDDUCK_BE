@@ -138,7 +138,7 @@ class GiftServiceTest {
         EventLog eventLog = new EventLog(event, user, gift, giftItem);
         eventLogRepository.save(eventLog);
 
-        GiftItemSearchDto giftItemSearchDto = sut.searchGiftItem(giftItem.getId(), user.getId());
+        GiftItemSearchDto giftItemSearchDto = sut.searchGiftItem(giftItem.getId());
 
         Assertions.assertThat(giftItemSearchDto.getSender()).isEqualTo(event.getMember().getName());
         Assertions.assertThat(giftItemSearchDto.getMainTemplate()).isEqualTo(event.getMainTemplate());

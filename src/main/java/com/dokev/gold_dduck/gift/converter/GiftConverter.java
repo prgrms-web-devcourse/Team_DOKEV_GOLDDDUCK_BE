@@ -34,14 +34,4 @@ public class GiftConverter {
         return new GiftItemDetailDto(giftItem.getId(), giftItem.getGiftType(), giftItem.getContent(),
             giftItem.isUsed(), giftId, category, mainTemplate, sender);
     }
-
-    public GiftItemSearchDto convertToGiftItemSearchDto(GiftItem giftItem) {
-        Gift gift = giftItem.getGift();
-        Event event = giftItem.getGift().getEvent();
-        EventLog eventLog = giftItem.getEventLog();
-
-        return new GiftItemSearchDto(giftItem.getId(), giftItem.getGiftType(), giftItem.getContent(), giftItem.isUsed(),
-            gift.getCategory(), event.getMainTemplate(), event.getMember().getName()
-            , eventLog.getCreatedAt());
-    }
 }

@@ -54,9 +54,6 @@ public class GiftItem extends BaseEntity {
     @JoinColumn(name = "member_id")
     private Member member;
 
-    @OneToOne(mappedBy = "giftItem", fetch = FetchType.LAZY)
-    private EventLog eventLog;
-
     public GiftItem(GiftType giftType, String content, boolean used) {
         Objects.requireNonNull(giftType, "선물 유형은 notnull이어야 합니다.");
         Objects.requireNonNull(content, "선물 내용은 notnull이어야 합니다.");
