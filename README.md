@@ -228,3 +228,7 @@ User : Group : Role 구조 채택
 ### https
 
 https 및 도메인 적용
+
+
+# ⚡API
+[API-SPEC.md](API-SPEC.md) 참고
