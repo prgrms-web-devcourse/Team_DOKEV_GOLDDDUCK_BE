@@ -152,7 +152,7 @@
 - `지라 1 티켓 = 1PR 원칙`
 - 티켓 마다 feature 브랜치를 생성하고 develop으로 PR
 - feature 네이밍은 `feature/{티켓번호}`
-ex) feature/GD-01
+  ex) feature/GD-01
 - 티켓 단위는 최대한 작게
 - `Merge시 Squash`를 하거나 PR을 올릴때 로컬에서 Squash를 수행해서 commit graph를 최대한 단순하게 유지
 
@@ -176,13 +176,13 @@ ex) feature/GD-01
 ## GitHub 컨벤션
 
 - PR로만 merge 가능 + 리뷰 approval이 2개 이상이여야만 merge 승인
-    
-    ![https://user-images.githubusercontent.com/49011919/140630372-2f07e682-ea73-4137-b939-e8c758c70d47.PNG](https://user-images.githubusercontent.com/49011919/140630372-2f07e682-ea73-4137-b939-e8c758c70d47.PNG)
-    
+
+  ![https://user-images.githubusercontent.com/49011919/140630372-2f07e682-ea73-4137-b939-e8c758c70d47.PNG](https://user-images.githubusercontent.com/49011919/140630372-2f07e682-ea73-4137-b939-e8c758c70d47.PNG)
+
 - 테스트를 모두 통과해야 merge가 가능 + 최신 상태의 develop 브랜치에만 merge 가능
-    
-    ![https://user-images.githubusercontent.com/49011919/140630396-fd4bcbfd-10a6-41f3-9749-22a980249b5b.PNG](https://user-images.githubusercontent.com/49011919/140630396-fd4bcbfd-10a6-41f3-9749-22a980249b5b.PNG)
-    
+
+  ![https://user-images.githubusercontent.com/49011919/140630396-fd4bcbfd-10a6-41f3-9749-22a980249b5b.PNG](https://user-images.githubusercontent.com/49011919/140630396-fd4bcbfd-10a6-41f3-9749-22a980249b5b.PNG)
+
 
 ## Jira 컨벤션
 
@@ -231,4 +231,4 @@ https 및 도메인 적용
 
 
 # ⚡API
-[API-SPEC.md](API-SPEC.md) 참고
+[참고 링크](https://www.notion.so/API-4f67bb18e01142e09327f78d4d9fe389) 
