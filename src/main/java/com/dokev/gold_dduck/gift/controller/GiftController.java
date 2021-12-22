@@ -41,6 +41,13 @@ public class GiftController {
         return ApiResponse.success(giftItemDto);
     }
 
+    @PostMapping("/v2/gifts/fifo")
+    public ApiResponse<GiftItemDto> chooseGiftItemByFIFOV2(@RequestBody @Validated GiftFifoChoiceDto giftFifoChoiceDto) {
+        GiftItemDto giftItemDto = giftService.chooseGiftItemByFIFOV2(giftFifoChoiceDto.getEventId(),
+            giftFifoChoiceDto.getMemberId(), giftFifoChoiceDto.getGiftId());
+        return ApiResponse.success(giftItemDto);
+    }
+
     @PostMapping("/v1/gifts/random")
     public ApiResponse<GiftItemDetailDto> chooseGiftItemByRandom(
         @RequestBody @Valid GiftRandomChoiceDto giftRandomChoiceDto

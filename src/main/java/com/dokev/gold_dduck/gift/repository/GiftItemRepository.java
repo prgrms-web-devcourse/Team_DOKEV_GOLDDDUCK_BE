@@ -13,10 +13,9 @@ import org.springframework.data.repository.query.Param;
 
 public interface GiftItemRepository extends JpaRepository<GiftItem, Long> {
 
-    @Lock(LockModeType.PESSIMISTIC_WRITE)
     @Query("select gl from GiftItem gl"
         + " where gl.gift.id = :giftId and gl.member is null")
-    List<GiftItem> findByGiftIdWithPageForUpdate(@Param("giftId") Long giftId, Pageable pageable);
+    List<GiftItem> findByGiftIdWithPage(@Param("giftId") Long giftId, Pageable pageable);
 
     @Modifying
     @Query("update GiftItem gi"
