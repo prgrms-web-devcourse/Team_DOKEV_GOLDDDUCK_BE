@@ -76,7 +76,7 @@ public class GiftService {
 
     @Transactional(noRollbackFor = {EventClosedException.class, GiftStockOutException.class})
     public GiftItemDto chooseGiftItemByFIFO(Long eventId, Long memberId, Long giftId) {
-        Event event = eventRepository.findById(eventId)
+        Event event = eventRepository.findByIdForUpdate(eventId)
             .orElseThrow(() -> new EntityNotFoundException(Event.class, eventId));
         event.validateEventRunning();
         Member member = memberRepository.findByIdWithGroup(memberId)
@@ -93,6 +93,30 @@ public class GiftService {
             }
             event.decreaseLeftGiftCount();
             chosenGiftItem.get().allocateMember(member);
+            return giftConverter.convertToGiftItemDto(chosenGiftItem.get());
+        }
+        throw new GiftStockOutException(giftId);
+    }
+
+    @Transactional(noRollbackFor = {EventClosedException.class, GiftStockOutException.class})
+    public GiftItemDto chooseGiftItemByFIFOV2(Long eventId, Long memberId, Long giftId) {
+        Event event = eventRepository.findByIdForUpdate(eventId)
+            .orElseThrow(() -> new EntityNotFoundException(Event.class, eventId));
+        event.validateEventRunning();
+        Member member = memberRepository.findByIdWithGroup(memberId)
+            .orElseThrow(() -> new EntityNotFoundException(Member.class, memberId));
+        checkAlreadyParticipatedMember(event, member);
+        Gift gift = giftRepository.findById(giftId)
+            .orElseThrow(() -> new EntityNotFoundException(Gift.class, giftId));
+
+        Optional<GiftItem> chosenGiftItem = findGiftItemByFIFO(giftId);
+        if (chosenGiftItem.isPresent()) {
+            if (event.getLeftGiftCount() <= 1) {
+                event.closeEvent();
+            }
+            event.decreaseLeftGiftCount();
+            chosenGiftItem.get().allocateMember(member);
+            eventLogRepository.save(new EventLog(event, member, gift, chosenGiftItem.get()));
             return giftConverter.convertToGiftItemDto(chosenGiftItem.get());
         }
         throw new GiftStockOutException(giftId);
@@ -231,7 +255,7 @@ public class GiftService {
     }
 
     private Optional<GiftItem> findGiftItemByFIFO(Long giftId) {
-        List<GiftItem> chosenGiftItems = giftItemRepository.findByGiftIdWithPageForUpdate(giftId, Pageable.ofSize(1));
+        List<GiftItem> chosenGiftItems = giftItemRepository.findByGiftIdWithPage(giftId, Pageable.ofSize(1));
         return chosenGiftItems.isEmpty() ? Optional.empty() : Optional.of(chosenGiftItems.get(0));
     }
 
