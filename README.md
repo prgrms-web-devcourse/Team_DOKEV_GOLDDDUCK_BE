@@ -45,10 +45,6 @@
 
 ![https://user-images.githubusercontent.com/49011919/146876270-31cf7f27-5507-43f2-8afe-278236473b30.png](https://user-images.githubusercontent.com/49011919/146876270-31cf7f27-5507-43f2-8afe-278236473b30.png)
 
-# 🏗️ 프로젝트 구조
-
-![https://user-images.githubusercontent.com/49011919/146668046-0d58d47d-b21f-4cfe-8148-74c7757245a8.png](https://user-images.githubusercontent.com/49011919/146668046-0d58d47d-b21f-4cfe-8148-74c7757245a8.png)
-
 <br>
 
 **Spring boot**
@@ -65,7 +61,7 @@
 
 **EC2**
 
-교육 과정에서 배운 **AWS** 클라우드 서비스를 적극 사용하여 백엔드 서버는 **EC2**로 구축하고 EC2위에 **docker**를 구동시켜서 **EC2 경량화**를 시도했고 **Spring Boot** 서버와 **Redis**가 동작하도록 했습니다.
+교육 과정에서 배운 **AWS** 클라우드 서비스를 적극 사용하여 백엔드 서버는 **EC2**로 구축하고 EC2위에 **docker**를 구동시켜서 **EC2 경량화**를 했습니다.
 
 또한 선물 이미지를 저장하기 위해 AWS의 S3를 사용하여 이미지를 저장하고 받아오도록 했습니다.
 
@@ -75,7 +71,7 @@
 
 데이터베이스는 **MySQL**을 사용하였고 **AWS의 RDS**를 사용하여 **MySQL Server**를 구축하였습니다.
 
-동시성 처리를 위해서는 DB의 트랜잭션을 최소화할 필요가 있었고 이를 위해 **Redis 서버**를 구축하여 메모리 기반의 빠른 처리를 유도 했습니다.
+동시성 처리를 위해서는 DB의 lock을 사용하여 동시성을 제어했습니다.
 
 <br>
 
